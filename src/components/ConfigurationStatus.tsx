@@ -148,7 +148,7 @@ export default function ConfigurationStatus() {
                     <p className="font-medium">Kurulum için gerekli adımlar:</p>
                     <ol className="list-decimal list-inside space-y-1 text-xs">
                       <li>.env.local dosyasını oluşturun</li>
-                      <li>Telegram Bot token ve chat ID'sini ekleyin</li>
+                      <li>Telegram Bot token ve chat ID&apos;sini ekleyin</li>
                       <li>Google Service Account bilgilerini ekleyin</li>
                       <li>Sayfayı yenileyin</li>
                     </ol>

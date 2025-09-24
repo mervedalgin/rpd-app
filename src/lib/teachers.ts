@@ -3,10 +3,20 @@ import path from 'path';
 import { getSinifSubeList } from '@/lib/data';
 import { loadTeachersFromStore, saveTeachersToStore } from './teachersStore';
 
+// Type definitions
+interface TeacherData {
+  [key: string]: unknown;
+}
+
 // Lazy import xlsx only if available to avoid build crashes when missing
-let XLSX: any = null;
+/* eslint-disable @typescript-eslint/no-require-imports */
+let XLSX: {
+  readFile: (path: string) => { SheetNames: string[], Sheets: Record<string, unknown> };
+  utils: {
+    sheet_to_json: (sheet: unknown, opts?: Record<string, unknown>) => TeacherData[];
+  };
+} | null = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   XLSX = require('xlsx');
 } catch {
   XLSX = null;
@@ -58,7 +68,7 @@ export function loadTeachersFromExcel(): TeacherRecord[] {
     return [];
   }
 
-  let rows: any[] = [];
+  let rows: TeacherData[] = [];
   try {
     const wb = XLSX.readFile(filePath);
     const sheet = wb.Sheets[wb.SheetNames[0]];

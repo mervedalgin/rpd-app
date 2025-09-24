@@ -1,5 +1,3 @@
-import { YonlendirilenOgrenci } from '@/types';
-
 // Telegram Bot API integration
 export async function sendTelegramMessage(messages: string[]): Promise<boolean> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;

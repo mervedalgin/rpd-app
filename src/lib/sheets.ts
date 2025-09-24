@@ -1,4 +1,4 @@
-import { google, sheets_v4 } from 'googleapis';
+import { google } from 'googleapis';
 import { YonlendirilenOgrenci } from '@/types';
 
 export async function writeToGoogleSheets(students: YonlendirilenOgrenci[]): Promise<boolean> {
@@ -60,7 +60,7 @@ export async function writeToGoogleSheets(students: YonlendirilenOgrenci[]): Pro
 
     // Try to get existing data to check if headers exist
     const sheetTitle = (process.env.SHEETS_RANGE?.split('!')[0]) || 'Sayfa1';
-    let headerRange = `${sheetTitle}!A1:G1`;
+    const headerRange = `${sheetTitle}!A1:G1`;
     try {
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetsId,
@@ -78,7 +78,7 @@ export async function writeToGoogleSheets(students: YonlendirilenOgrenci[]): Pro
           },
         });
       }
-    } catch (error) {
+    } catch {
       // Sheet doesn't exist, create it
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId: sheetsId,
