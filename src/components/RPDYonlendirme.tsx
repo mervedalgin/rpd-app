@@ -31,6 +31,7 @@ export default function RPDYonlendirme() {
   const [yonlendirilenOgrenciler, setYonlendirilenOgrenciler] = useState<YonlendirilenOgrenci[]>([]);
   const [loading, setLoading] = useState(true);
   const [ogrenciLoading, setOgrenciLoading] = useState(false);
+  const [sendingLoading, setSendingLoading] = useState(false);
   const [teacherOptions, setTeacherOptions] = useState<{ value: string; label: string; sinifSubeKey: string; sinifSubeDisplay: string }[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -100,7 +101,7 @@ export default function RPDYonlendirme() {
     }
     const sinifSubeText = sinifSubeList.find(s => s.value === values.sinifSube)?.text || "";
     const ogrenciAdi = ogrenciList.find(o => o.value === values.ogrenci)?.text || "";
-    
+
     // Her seçilen neden için ayrı bir öğrenci entry'si oluştur
     const yeniOgrenciler: YonlendirilenOgrenci[] = values.yonlendirmeNedenleri.map(neden => ({
       id: `${Date.now()}-${Math.random()}-${neden}`,
@@ -113,11 +114,11 @@ export default function RPDYonlendirme() {
     }));
 
     setYonlendirilenOgrenciler(prev => [...prev, ...yeniOgrenciler]);
-    
+
     // Formu kısmen sıfırla (öğretmen adı ve öğrenci seçimi korunur)
     form.setValue("yonlendirmeNedenleri", []);
     form.setValue("not", "");
-    
+
     toast.success(`${ogrenciAdi} ${values.yonlendirmeNedenleri.length} farklı nedenle başarıyla eklendi`);
   };
 
@@ -131,6 +132,14 @@ export default function RPDYonlendirme() {
       toast.error("Yönlendirilecek öğrenci bulunmuyor");
       return;
     }
+
+    // Çoklu gönderim engellemek için loading state'i kontrol et
+    if (sendingLoading) {
+      toast.warning("Gönderim devam ediyor, lütfen bekleyin...");
+      return;
+    }
+
+    setSendingLoading(true);
 
     try {
       const response = await fetch('/api/send-guidance', {
@@ -151,7 +160,7 @@ export default function RPDYonlendirme() {
         } else {
           toast.error("❌ Gönderim başarısız: " + result.message);
         }
-        
+
         // Only clear the list if at least one integration succeeded
         if (result.telegram || result.sheets) {
           setYonlendirilenOgrenciler([]);
@@ -162,6 +171,8 @@ export default function RPDYonlendirme() {
     } catch (error) {
       console.error('Gönderim hatası:', error);
       toast.error("❌ Gönderim sırasında hata oluştu");
+    } finally {
+      setSendingLoading(false);
     }
   };
 
@@ -170,12 +181,12 @@ export default function RPDYonlendirme() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         </div>
         <div className="text-center relative z-10">
           <div className="relative">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
-            <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-transparent via-white to-transparent mx-auto" style={{animationDuration: '1s'}}></div>
+            <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-transparent via-white to-transparent mx-auto" style={{ animationDuration: '1s' }}></div>
           </div>
           <p className="text-xl font-medium bg-gradient-to-r from-gray-700 to-blue-600 bg-clip-text text-transparent animate-pulse">Veriler yükleniyor...</p>
         </div>
@@ -188,8 +199,8 @@ export default function RPDYonlendirme() {
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-emerald-400/10 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-emerald-400/10 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
       <div className="container mx-auto px-3 md:px-4 py-4 md:py-8 max-w-7xl relative z-10">
         {/* Header */}
@@ -349,11 +360,10 @@ export default function RPDYonlendirme() {
                                   }}
                                   className="sr-only"
                                 />
-                                <div className={`w-5 h-5 md:w-6 md:h-6 rounded border-2 transition-all duration-300 cursor-pointer flex items-center justify-center ${
-                                  field.value?.includes(neden) 
-                                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-blue-500 shadow-lg shadow-blue-500/30' 
+                                <div className={`w-5 h-5 md:w-6 md:h-6 rounded border-2 transition-all duration-300 cursor-pointer flex items-center justify-center ${field.value?.includes(neden)
+                                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-blue-500 shadow-lg shadow-blue-500/30'
                                     : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50 group-hover:scale-110'
-                                }`}>
+                                  }`}>
                                   {field.value?.includes(neden) && (
                                     <svg className="w-3 h-3 md:w-4 md:h-4 text-white animate-in zoom-in-50 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
@@ -423,7 +433,7 @@ export default function RPDYonlendirme() {
                 <div className="text-center py-6 md:py-8 text-gray-500">
                   <div className="relative inline-block">
                     <Users className="h-8 w-8 md:h-12 md:w-12 mx-auto mb-2 md:mb-4 opacity-50 animate-pulse" />
-                    <div className="absolute inset-0 h-8 w-8 md:h-12 md:w-12 mx-auto bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                    <div className="absolute inset-0 h-8 w-8 md:h-12 md:w-12 mx-auto bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                   </div>
                   <p className="text-sm md:text-base animate-fade-in">Henüz yönlendirilen öğrenci bulunmuyor</p>
                   <p className="text-xs text-gray-400 mt-2">Forma öğrenci ekleyince burada görünecek</p>
@@ -456,30 +466,39 @@ export default function RPDYonlendirme() {
                       </Button>
                     </div>
                   ))}
-                  
+
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
-        
+
         {/* Sticky Gönder Butonu - Sadece öğrenci varsa görünür */}
         {yonlendirilenOgrenciler.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 p-4 shadow-2xl z-50 md:hidden">
             <div className="container mx-auto max-w-md">
               <Button
                 onClick={sendToGuidance}
-                className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-[52px] text-base font-medium shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/40 transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
-                disabled={yonlendirilenOgrenciler.length === 0}
+                className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-[52px] text-base font-medium shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/40 transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-green-500/30"
+                disabled={yonlendirilenOgrenciler.length === 0 || sendingLoading}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                <Send className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="relative z-10">Gönder ({yonlendirilenOgrenciler.length})</span>
+                {sendingLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-2"></div>
+                    <span className="relative z-10">Gönderiliyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                    <span className="relative z-10">Gönder ({yonlendirilenOgrenciler.length})</span>
+                  </>
+                )}
               </Button>
             </div>
           </div>
         )}
-        
+
         {/* Desktop için normal buton */}
         {yonlendirilenOgrenciler.length > 0 && (
           <div className="hidden md:block">
@@ -489,12 +508,21 @@ export default function RPDYonlendirme() {
                 <div className="mt-4">
                   <Button
                     onClick={sendToGuidance}
-                    className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-[44px] text-sm font-medium shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
-                    disabled={yonlendirilenOgrenciler.length === 0}
+                    className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-[44px] text-sm font-medium shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-green-500/30"
+                    disabled={yonlendirilenOgrenciler.length === 0 || sendingLoading}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                    <Send className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                    <span className="relative z-10">Rehberlik Servisine Gönder ({yonlendirilenOgrenciler.length})</span>
+                    {sendingLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
+                        <span className="relative z-10">Gönderiliyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                        <span className="relative z-10">Rehberlik Servisine Gönder ({yonlendirilenOgrenciler.length})</span>
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  rpd-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - GOOGLE_SHEETS_API_KEY=${GOOGLE_SHEETS_API_KEY}
+      - GOOGLE_SHEETS_SPREADSHEET_ID=${GOOGLE_SHEETS_SPREADSHEET_ID}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    volumes:
+      - ./var:/app/var
+    restart: unless-stopped
