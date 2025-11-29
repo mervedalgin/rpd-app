@@ -342,7 +342,7 @@ export default function RPDYonlendirme() {
                         <FormLabel>Yönlendirme Nedenleri (Birden fazla seçilebilir)</FormLabel>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2 md:gap-3 border-2 border-gray-200 rounded-lg p-3 md:p-4 bg-white/50 backdrop-blur-sm">
                           {YONLENDIRME_NEDENLERI.map((neden) => (
-                            <div key={neden} className="flex items-start space-x-3 min-h-[44px] group">
+                            <label key={neden} className="flex items-start space-x-3 min-h-[44px] group cursor-pointer">
                               <div className="relative">
                                 <input
                                   type="checkbox"
@@ -356,9 +356,9 @@ export default function RPDYonlendirme() {
                                       field.onChange(currentValues.filter(v => v !== neden));
                                     }
                                   }}
-                                  className="sr-only"
+                                  className="absolute inset-0 w-5 h-5 md:w-6 md:h-6 opacity-0 cursor-pointer"
                                 />
-                                <div className={`w-5 h-5 md:w-6 md:h-6 rounded border-2 transition-all duration-300 cursor-pointer flex items-center justify-center ${field.value?.includes(neden)
+                                <div className={`w-5 h-5 md:w-6 md:h-6 rounded border-2 transition-all duration-300 flex items-center justify-center ${field.value?.includes(neden)
                                     ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-blue-500 shadow-lg shadow-blue-500/30'
                                     : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50 group-hover:scale-110'
                                   }`}>
@@ -369,10 +369,10 @@ export default function RPDYonlendirme() {
                                   )}
                                 </div>
                               </div>
-                              <label htmlFor={neden} className="text-sm md:text-base font-medium leading-tight cursor-pointer py-2 flex-1 transition-colors duration-200 group-hover:text-blue-700">
+                              <span className="text-sm md:text-base font-medium leading-tight py-2 flex-1 transition-colors duration-200 group-hover:text-blue-700">
                                 {neden}
-                              </label>
-                            </div>
+                              </span>
+                            </label>
                           ))}
                         </div>
                         <FormMessage />
