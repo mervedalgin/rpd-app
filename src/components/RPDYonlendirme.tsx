@@ -70,7 +70,10 @@ export default function RPDYonlendirme() {
     console.log('🔄 Sınıf değişti:', sinifSube);
     setOgrenciLoading(true);
     try {
-      const response = await fetch(`/api/students?sinifSube=${sinifSube}`);
+      // URL encode yaparak # karakterinin düzgün gönderilmesini sağla
+      const encodedSinifSube = encodeURIComponent(sinifSube);
+      console.log('📤 API çağrısı:', `/api/students?sinifSube=${encodedSinifSube}`);
+      const response = await fetch(`/api/students?sinifSube=${encodedSinifSube}`);
       const data = await response.json();
       console.log('📚 API Yanıtı:', Array.isArray(data) ? `${data.length} öğrenci` : typeof data, data);
       // API'den gelen verinin array olduğundan emin ol
