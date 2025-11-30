@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { formatTelegramMessage } from '@/lib/data';
 import { sendTelegramMessage, formatTelegramMessageHTML } from '@/lib/telegram';
 import { writeToGoogleSheets } from '@/lib/sheets';
-import { YonlendirilenOgrenci } from '@/types';
+import { YonlendirilenOgrenci, ReferralRecord } from '@/types';
+import { supabase } from '@/lib/supabase';
 import { getTeachersData, validateTeacherClass, resolveKeyFromDisplay } from '@/lib/teachers';
 
 export const runtime = 'nodejs';
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // 1. Telegram Bot API entegrasyonu
     try {
-      const telegramMessages = students.map(student => 
+      const telegramMessages = students.map((student) =>
         formatTelegramMessageHTML(
           student.ogretmenAdi,
           student.ogrenciAdi,
@@ -49,10 +50,17 @@ export async function POST(request: NextRequest) {
           student.not
         )
       );
-      
-      telegramSuccess = await sendTelegramMessage(telegramMessages);
-      if (!telegramSuccess) {
-        errors.push('Telegram gönderimi başarısız');
+
+      const telegramResult = await sendTelegramMessage(telegramMessages);
+
+      if (telegramResult.sent === telegramResult.total) {
+        telegramSuccess = true;
+      } else {
+        telegramSuccess = telegramResult.sent > 0;
+        const failureDetails = telegramResult.failures
+          .map((f) => `#${f.index + 1}:${f.status ?? 'err'} ${f.body ?? f.error ?? ''}`)
+          .join('; ');
+        errors.push(`Telegram: ${telegramResult.sent}/${telegramResult.total} gönderildi. Hatalar: ${failureDetails}`);
       }
     } catch (error) {
       console.error('Telegram entegrasyonu hatası:', error);
@@ -70,7 +78,36 @@ export async function POST(request: NextRequest) {
       errors.push('Google Sheets entegrasyonu hatası');
     }
 
-    // 3. Console log (backup)
+    // 3. Supabase referrals tablosuna kayıt (opsiyonel, akışı bozmaz)
+    try {
+      if (supabase) {
+        const payload: ReferralRecord[] = students.map((student) => ({
+          teacher_name: student.ogretmenAdi,
+          class_key: '', // İleride sinifSube value'su ile doldurulabilir
+          class_display: student.sinifSube,
+          student_name: student.ogrenciAdi,
+          reason: student.yonlendirmeNedeni,
+          note: student.not ?? null,
+          source: 'web',
+        }));
+
+        const { error: supabaseError } = await supabase
+          .from('referrals')
+          .insert(payload);
+
+        if (supabaseError) {
+          console.error('Supabase referrals insert hatası:', supabaseError.message);
+          errors.push('Supabase istatistik kaydı yapılamadı');
+        }
+      } else {
+        console.warn('Supabase client tanımlı değil, referrals kaydı atlanıyor');
+      }
+    } catch (error) {
+      console.error('Supabase referrals entegrasyonu hatası:', error);
+      errors.push('Supabase istatistik kaydı hatası');
+    }
+
+    // 4. Console log (backup)
     console.log('=== RPD Öğrenci Yönlendirme ===');
     students.forEach((student, index) => {
       const message = formatTelegramMessage(

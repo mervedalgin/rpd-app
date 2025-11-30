@@ -30,6 +30,19 @@ export interface YonlendirilenOgrenci {
   tarih: string;
 }
 
+// Supabase referrals tablosu için temel tip
+export interface ReferralRecord {
+  id?: string;
+  created_at?: string;
+  teacher_name: string;
+  class_key: string;
+  class_display: string;
+  student_name: string;
+  reason: string;
+  note?: string | null;
+  source?: string;
+}
+
 export const YONLENDIRME_NEDENLERI = [
   "Akran Zorbalığı Yapan",
   "Özel Gereksinimli",
