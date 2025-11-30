@@ -22,7 +22,9 @@ import {
   EyeOff,
   ShieldAlert,
   KeyRound,
-  LogOut
+  LogOut,
+  Gavel,
+  History
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -62,6 +64,16 @@ const menuItems = [
     href: "/panel/belge",
     label: "Belge Oluştur",
     icon: FileText
+  },
+  {
+    href: "/panel/disiplin",
+    label: "Disiplin İşlemleri",
+    icon: Gavel
+  },
+  {
+    href: "/panel/ogrenci-gecmisi",
+    label: "Öğrenci Geçmişi",
+    icon: History
   },
   { 
     href: "/panel/ogrenciler", 

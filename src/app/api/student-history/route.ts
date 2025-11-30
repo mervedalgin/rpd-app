@@ -93,3 +93,50 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// Yönlendirme kaydını sil
+export async function DELETE(request: NextRequest) {
+  if (!supabase) {
+    return NextResponse.json(
+      { error: 'Supabase yapılandırması eksik' },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Kayıt ID\'si gerekli' },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase
+      .from('referrals')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase referral delete error:', error);
+      return NextResponse.json(
+        { error: 'Yönlendirme kaydı silinemedi: ' + error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Yönlendirme kaydı başarıyla silindi'
+    });
+
+  } catch (error) {
+    console.error('Student history DELETE API error:', error);
+    return NextResponse.json(
+      { error: 'Yönlendirme kaydı silinirken hata oluştu' },
+      { status: 500 }
+    );
+  }
+}
