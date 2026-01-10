@@ -1,0 +1,1346 @@
+{
+  "metadata": {
+    "generated_at": "2025-09-21T03:05:57.095788",
+    "total_services": 3
+  },
+  "services": {
+    "7": {
+      "hizmet_adi": "D - DESTEK HİZMETLER",
+      "asama_1": {
+        "secenekler": [
+          {
+            "deger": "20",
+            "metin": "DM - Müşavirlik"
+          }
+        ],
+        "toplam": 1
+      },
+      "asama_2_bagimliliklari": {
+        "DM - Müşavirlik": {
+          "asama_1_deger": "20",
+          "secenekler": [
+            {
+              "deger": "22",
+              "metin": "DMÖ - Öğretmene Yönelik"
+            },
+            {
+              "deger": "21",
+              "metin": "DMV - Veliye Yönelik"
+            }
+          ],
+          "toplam": 2
+        }
+      },
+      "asama_3_bagimliliklari": {
+        "DM - Müşavirlik → DMÖ - Öğretmene Yönelik": {
+          "asama_1_deger": "20",
+          "asama_2_deger": "22",
+          "secenekler": [
+            {
+              "deger": "108",
+              "metin": "DMÖG - Aile"
+            },
+            {
+              "deger": "116",
+              "metin": "DMÖG - Akademik Konular"
+            },
+            {
+              "deger": "110",
+              "metin": "DMÖG - Okula ve Çevreye Uyum"
+            },
+            {
+              "deger": "113",
+              "metin": "DMÖG - Problem Davranış"
+            },
+            {
+              "deger": "112",
+              "metin": "DMÖG - Psikolojik Uyum"
+            },
+            {
+              "deger": "109",
+              "metin": "DMÖG - Sağlık"
+            },
+            {
+              "deger": "1341",
+              "metin": "DMÖG - Sevk Bilgilendirme"
+            },
+            {
+              "deger": "111",
+              "metin": "DMÖG - Sosyal Uyum"
+            },
+            {
+              "deger": "114",
+              "metin": "DMÖG - Sosyoekonomik Konular"
+            },
+            {
+              "deger": "115",
+              "metin": "DMÖG - Yöneltme Yerleştirme"
+            }
+          ],
+          "toplam": 10
+        },
+        "DM - Müşavirlik → DMV - Veliye Yönelik": {
+          "asama_1_deger": "20",
+          "asama_2_deger": "21",
+          "secenekler": [
+            {
+              "deger": "98",
+              "metin": "DMVG - Aile"
+            },
+            {
+              "deger": "106",
+              "metin": "DMVG - Akademik Konular"
+            },
+            {
+              "deger": "1340",
+              "metin": "DMVG - Danışmanlık Tedbiri"
+            },
+            {
+              "deger": "100",
+              "metin": "DMVG - Okula ve Çevreye Uyum"
+            },
+            {
+              "deger": "103",
+              "metin": "DMVG - Problem Davranış"
+            },
+            {
+              "deger": "102",
+              "metin": "DMVG - Psikolojik Uyum"
+            },
+            {
+              "deger": "99",
+              "metin": "DMVG - Sağlık"
+            },
+            {
+              "deger": "1339",
+              "metin": "DMVG - Sevk Bilgilendirme"
+            },
+            {
+              "deger": "101",
+              "metin": "DMVG - Sosyal Uyum"
+            },
+            {
+              "deger": "104",
+              "metin": "DMVG - Sosyoekonomik Konular"
+            },
+            {
+              "deger": "105",
+              "metin": "DMVG - Yöneltme Yerleştirme"
+            }
+          ],
+          "toplam": 11
+        }
+      },
+      "istatistikler": {
+        "toplam_asama_1": 1,
+        "toplam_asama_2": 2,
+        "toplam_asama_3": 21,
+        "toplam_kombinasyon": 24
+      }
+    },
+    "5": {
+      "hizmet_adi": "Ö - GELİŞİMSEL VE ÖNLEYİCİ HİZMETLER",
+      "asama_1": {
+        "secenekler": [
+          {
+            "deger": "12",
+            "metin": "ÖOV - Bilgi Verme Çalışmaları"
+          },
+          {
+            "deger": "11",
+            "metin": "ÖOB - Bireyi Tanıma Çalışmaları"
+          },
+          {
+            "deger": "13",
+            "metin": "ÖOY - Yöneltme Ve İzleme"
+          }
+        ],
+        "toplam": 3
+      },
+      "asama_2_bagimliliklari": {
+        "ÖOV - Bilgi Verme Çalışmaları": {
+          "asama_1_deger": "12",
+          "secenekler": [
+            {
+              "deger": "15",
+              "metin": "ÖOVE - Akademik Gelişim"
+            },
+            {
+              "deger": "16",
+              "metin": "ÖOVM - Kariyer Gelişimi"
+            },
+            {
+              "deger": "14",
+              "metin": "ÖOVK - Sosyal Duygusal Gelişim"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları": {
+          "asama_1_deger": "11",
+          "secenekler": [
+            {
+              "deger": "23",
+              "metin": "B.K.P.1.c - Yaşam Pencerem"
+            },
+            {
+              "deger": "24",
+              "metin": "B.K.G.4.c - Öğrenci Bilgi Formu"
+            },
+            {
+              "deger": "25",
+              "metin": "B.K.G.12.c - Yol Haritam"
+            },
+            {
+              "deger": "26",
+              "metin": "B.K.O.1.c - Bana Kendini Anlat"
+            },
+            {
+              "deger": "28",
+              "metin": "B.K.G.3.c - Kendimi Tanıyorum"
+            },
+            {
+              "deger": "29",
+              "metin": "ÖOB99 - Diğer"
+            },
+            {
+              "deger": "582",
+              "metin": "B.K.A.7.c - Şiddet Algısı Anketi"
+            },
+            {
+              "deger": "583",
+              "metin": "B.K.A.8.c - Şiddet Sıklığı Anketi"
+            },
+            {
+              "deger": "584",
+              "metin": "B.K.A.9.c - Şiddet Meşruiyeti Anketi"
+            },
+            {
+              "deger": "585",
+              "metin": "B.K.A.10.c - Şiddet Algısı Anketi (Veli)"
+            },
+            {
+              "deger": "586",
+              "metin": "B.G.G.10.c - Şiddet Sıklığı Anketi (Veli)"
+            },
+            {
+              "deger": "587",
+              "metin": "B.K.A.12.c - Şiddet Meşruiyeti Anketi (Veli)"
+            },
+            {
+              "deger": "588",
+              "metin": "B.K.A.11.c - Şiddet Algısı Anketi (Öğretmen)"
+            },
+            {
+              "deger": "589",
+              "metin": "B.G.G.11.c - Şiddet Sıklığı Anketi (Öğretmen)"
+            },
+            {
+              "deger": "590",
+              "metin": "B.K.A.13.c - Şiddet Meşruiyeti Anketi (Öğretmen 4-6.sınıf)"
+            },
+            {
+              "deger": "591",
+              "metin": "B.K.A.14.c - Şiddet Meşruiyeti Anketi (Öğretmen 7-12. Sınıf)"
+            },
+            {
+              "deger": "673",
+              "metin": "B.K.İ.1.c - Verimli Ders Çalışma Kontrol Listesi"
+            },
+            {
+              "deger": "674",
+              "metin": "B.G.G.2.c - Çocuğumu Tanıyorum Formu"
+            },
+            {
+              "deger": "675",
+              "metin": "B.G.G.1.c - Aile içi Gözlem Formu"
+            },
+            {
+              "deger": "676",
+              "metin": "B.G.G.3.c - DEHB Gözlem Formu"
+            },
+            {
+              "deger": "677",
+              "metin": "B.G.G.4.c - Ev Ziyaret Formu"
+            },
+            {
+              "deger": "678",
+              "metin": "B.G.G.7.c - Öğrenci Gözlem Kaydı"
+            },
+            {
+              "deger": "679",
+              "metin": "B.G.G.8.a - Özel Öğrenme Güçlüğü Gözlem Formu"
+            },
+            {
+              "deger": "680",
+              "metin": "B.K.G.7.c - Öğrenci-Öngörüşme Formu"
+            },
+            {
+              "deger": "1309",
+              "metin": "RAM (WISC-R) - RAM (WISC-R)"
+            },
+            {
+              "deger": "964",
+              "metin": "B.K.A.2.C - Devamsızlık Nedenleri Anketi"
+            },
+            {
+              "deger": "1310",
+              "metin": "RAM (LEITER) - RAM (LEITER)"
+            },
+            {
+              "deger": "1311",
+              "metin": "RAM (ASİS) - RAM (ASİS)"
+            },
+            {
+              "deger": "1312",
+              "metin": "RAM (S.BİNET) - RAM (S.BİNET)"
+            },
+            {
+              "deger": "1313",
+              "metin": "RAM (ÖGT) - RAM (ÖGT)"
+            }
+          ],
+          "toplam": 30
+        },
+        "ÖOY - Yöneltme Ve İzleme": {
+          "asama_1_deger": "13",
+          "secenekler": [
+            {
+              "deger": "64",
+              "metin": "ÖOYb - Alan/Dal Tercihleri"
+            },
+            {
+              "deger": "1331",
+              "metin": "ÖOYb - Değişen Ben-Sosyal Kültürel Faaliyetler"
+            },
+            {
+              "deger": "1332",
+              "metin": "ÖOYb - Risk Haritası-Sosyal Kültürel Faaliyetler"
+            },
+            {
+              "deger": "65",
+              "metin": "ÖOYb - Seçmeli Ders"
+            },
+            {
+              "deger": "66",
+              "metin": "ÖOYb - Sosyal Kulüpler"
+            },
+            {
+              "deger": "67",
+              "metin": "ÖOYb - Üst Öğrenim Kurumuna Geçen Öğrencilerin İzlenmesi"
+            }
+          ],
+          "toplam": 6
+        }
+      },
+      "asama_3_bagimliliklari": {
+        "ÖOV - Bilgi Verme Çalışmaları → ÖOVE - Akademik Gelişim": {
+          "asama_1_deger": "12",
+          "asama_2_deger": "15",
+          "secenekler": [
+            {
+              "deger": "53",
+              "metin": "ÖOVEb - Başarısızlık Nedenleri"
+            },
+            {
+              "deger": "365",
+              "metin": "ÖOVEb - Çalışma Programı Hazırlama"
+            },
+            {
+              "deger": "50",
+              "metin": "ÖOVEb - Ders Seçimi"
+            },
+            {
+              "deger": "368",
+              "metin": "ÖOVEb - Devamsızlığı Önleme"
+            },
+            {
+              "deger": "54",
+              "metin": "ÖOVEb - Devamsızlık Nedenleri"
+            },
+            {
+              "deger": "366",
+              "metin": "ÖOVEb - Dikkat Geliştirme Çalışmaları"
+            },
+            {
+              "deger": "362",
+              "metin": "ÖOVEb - Hedef Belirleme"
+            },
+            {
+              "deger": "364",
+              "metin": "ÖOVEb - Motivasyon"
+            },
+            {
+              "deger": "40",
+              "metin": "ÖOVEb - Okul Kuralları"
+            },
+            {
+              "deger": "367",
+              "metin": "ÖOVEb - Okul ve Çevresindeki Eğitim Olanakları"
+            },
+            {
+              "deger": "681",
+              "metin": "ÖOVEb - Okula ve Çevreye Uyum"
+            },
+            {
+              "deger": "51",
+              "metin": "ÖOVEb - Okulda Seçilebilecek Alan/Dal"
+            },
+            {
+              "deger": "38",
+              "metin": "ÖOVEb - Okulun Fiziksel İmkanları"
+            },
+            {
+              "deger": "39",
+              "metin": "ÖOVEb - Okulun Sosyokültürel İmkanları"
+            },
+            {
+              "deger": "41",
+              "metin": "ÖOVEb - Öğrenciyi İlgilendiren Yönetmelikler"
+            },
+            {
+              "deger": "47",
+              "metin": "ÖOVEb - Öğrenme Stilleri"
+            },
+            {
+              "deger": "363",
+              "metin": "ÖOVEb - Öz Disiplin Geliştirme"
+            },
+            {
+              "deger": "42",
+              "metin": "ÖOVEb - Rehberlik ve Psikolojik Danışma Servisinin Tanıtılması"
+            },
+            {
+              "deger": "46",
+              "metin": "ÖOVEb - Serbest Zamanı Değerlendirme"
+            },
+            {
+              "deger": "49",
+              "metin": "ÖOVEb - Sınav Kaygısı"
+            },
+            {
+              "deger": "48",
+              "metin": "ÖOVEb - Sınavda Başarılı Olma Stratejileri"
+            },
+            {
+              "deger": "43",
+              "metin": "ÖOVEb - Sosyal Kulüpler"
+            },
+            {
+              "deger": "683",
+              "metin": "ÖOVEb - Üst Öğrenimde Yararlanılacak Burslar ve Barınma Olanakları"
+            },
+            {
+              "deger": "52",
+              "metin": "ÖOVEb - Üst Öğrenime Geçiş Sınavları"
+            },
+            {
+              "deger": "44",
+              "metin": "ÖOVEb - Verimli Ders Çalışma"
+            },
+            {
+              "deger": "682",
+              "metin": "ÖOVEb - Yurt Dışı Eğitim Olanakları"
+            },
+            {
+              "deger": "45",
+              "metin": "ÖOVEb - Zamanı Yönetimi"
+            }
+          ],
+          "toplam": 27
+        },
+        "ÖOV - Bilgi Verme Çalışmaları → ÖOVM - Kariyer Gelişimi": {
+          "asama_1_deger": "12",
+          "asama_2_deger": "16",
+          "secenekler": [
+            {
+              "deger": "694",
+              "metin": "ÖOVMb - Çalışan/işveren Hak ve Sorumlulukları"
+            },
+            {
+              "deger": "60",
+              "metin": "ÖOVMb - Çevredeki İş Olanakları Ve Çalışma Koşulları"
+            },
+            {
+              "deger": "693",
+              "metin": "ÖOVMb - İş Görüşmesi Becerileri"
+            },
+            {
+              "deger": "691",
+              "metin": "ÖOVMb - İş ve Mesleğe Hazırlayan Kurum ve Kursların Tanıtımı"
+            },
+            {
+              "deger": "695",
+              "metin": "ÖOVMb - İş ve Meslek Etiği"
+            },
+            {
+              "deger": "369",
+              "metin": "ÖOVMb - İş Yaşamına Yönelik Beceriler"
+            },
+            {
+              "deger": "1330",
+              "metin": "ÖOVMb - Kariyer Olgunluğu"
+            },
+            {
+              "deger": "688",
+              "metin": "ÖOVMb - Kariyer Planlama"
+            },
+            {
+              "deger": "684",
+              "metin": "ÖOVMb - Meslek ile İlgi, Değer, Yetenek ve Kişisel Özellik İlişkisi"
+            },
+            {
+              "deger": "689",
+              "metin": "ÖOVMb - Meslek Sahibi Olmanın Önemi"
+            },
+            {
+              "deger": "58",
+              "metin": "ÖOVMb - Meslek Seçerken Dikkat Edilmesi Gereken Hususlar"
+            },
+            {
+              "deger": "57",
+              "metin": "ÖOVMb - Meslek Tanıtımı"
+            },
+            {
+              "deger": "690",
+              "metin": "ÖOVMb - Mesleki Hedef Belirleme"
+            },
+            {
+              "deger": "59",
+              "metin": "ÖOVMb - Mesleklerin İncelenmesi"
+            },
+            {
+              "deger": "692",
+              "metin": "ÖOVMb - Özgeçmiş Hazırlama"
+            },
+            {
+              "deger": "696",
+              "metin": "ÖOVMb - Staj"
+            }
+          ],
+          "toplam": 16
+        },
+        "ÖOV - Bilgi Verme Çalışmaları → ÖOVK - Sosyal Duygusal Gelişim": {
+          "asama_1_deger": "12",
+          "asama_2_deger": "14",
+          "secenekler": [
+            {
+              "deger": "30",
+              "metin": "ÖOVKb - Aile"
+            },
+            {
+              "deger": "32",
+              "metin": "ÖOVKb - Arkadaşlık İlişkileri"
+            },
+            {
+              "deger": "1329",
+              "metin": "ÖOVKb - Bağımlılıkla Mücadele Akran Desteği"
+            },
+            {
+              "deger": "35",
+              "metin": "ÖOVKb - Problem Davranış"
+            },
+            {
+              "deger": "34",
+              "metin": "ÖOVKb - Psikolojik Uyum"
+            },
+            {
+              "deger": "31",
+              "metin": "ÖOVKb - Sağlık"
+            },
+            {
+              "deger": "33",
+              "metin": "ÖOVKb - Sosyal Uyum"
+            },
+            {
+              "deger": "36",
+              "metin": "ÖOVKb - Sosyoekonomik Konular"
+            }
+          ],
+          "toplam": 8
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.P.1.c - Yaşam Pencerem": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "23",
+          "secenekler": [
+            {
+              "deger": "293",
+              "metin": "B.K.P.1.c.2 - Yaşam Pencerem - Geribildirim"
+            },
+            {
+              "deger": "892",
+              "metin": "B.K.P.1.c.3 - Yaşam Pencerem - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "286",
+              "metin": "B.K.P.1.c.1 - Yaşam Pencerem - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.G.4.c - Öğrenci Bilgi Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "24",
+          "secenekler": [
+            {
+              "deger": "294",
+              "metin": "B.K.G.4.c.2 - Öğrenci Bilgi Formu - Geribildirim"
+            },
+            {
+              "deger": "888",
+              "metin": "B.K.G.4.c.3 - Öğrenci Bilgi Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "287",
+              "metin": "B.K.G.4.c.1 - Öğrenci Bilgi Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.G.12.c - Yol Haritam": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "25",
+          "secenekler": [
+            {
+              "deger": "295",
+              "metin": "B.K.G.12.c.2 - Yol Haritam - Geribildirim"
+            },
+            {
+              "deger": "886",
+              "metin": "B.K.G.12.c.3 - Yol Haritam - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "288",
+              "metin": "B.K.G.12.c.1 - Yol Haritam - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.O.1.c - Bana Kendini Anlat": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "26",
+          "secenekler": [
+            {
+              "deger": "296",
+              "metin": "B.K.O.1.c.2 - Bana Kendini Anlat - Geribildirim"
+            },
+            {
+              "deger": "891",
+              "metin": "B.K.O.1.c.3 - Bana Kendini Anlat - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "289",
+              "metin": "B.K.O.1.c.1 - Bana Kendini Anlat - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.G.3.c - Kendimi Tanıyorum": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "28",
+          "secenekler": [
+            {
+              "deger": "298",
+              "metin": "B.K.G.3.c.2 - Kendimi Tanıyorum - Geribildirim"
+            },
+            {
+              "deger": "887",
+              "metin": "B.K.G.3.c.3 - Kendimi Tanıyorum - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "291",
+              "metin": "B.K.G.3.c.1 - Kendimi Tanıyorum - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → ÖOB99 - Diğer": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "29",
+          "secenekler": [
+            {
+              "deger": "299",
+              "metin": "ÖOB2.2 - Diğer - Geribildirim"
+            },
+            {
+              "deger": "893",
+              "metin": "ÖOB2.3 - Diğer - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "292",
+              "metin": "ÖOB2.1 - Diğer - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.7.c - Şiddet Algısı Anketi": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "582",
+          "secenekler": [
+            {
+              "deger": "830",
+              "metin": "B.K.A.7.c.2 - Şiddet Algısı Anketi - Geribildirim"
+            },
+            {
+              "deger": "883",
+              "metin": "B.K.A.7.c.3 - Şiddet Algısı Anketi - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "829",
+              "metin": "B.K.A.7.c.1 - Şiddet Algısı Anketi - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.8.c - Şiddet Sıklığı Anketi": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "583",
+          "secenekler": [
+            {
+              "deger": "832",
+              "metin": "B.K.A.8.c.2 - Şiddet Sıklığı Anketi - Geribildirim"
+            },
+            {
+              "deger": "884",
+              "metin": "B.K.A.8.c.3 - Şiddet Sıklığı Anketi - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "831",
+              "metin": "B.K.A.8.c.1 - Şiddet Sıklığı Anketi - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.9.c - Şiddet Meşruiyeti Anketi": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "584",
+          "secenekler": [
+            {
+              "deger": "834",
+              "metin": "B.K.A.9.c.2 - Şiddet Meşruiyeti Anketi - Geribildirim"
+            },
+            {
+              "deger": "885",
+              "metin": "B.K.A.9.c.3 - Şiddet Meşruiyeti Anketi - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "833",
+              "metin": "B.K.A.9.c.1 - Şiddet Meşruiyeti Anketi - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.10.c - Şiddet Algısı Anketi (Veli)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "585",
+          "secenekler": [
+            {
+              "deger": "836",
+              "metin": "B.K.A.10.c.2 - Şiddet Algısı Anketi (Veli) - Geribildirim"
+            },
+            {
+              "deger": "870",
+              "metin": "B.K.A.10.c.3 - Şiddet Algısı Anketi (Veli) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "835",
+              "metin": "B.K.A.10.c.1 - Şiddet Algısı Anketi (Veli) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.10.c - Şiddet Sıklığı Anketi (Veli)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "586",
+          "secenekler": [
+            {
+              "deger": "838",
+              "metin": "B.G.G.10.c.2 - Şiddet Sıklığı Anketi (Veli) - Geribildirim"
+            },
+            {
+              "deger": "871",
+              "metin": "B.G.G.10.c.3 - Şiddet Sıklığı Anketi (Veli) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "837",
+              "metin": "B.G.G.10.c.1 - Şiddet Sıklığı Anketi (Veli) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.12.c - Şiddet Meşruiyeti Anketi (Veli)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "587",
+          "secenekler": [
+            {
+              "deger": "840",
+              "metin": "B.K.A.12.c.2 - Şiddet Meşruiyeti Anketi (Veli) - Geribildirim"
+            },
+            {
+              "deger": "872",
+              "metin": "B.K.A.12.c.3 - Şiddet Meşruiyeti Anketi (Veli) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "839",
+              "metin": "B.K.A.12.c.1 - Şiddet Meşruiyeti Anketi (Veli) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.11.c - Şiddet Algısı Anketi (Öğretmen)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "588",
+          "secenekler": [
+            {
+              "deger": "842",
+              "metin": "B.K.A.11.c.2 - Şiddet Algısı Anketi (Öğretmen) - Geribildirim"
+            },
+            {
+              "deger": "873",
+              "metin": "B.K.A.11.c.3 - Şiddet Algısı Anketi (Öğretmen) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "841",
+              "metin": "B.K.A.11.c.1 - Şiddet Algısı Anketi (Öğretmen) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.11.c - Şiddet Sıklığı Anketi (Öğretmen)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "589",
+          "secenekler": [
+            {
+              "deger": "844",
+              "metin": "B.G.G.11.c.2 - Şiddet Sıklığı Anketi (Öğretmen) - Geribildirim"
+            },
+            {
+              "deger": "874",
+              "metin": "B.G.G.11.c.3 - Şiddet Sıklığı Anketi (Öğretmen) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "843",
+              "metin": "B.G.G.11.c.1 - Şiddet Sıklığı Anketi (Öğretmen) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.13.c - Şiddet Meşruiyeti Anketi (Öğretmen 4-6.sınıf)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "590",
+          "secenekler": [
+            {
+              "deger": "846",
+              "metin": "B.K.A.13.c.2 - Şiddet Meşruiyeti Anketi (Öğretmen 4-6.sınıf) - Geribildirim"
+            },
+            {
+              "deger": "875",
+              "metin": "B.K.A.13.c.3 - Şiddet Meşruiyeti Anketi (Öğretmen 4-6.sınıf) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "845",
+              "metin": "B.K.A.13.c.1 - Şiddet Meşruiyeti Anketi (Öğretmen 4-6.sınıf) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.14.c - Şiddet Meşruiyeti Anketi (Öğretmen 7-12. Sınıf)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "591",
+          "secenekler": [
+            {
+              "deger": "848",
+              "metin": "B.K.A.14.c.2 - Şiddet Meşruiyeti Anketi (Öğretmen 7-12. Sınıf) - Geribildirim"
+            },
+            {
+              "deger": "876",
+              "metin": "B.K.A.14.c.3 - Şiddet Meşruiyeti Anketi (Öğretmen 7-12. Sınıf) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "847",
+              "metin": "B.K.A.14.c.1 - Şiddet Meşruiyeti Anketi (Öğretmen 7-12. Sınıf) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.İ.1.c - Verimli Ders Çalışma Kontrol Listesi": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "673",
+          "secenekler": [
+            {
+              "deger": "864",
+              "metin": "B.K.İ.1.c.2 - Verimli Ders Çalışma Kontrol Listesi - Geribildirim"
+            },
+            {
+              "deger": "890",
+              "metin": "B.K.İ.1.c.3 - Verimli Ders Çalışma Kontrol Listesi - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "863",
+              "metin": "B.K.İ.1.c.1 - Verimli Ders Çalışma Kontrol Listesi - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.2.c - Çocuğumu Tanıyorum Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "674",
+          "secenekler": [
+            {
+              "deger": "850",
+              "metin": "B.G.G.2.c.2 - Çocuğumu Tanıyorum Formu - Geribildirim"
+            },
+            {
+              "deger": "878",
+              "metin": "B.G.G.2.c.3 - Çocuğumu Tanıyorum Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "849",
+              "metin": "B.G.G.2.c.1 - Çocuğumu Tanıyorum Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.1.c - Aile içi Gözlem Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "675",
+          "secenekler": [
+            {
+              "deger": "852",
+              "metin": "B.G.G.1.c.2 - Aile içi Gözlem Formu - Geribildirim"
+            },
+            {
+              "deger": "869",
+              "metin": "B.G.G.1.c.3 - Aile içi Gözlem Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "851",
+              "metin": "B.G.G.1.c.1 - Aile içi Gözlem Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.3.c - DEHB Gözlem Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "676",
+          "secenekler": [
+            {
+              "deger": "854",
+              "metin": "B.G.G.3.c.2 - DEHB Gözlem Formu - Geribildirim"
+            },
+            {
+              "deger": "879",
+              "metin": "B.G.G.3.c.3 - DEHB Gözlem Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "853",
+              "metin": "B.G.G.3.c.1 - DEHB Gözlem Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.4.c - Ev Ziyaret Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "677",
+          "secenekler": [
+            {
+              "deger": "856",
+              "metin": "B.G.G.4.c.2 - Ev Ziyaret Formu - Geribildirim"
+            },
+            {
+              "deger": "880",
+              "metin": "B.G.G.4.c.3 - Ev Ziyaret Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "855",
+              "metin": "B.G.G.4.c.1 - Ev Ziyaret Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.7.c - Öğrenci Gözlem Kaydı": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "678",
+          "secenekler": [
+            {
+              "deger": "858",
+              "metin": "B.G.G.7.c.2 - Öğrenci Gözlem Kaydı - Geribildirim"
+            },
+            {
+              "deger": "881",
+              "metin": "B.G.G.7.c.3 - Öğrenci Gözlem Kaydı - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "857",
+              "metin": "B.G.G.7.c.1 - Öğrenci Gözlem Kaydı - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.G.G.8.a - Özel Öğrenme Güçlüğü Gözlem Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "679",
+          "secenekler": [
+            {
+              "deger": "860",
+              "metin": "B.G.G.8.a.2 - Özel Öğrenme Güçlüğü Gözlem Formu - Geribildirim"
+            },
+            {
+              "deger": "882",
+              "metin": "B.G.G.8.a.3 - Özel Öğrenme Güçlüğü Gözlem Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "859",
+              "metin": "B.G.G.8.a.1 - Özel Öğrenme Güçlüğü Gözlem Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.G.7.c - Öğrenci-Öngörüşme Formu": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "680",
+          "secenekler": [
+            {
+              "deger": "862",
+              "metin": "B.K.G.7.c.2 - Öğrenci-Öngörüşme Formu - Geribildirim"
+            },
+            {
+              "deger": "889",
+              "metin": "B.K.G.7.c.3 - Öğrenci-Öngörüşme Formu - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "861",
+              "metin": "B.K.G.7.c.1 - Öğrenci-Öngörüşme Formu - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → RAM (WISC-R) - RAM (WISC-R)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "1309",
+          "secenekler": [
+            {
+              "deger": "1315",
+              "metin": "RAM (WISC-R) - Geribildirim - RAM (WISC-R) - Geribildirim"
+            },
+            {
+              "deger": "1316",
+              "metin": "RAM (WISC-R) - Sonuç Değerlendirme - RAM (WISC-R) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "1314",
+              "metin": "RAM (WISC-R) - Uygulama - RAM (WISC-R) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → B.K.A.2.C - Devamsızlık Nedenleri Anketi": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "964",
+          "secenekler": [
+            {
+              "deger": "966",
+              "metin": "B.K.A.2.c.2 - Devamsızlık Nedenleri Anketi - Geribildirim"
+            },
+            {
+              "deger": "967",
+              "metin": "B.K.A.2.c.3 - Devamsızlık Nedenleri Anketi - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "965",
+              "metin": "B.K.A.2.c.1 - Devamsızlık Nedenleri Anketi - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → RAM (LEITER) - RAM (LEITER)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "1310",
+          "secenekler": [
+            {
+              "deger": "1318",
+              "metin": "RAM (LEITER) - Geribildirim - RAM (LEITER) - Geribildirim"
+            },
+            {
+              "deger": "1319",
+              "metin": "RAM (LEITER) - Sonuç Değerlendirme - RAM (LEITER) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "1317",
+              "metin": "RAM (LEITER) - Uygulama - RAM (LEITER) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → RAM (ASİS) - RAM (ASİS)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "1311",
+          "secenekler": [
+            {
+              "deger": "1321",
+              "metin": "RAM (ASİS) - Geribildirim - RAM (ASİS) - Geribildirim"
+            },
+            {
+              "deger": "1322",
+              "metin": "RAM (ASİS) - Sonuç Değerlendirme - RAM (ASİS) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "1320",
+              "metin": "RAM (ASİS) - Uygulama - RAM (ASİS) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → RAM (S.BİNET) - RAM (S.BİNET)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "1312",
+          "secenekler": [
+            {
+              "deger": "1324",
+              "metin": "RAM (S.BİNET) - Geribildirim - RAM (S.BİNET) - Geribildirim"
+            },
+            {
+              "deger": "1325",
+              "metin": "RAM (S.BİNET) - Sonuç Değerlendirme - RAM (S.BİNET) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "1323",
+              "metin": "RAM (S.BİNET) - Uygulama - RAM (S.BİNET) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        },
+        "ÖOB - Bireyi Tanıma Çalışmaları → RAM (ÖGT) - RAM (ÖGT)": {
+          "asama_1_deger": "11",
+          "asama_2_deger": "1313",
+          "secenekler": [
+            {
+              "deger": "1327",
+              "metin": "RAM (ÖGT) - Geribildirim - RAM (ÖGT) - Geribildirim"
+            },
+            {
+              "deger": "1328",
+              "metin": "RAM (ÖGT) - Sonuç Değerlendirme - RAM (ÖGT) - Sonuç Değerlendirme"
+            },
+            {
+              "deger": "1326",
+              "metin": "RAM (ÖGT) - Uygulama - RAM (ÖGT) - Uygulama"
+            }
+          ],
+          "toplam": 3
+        }
+      },
+      "istatistikler": {
+        "toplam_asama_1": 3,
+        "toplam_asama_2": 39,
+        "toplam_asama_3": 141,
+        "toplam_kombinasyon": 183
+      }
+    },
+    "6": {
+      "hizmet_adi": "İ - İYİLEŞTİRİCİ HİZMETLER",
+      "asama_1": {
+        "secenekler": [
+          {
+            "deger": "17",
+            "metin": "İB - Bireysel Psikolojik Danışma"
+          },
+          {
+            "deger": "18",
+            "metin": "İP - Psikososyal Müdahale"
+          },
+          {
+            "deger": "19",
+            "metin": "İS - Sevk (Yönlendirme)"
+          }
+        ],
+        "toplam": 3
+      },
+      "asama_2_bagimliliklari": {
+        "İB - Bireysel Psikolojik Danışma": {
+          "asama_1_deger": "17",
+          "secenekler": [
+            {
+              "deger": "71",
+              "metin": "İB - Aile"
+            },
+            {
+              "deger": "76",
+              "metin": "İB - Davranış Sorunları"
+            },
+            {
+              "deger": "1032",
+              "metin": "İB - OBM"
+            },
+            {
+              "deger": "1569",
+              "metin": "İB - Okul öncesi-Arkadaşlık İlişkileri Geliştirme Psikoeğitim Programı(Zorba)"
+            },
+            {
+              "deger": "1338",
+              "metin": "İB - Okul öncesi-Arkadaşlık İlişkileri Geliştirme Psikoeğitm Programı(Maruz Kalan)"
+            },
+            {
+              "deger": "73",
+              "metin": "İB - Okula Ve Çevreye Uyum"
+            },
+            {
+              "deger": "75",
+              "metin": "İB - Psikolojik Uyum"
+            },
+            {
+              "deger": "72",
+              "metin": "İB - Sağlık"
+            },
+            {
+              "deger": "74",
+              "metin": "İB - Sosyal Uyum"
+            },
+            {
+              "deger": "77",
+              "metin": "İB - Sosyoekonomik Konular"
+            },
+            {
+              "deger": "1336",
+              "metin": "İB - Travma Sonrası Grup Temelli Müdahale Programı (TS-GTM)"
+            },
+            {
+              "deger": "78",
+              "metin": "İB - Yöneltme Yerleştirme"
+            }
+          ],
+          "toplam": 12
+        },
+        "İP - Psikososyal Müdahale": {
+          "asama_1_deger": "18",
+          "secenekler": [
+            {
+              "deger": "592",
+              "metin": "İPbB - Bildirim Yükümlülüğü"
+            },
+            {
+              "deger": "594",
+              "metin": "İPbİ - İntihar"
+            },
+            {
+              "deger": "593",
+              "metin": "İPbT - Koruyucu ve Destekleyici Tedbir"
+            }
+          ],
+          "toplam": 3
+        },
+        "İS - Sevk (Yönlendirme)": {
+          "asama_1_deger": "19",
+          "secenekler": [
+            {
+              "deger": "97",
+              "metin": "İS - Diğer"
+            },
+            {
+              "deger": "91",
+              "metin": "İS - RAM Rehberlik ve Psikolojik Danışma Hizmetleri Bölümüne Yönlendirme"
+            },
+            {
+              "deger": "92",
+              "metin": "İS - Sağlık Kuruluşuna Yönlendirme"
+            }
+          ],
+          "toplam": 3
+        }
+      },
+      "asama_3_bagimliliklari": {
+        "İP - Psikososyal Müdahale → İPbB - Bildirim Yükümlülüğü": {
+          "asama_1_deger": "18",
+          "asama_2_deger": "592",
+          "secenekler": [
+            {
+              "deger": "628",
+              "metin": "İPbB - Cinsel İstismar"
+            },
+            {
+              "deger": "597",
+              "metin": "İPbB - Duygusal İhmal"
+            },
+            {
+              "deger": "627",
+              "metin": "İPbB - Duygusal İstismar"
+            },
+            {
+              "deger": "596",
+              "metin": "İPbB - Eğitim İle İlgili İhmal"
+            },
+            {
+              "deger": "629",
+              "metin": "İPbB - Ekonomik İstismar"
+            },
+            {
+              "deger": "595",
+              "metin": "İPbB - Fiziksel İhmal"
+            },
+            {
+              "deger": "626",
+              "metin": "İPbB - Fiziksel İstismar"
+            },
+            {
+              "deger": "631",
+              "metin": "İPbB - Madde Bulundurma"
+            },
+            {
+              "deger": "630",
+              "metin": "İPbB - Madde Kullanımı"
+            },
+            {
+              "deger": "632",
+              "metin": "İPbB - Madde Satışı"
+            },
+            {
+              "deger": "625",
+              "metin": "İPbB - Sağlık İhmali"
+            }
+          ],
+          "toplam": 11
+        },
+        "İP - Psikososyal Müdahale → İPbİ - İntihar": {
+          "asama_1_deger": "18",
+          "asama_2_deger": "594",
+          "secenekler": [
+            {
+              "deger": "610",
+              "metin": "İPbİ - Tamamlanmamış İntihar"
+            },
+            {
+              "deger": "611",
+              "metin": "İPbİ - Tamamlanmış İntihar"
+            }
+          ],
+          "toplam": 2
+        },
+        "İP - Psikososyal Müdahale → İPbT - Koruyucu ve Destekleyici Tedbir": {
+          "asama_1_deger": "18",
+          "asama_2_deger": "593",
+          "secenekler": [
+            {
+              "deger": "606",
+              "metin": "İPbT - Danışmanlık Tedbiri"
+            },
+            {
+              "deger": "608",
+              "metin": "İPbT - Danışmanlık ve Eğitim Tedbiri"
+            },
+            {
+              "deger": "607",
+              "metin": "İPbT - EğitimTedbiri"
+            }
+          ],
+          "toplam": 3
+        }
+      },
+      "istatistikler": {
+        "toplam_asama_1": 3,
+        "toplam_asama_2": 18,
+        "toplam_asama_3": 16,
+        "toplam_kombinasyon": 37
+      }
+    }
+  }
+}

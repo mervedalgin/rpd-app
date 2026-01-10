@@ -46,7 +46,8 @@ import {
   ExternalLink,
   BellRing,
   Phone,
-  PieChart
+  PieChart,
+  Bot
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -245,6 +246,12 @@ const menuCategories: MenuCategory[] = [
         href: "/panel/telegram", 
         label: "Telegram Bildirimleri", 
         icon: Send,
+        color: "sky"
+      },
+      {
+        href: "/panel/mebbis",
+        label: "MEBBİS Entegrasyonu",
+        icon: Bot,
         color: "sky"
       },
     ]
