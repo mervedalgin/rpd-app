@@ -38,7 +38,15 @@ import {
   Clock,
   Target,
   BookOpen,
-  Brain
+  Brain,
+  CalendarCheck,
+  FolderOpen,
+  Calendar,
+  ListTodo,
+  ExternalLink,
+  BellRing,
+  Phone,
+  PieChart
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -75,10 +83,110 @@ const menuCategories: MenuCategory[] = [
         badge: null,
         color: "blue"
       },
+      { 
+        href: "/panel/takvim", 
+        label: "Takvim", 
+        icon: Calendar,
+        color: "teal"
+      },
+      { 
+        href: "/panel/yapilacaklar", 
+        label: "Yapılacaklar", 
+        icon: ListTodo,
+        color: "orange"
+      },
+      { 
+        href: "/panel/ayarlar", 
+        label: "Ayarlar", 
+        icon: Settings,
+        color: "slate"
+      },
     ]
   },
   {
-    title: "Analiz",
+    title: "Randevular",
+    items: [
+      { 
+        href: "/panel/randevu", 
+        label: "Randevular", 
+        icon: CalendarCheck,
+        exact: true,
+        color: "indigo"
+      },
+      { 
+        href: "/panel/randevu/raporlar", 
+        label: "Randevu Raporları", 
+        icon: FileText,
+        color: "purple"
+      },
+      { 
+        href: "/panel/randevu/bildirimler", 
+        label: "Randevu Bildirimleri", 
+        icon: Bell,
+        color: "amber"
+      },
+    ]
+  },
+  {
+    title: "Öğrenci Takip",
+    items: [
+      {
+        href: "/panel/vaka-dosyalari",
+        label: "Vaka Dosyaları",
+        icon: FolderOpen,
+        color: "cyan"
+      },
+      {
+        href: "/panel/ogrenci-listesi",
+        label: "Öğrenci Listesi",
+        icon: GraduationCap,
+        color: "emerald"
+      },
+      {
+        href: "/panel/ogrenci-gecmisi",
+        label: "Öğrenci Geçmişi",
+        icon: History,
+        color: "violet"
+      },
+      { 
+        href: "/panel/ogrenciler", 
+        label: "Öğrenci Yönetimi", 
+        icon: Users,
+        color: "slate"
+      },
+      {
+        href: "/panel/risk-takip",
+        label: "Risk Takip",
+        icon: AlertTriangle,
+        color: "red"
+      },
+    ]
+  },
+  {
+    title: "Süreç Yönetimi",
+    items: [
+      {
+        href: "/panel/ram-yonlendirme",
+        label: "RAM Yönlendirme",
+        icon: ExternalLink,
+        color: "purple"
+      },
+      {
+        href: "/panel/takip-hatirlaticilar",
+        label: "Takip Hatırlatıcılar",
+        icon: BellRing,
+        color: "orange"
+      },
+      {
+        href: "/panel/veli-iletisim",
+        label: "Veli İletişim",
+        icon: Phone,
+        color: "pink"
+      },
+    ]
+  },
+  {
+    title: "Analiz & Raporlar",
     items: [
       { 
         href: "/panel/nedenler", 
@@ -98,34 +206,29 @@ const menuCategories: MenuCategory[] = [
         icon: UserCheck,
         color: "emerald"
       },
-    ]
-  },
-  {
-    title: "Öğrenci",
-    items: [
       {
-        href: "/panel/ogrenci-listesi",
-        label: "Öğrenci Listesi",
-        icon: GraduationCap,
-        color: "cyan"
+        href: "/panel/trend-analizi",
+        label: "Trend Analizi",
+        icon: TrendingUp,
+        color: "teal"
       },
       {
-        href: "/panel/ogrenci-gecmisi",
-        label: "Öğrenci Geçmişi",
-        icon: History,
-        color: "violet"
-      },
-      { 
-        href: "/panel/ogrenciler", 
-        label: "Öğrenci Yönetimi", 
-        icon: Settings,
-        color: "slate"
+        href: "/panel/donem-raporu",
+        label: "Dönem Raporu",
+        icon: PieChart,
+        color: "blue"
       },
     ]
   },
   {
     title: "İşlemler",
     items: [
+      {
+        href: "/panel/sinif-etkinlikleri",
+        label: "Sınıf Etkinlikleri",
+        icon: Users,
+        color: "cyan"
+      },
       {
         href: "/panel/belge",
         label: "Belge Oluştur",
@@ -163,6 +266,10 @@ const colorMap: Record<string, { gradient: string; bg: string; text: string; bor
   purple: { gradient: "from-purple-500 to-pink-600", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
   rose: { gradient: "from-rose-500 to-red-600", bg: "bg-rose-50", text: "text-rose-600", border: "border-rose-200" },
   sky: { gradient: "from-sky-500 to-cyan-600", bg: "bg-sky-50", text: "text-sky-600", border: "border-sky-200" },
+  teal: { gradient: "from-teal-500 to-emerald-600", bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200" },
+  orange: { gradient: "from-orange-500 to-amber-600", bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200" },
+  red: { gradient: "from-red-500 to-rose-600", bg: "bg-red-50", text: "text-red-600", border: "border-red-200" },
+  pink: { gradient: "from-pink-500 to-rose-600", bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200" },
 };
 
 export default function PanelLayout({
@@ -176,7 +283,7 @@ export default function PanelLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(["Genel", "Analiz", "Öğrenci", "İşlemler"]);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(["Genel", "Randevular", "Öğrenci Takip", "Süreç Yönetimi", "Analiz & Raporlar", "İşlemler"]);
   
   // Şifre koruması state'leri
   const [isAuthenticated, setIsAuthenticated] = useState(false);

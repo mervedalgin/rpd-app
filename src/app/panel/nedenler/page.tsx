@@ -29,6 +29,10 @@ import {
   Activity
 } from "lucide-react";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, HeadingLevel, AlignmentType, WidthType, BorderStyle } from "docx";
+import { saveAs } from "file-saver";
 import { usePanelData } from "../hooks";
 import { YONLENDIRME_NEDENLERI } from "@/types";
 import { TimeFilter, StatsResponse } from "../types";
@@ -229,6 +233,228 @@ export default function NedenlerPage() {
     month: "Bu Ay",
     all: "Tüm Zamanlar",
     custom: reasonCustomDate ? new Date(reasonCustomDate).toLocaleDateString('tr-TR') : "Özel Tarih"
+  };
+
+  // PDF Export fonksiyonu
+  const exportToPDF = (reason: string, students: { student_name: string; class_display: string; date?: string }[]) => {
+    const doc = new jsPDF();
+    
+    // Türkçe karakter desteği için
+    doc.setFont("helvetica");
+    
+    // Başlık
+    doc.setFontSize(18);
+    doc.setTextColor(234, 88, 12); // Orange color
+    doc.text("RPD Yönlendirme Raporu", 14, 20);
+    
+    // Alt başlık
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Yönlendirme Nedeni: ${reason}`, 14, 32);
+    
+    // Dönem bilgisi
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Dönem: ${periodLabels[reasonTimeFilter]}`, 14, 40);
+    doc.text(`Toplam Öğrenci: ${students.length}`, 14, 46);
+    doc.text(`Rapor Tarihi: ${new Date().toLocaleDateString('tr-TR')}`, 14, 52);
+    
+    // Tablo
+    const tableData = students.map((s, idx) => [
+      (idx + 1).toString(),
+      s.student_name,
+      s.class_display,
+      s.date ? new Date(s.date).toLocaleDateString('tr-TR') : '-'
+    ]);
+    
+    autoTable(doc, {
+      startY: 60,
+      head: [['#', 'Öğrenci Adı', 'Sınıf', 'Tarih']],
+      body: tableData,
+      theme: 'striped',
+      headStyles: {
+        fillColor: [234, 88, 12],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+      columnStyles: {
+        0: { cellWidth: 15 },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 50 },
+        3: { cellWidth: 35 }
+      }
+    });
+    
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Sayfa ${i} / ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+    
+    // Dosya adını oluştur
+    const safeReason = reason.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s]/g, '').replace(/\s+/g, '_').substring(0, 30);
+    const fileName = `RPD_${safeReason}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    
+    doc.save(fileName);
+    toast.success("PDF dosyası indirildi");
+  };
+
+  // Word Export fonksiyonu
+  const exportToWord = async (reason: string, students: { student_name: string; class_display: string; date?: string }[]) => {
+    // Tablo satırları oluştur
+    const tableRows = [
+      // Header row
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: "#", bold: true, color: "FFFFFF" })],
+              alignment: AlignmentType.CENTER 
+            })],
+            shading: { fill: "EA580C" },
+            width: { size: 10, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: "Öğrenci Adı", bold: true, color: "FFFFFF" })],
+              alignment: AlignmentType.CENTER 
+            })],
+            shading: { fill: "EA580C" },
+            width: { size: 40, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: "Sınıf", bold: true, color: "FFFFFF" })],
+              alignment: AlignmentType.CENTER 
+            })],
+            shading: { fill: "EA580C" },
+            width: { size: 30, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: "Tarih", bold: true, color: "FFFFFF" })],
+              alignment: AlignmentType.CENTER 
+            })],
+            shading: { fill: "EA580C" },
+            width: { size: 20, type: WidthType.PERCENTAGE }
+          }),
+        ],
+      }),
+      // Data rows
+      ...students.map((s, idx) => 
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: (idx + 1).toString() })],
+                alignment: AlignmentType.CENTER 
+              })],
+              shading: { fill: idx % 2 === 0 ? "FFF7ED" : "FFFFFF" }
+            }),
+            new TableCell({
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: s.student_name })]
+              })],
+              shading: { fill: idx % 2 === 0 ? "FFF7ED" : "FFFFFF" }
+            }),
+            new TableCell({
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: s.class_display })],
+                alignment: AlignmentType.CENTER 
+              })],
+              shading: { fill: idx % 2 === 0 ? "FFF7ED" : "FFFFFF" }
+            }),
+            new TableCell({
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: s.date ? new Date(s.date).toLocaleDateString('tr-TR') : '-' })],
+                alignment: AlignmentType.CENTER 
+              })],
+              shading: { fill: idx % 2 === 0 ? "FFF7ED" : "FFFFFF" }
+            }),
+          ],
+        })
+      ),
+    ];
+
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          // Başlık
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "RPD Yönlendirme Raporu",
+                bold: true,
+                size: 36,
+                color: "EA580C"
+              })
+            ],
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 200 }
+          }),
+          // Alt başlık
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Yönlendirme Nedeni: ${reason}`,
+                bold: true,
+                size: 28
+              })
+            ],
+            heading: HeadingLevel.HEADING_2,
+            spacing: { after: 150 }
+          }),
+          // Bilgi satırları
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Dönem: ", bold: true }),
+              new TextRun({ text: periodLabels[reasonTimeFilter] })
+            ],
+            spacing: { after: 100 }
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Toplam Öğrenci: ", bold: true }),
+              new TextRun({ text: students.length.toString() })
+            ],
+            spacing: { after: 100 }
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Rapor Tarihi: ", bold: true }),
+              new TextRun({ text: new Date().toLocaleDateString('tr-TR') })
+            ],
+            spacing: { after: 300 }
+          }),
+          // Tablo
+          new Table({
+            rows: tableRows,
+            width: { size: 100, type: WidthType.PERCENTAGE }
+          }),
+        ],
+      }],
+    });
+
+    // Dosya oluştur ve indir
+    const blob = await Packer.toBlob(doc);
+    const safeReason = reason.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s]/g, '').replace(/\s+/g, '_').substring(0, 30);
+    const fileName = `RPD_${safeReason}_${new Date().toISOString().slice(0, 10)}.docx`;
+    
+    saveAs(blob, fileName);
+    toast.success("Word dosyası indirildi");
   };
 
   return (
@@ -654,18 +880,43 @@ export default function NedenlerPage() {
                   </div>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1"
-                onClick={() => {
-                  setSelectedReason(null);
-                  setReasonStudents([]);
-                }}
-              >
-                <X className="h-4 w-4" />
-                Kapat
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* PDF ve Word İndirme Butonları */}
+                {reasonStudents.length > 0 && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 gap-1.5 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                      onClick={() => exportToPDF(selectedReason, reasonStudents)}
+                    >
+                      <FileText className="h-4 w-4" />
+                      PDF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300"
+                      onClick={() => exportToWord(selectedReason, reasonStudents)}
+                    >
+                      <FileText className="h-4 w-4" />
+                      Word
+                    </Button>
+                  </>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1"
+                  onClick={() => {
+                    setSelectedReason(null);
+                    setReasonStudents([]);
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                  Kapat
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
