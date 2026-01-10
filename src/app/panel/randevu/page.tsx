@@ -1042,7 +1042,7 @@ export default function RandevuPage() {
                       if (e.key === 'Enter' && customTag.trim()) {
                         e.preventDefault();
                         const newTag = customTag.trim();
-                        if (!formData.topic_tags.includes(newTag) && !TOPIC_TAGS.includes(newTag)) {
+                        if (!formData.topic_tags.includes(newTag) && !(TOPIC_TAGS as readonly string[]).includes(newTag)) {
                           setFormData({ ...formData, topic_tags: [...formData.topic_tags, newTag] });
                           if (!customTags.includes(newTag)) {
                             setCustomTags([...customTags, newTag]);
@@ -1061,7 +1061,7 @@ export default function RandevuPage() {
                     onClick={() => {
                       if (customTag.trim()) {
                         const newTag = customTag.trim();
-                        if (!formData.topic_tags.includes(newTag) && !TOPIC_TAGS.includes(newTag)) {
+                        if (!formData.topic_tags.includes(newTag) && !(TOPIC_TAGS as readonly string[]).includes(newTag)) {
                           setFormData({ ...formData, topic_tags: [...formData.topic_tags, newTag] });
                           if (!customTags.includes(newTag)) {
                             setCustomTags([...customTags, newTag]);
@@ -1101,7 +1101,7 @@ export default function RandevuPage() {
                 
                 {/* Önerilen etiketler */}
                 <div className="flex flex-wrap gap-2 p-3 border rounded-lg bg-slate-50 max-h-32 overflow-y-auto">
-                  {[...TOPIC_TAGS, ...customTags.filter(t => !TOPIC_TAGS.includes(t))].map(tag => (
+                  {[...TOPIC_TAGS, ...customTags.filter(t => !(TOPIC_TAGS as readonly string[]).includes(t))].map(tag => (
                     <button
                       key={tag}
                       type="button"
@@ -1114,12 +1114,12 @@ export default function RandevuPage() {
                       className={`text-xs px-2 py-1 rounded-full transition-colors ${
                         formData.topic_tags.includes(tag)
                           ? "bg-teal-500 text-white"
-                          : customTags.includes(tag) && !TOPIC_TAGS.includes(tag)
+                          : customTags.includes(tag) && !(TOPIC_TAGS as readonly string[]).includes(tag)
                             ? "bg-purple-100 border border-purple-300 hover:bg-purple-200 text-purple-700"
                             : "bg-white border hover:bg-slate-100"
                       }`}
                     >
-                      {customTags.includes(tag) && !TOPIC_TAGS.includes(tag) && "✨ "}
+                      {customTags.includes(tag) && !(TOPIC_TAGS as readonly string[]).includes(tag) && "✨ "}
                       {tag}
                     </button>
                   ))}
