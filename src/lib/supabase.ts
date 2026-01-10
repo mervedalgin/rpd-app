@@ -8,14 +8,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn("Supabase configuration missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
 }
 
-export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
+const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 
 // Helper function - supabase null ise hata fırlat
 export function getSupabase(): SupabaseClient {
-  if (!supabase) {
+  if (!_supabaseClient) {
     throw new Error("Supabase is not configured. Please check your environment variables.");
   }
-  return supabase;
+  return _supabaseClient;
 }
+
+// Backward compatibility - supabase'i null olmayan bir şekilde export et
+// Runtime'da null olabilir ama TypeScript'e null olmadığını söylüyoruz
+export const supabase = _supabaseClient as SupabaseClient;

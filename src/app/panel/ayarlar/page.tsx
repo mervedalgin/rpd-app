@@ -539,7 +539,7 @@ export default function AyarlarPage() {
                   </button>
                 </div>
                 
-                {settings.appointment_reminder && (
+                {Boolean(settings.appointment_reminder) && (
                   <div className="ml-16 p-4 bg-amber-50 rounded-xl border border-amber-200">
                     <Label htmlFor="reminder_hours" className="text-sm">Kaç saat önce hatırlat?</Label>
                     <div className="flex items-center gap-2 mt-2">
@@ -686,7 +686,7 @@ export default function AyarlarPage() {
                       {settings.signature_text as string}
                     </pre>
                   </div>
-                  {settings.document_footer && (
+                  {Boolean(settings.document_footer) && (
                     <div className="text-center mt-4 pt-4 border-t">
                       <pre className="text-xs text-slate-400 whitespace-pre-wrap font-sans">
                         {settings.document_footer as string}
