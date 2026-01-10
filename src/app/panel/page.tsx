@@ -50,6 +50,7 @@ import {
   useNewReferralNotification 
 } from "@/components/NotificationSystem";
 import Link from "next/link";
+import { Appointment, PARTICIPANT_TYPES, APPOINTMENT_LOCATIONS } from "@/types";
 
 // Canlı Saat Komponenti - Geliştirilmiş
 function LiveClock() {
@@ -711,6 +712,390 @@ function ReasonsMiniWidget({ byReason }: { byReason?: Record<string, number> }) 
   );
 }
 
+// Yaklaşan Randevular Widget - Modern & Animated
+function UpcomingAppointmentsWidget() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeCard, setActiveCard] = useState<string | null>(null);
+  const [weekSummary, setWeekSummary] = useState({
+    total: 0,
+    completed: 0,
+    planned: 0,
+    cancelled: 0
+  });
+
+  // Canlı saat güncellemesi
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const res = await fetch("/api/appointments?status=planned");
+        if (res.ok) {
+          const data = await res.json();
+          const allAppointments = data.appointments || data || [];
+          
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const upcoming = allAppointments
+            .filter((apt: Appointment) => new Date(apt.appointment_date) >= today)
+            .sort((a: Appointment, b: Appointment) => {
+              const dateCompare = new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime();
+              if (dateCompare !== 0) return dateCompare;
+              return a.start_time.localeCompare(b.start_time);
+            })
+            .slice(0, 3);
+          
+          setAppointments(upcoming);
+        }
+
+        const allRes = await fetch("/api/appointments");
+        if (allRes.ok) {
+          const allData = await allRes.json();
+          const allApts = allData.appointments || allData || [];
+          
+          const now = new Date();
+          const startOfWeek = new Date(now);
+          startOfWeek.setDate(now.getDate() - now.getDay() + 1);
+          startOfWeek.setHours(0, 0, 0, 0);
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
+          endOfWeek.setHours(23, 59, 59, 999);
+          
+          const weekApts = allApts.filter((apt: Appointment) => {
+            const aptDate = new Date(apt.appointment_date);
+            return aptDate >= startOfWeek && aptDate <= endOfWeek;
+          });
+          
+          setWeekSummary({
+            total: weekApts.length,
+            completed: weekApts.filter((a: Appointment) => a.status === 'attended').length,
+            planned: weekApts.filter((a: Appointment) => a.status === 'planned').length,
+            cancelled: weekApts.filter((a: Appointment) => a.status === 'cancelled' || a.status === 'not_attended').length
+          });
+        }
+      } catch (error) {
+        console.error("Randevular yüklenirken hata:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  // Kalan süre hesaplama
+  const getTimeRemaining = (dateStr: string, timeStr: string) => {
+    const aptDateTime = new Date(dateStr);
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    aptDateTime.setHours(hours, minutes, 0, 0);
+    
+    const diff = aptDateTime.getTime() - currentTime.getTime();
+    if (diff < 0) return { text: "Geçti", urgent: false, passed: true };
+    
+    const totalMinutes = Math.floor(diff / (1000 * 60));
+    const totalHours = Math.floor(totalMinutes / 60);
+    const days = Math.floor(totalHours / 24);
+    const remainingHours = totalHours % 24;
+    const remainingMinutes = totalMinutes % 60;
+    
+    if (days > 0) return { text: `${days}g ${remainingHours}s`, urgent: false, passed: false };
+    if (totalHours > 0) return { text: `${totalHours}s ${remainingMinutes}dk`, urgent: totalHours < 2, passed: false };
+    return { text: `${totalMinutes}dk`, urgent: true, passed: false };
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    if (date.toDateString() === today.toDateString()) return "Bugün";
+    if (date.toDateString() === tomorrow.toDateString()) return "Yarın";
+    return date.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' });
+  };
+
+  const formatTime = (timeStr: string) => timeStr.slice(0, 5);
+
+  const getParticipantIcon = (type: string) => {
+    switch (type) {
+      case 'student': return { icon: GraduationCap, color: 'from-blue-500 to-indigo-600', bg: 'bg-blue-100' };
+      case 'parent': return { icon: Users, color: 'from-purple-500 to-pink-600', bg: 'bg-purple-100' };
+      case 'teacher': return { icon: BookOpen, color: 'from-amber-500 to-orange-600', bg: 'bg-amber-100' };
+      default: return { icon: Calendar, color: 'from-slate-500 to-slate-600', bg: 'bg-slate-100' };
+    }
+  };
+
+  const getParticipantLabel = (type: string) => {
+    switch (type) {
+      case 'student': return 'Öğrenci';
+      case 'parent': return 'Veli';
+      case 'teacher': return 'Öğretmen';
+      default: return 'Randevu';
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card className="bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 border-0 shadow-2xl overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500/20 to-cyan-500/20 animate-pulse" />
+            <div className="space-y-2 flex-1">
+              <div className="h-4 bg-white/10 rounded w-1/3 animate-pulse" />
+              <div className="h-3 bg-white/5 rounded w-1/2 animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 bg-white/5 rounded-2xl animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 border-0 shadow-2xl overflow-hidden relative group">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,rgba(255,255,255,0.3))]" />
+      <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-teal-500/20 blur-3xl animate-float-slow" />
+      <div className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-cyan-500/20 blur-3xl animate-float-reverse" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl animate-pulse-glow" />
+      
+      {/* Floating Particles */}
+      <div className="absolute top-10 right-20 h-2 w-2 rounded-full bg-teal-400/60 animate-float animation-delay-100" />
+      <div className="absolute top-32 right-40 h-1.5 w-1.5 rounded-full bg-cyan-400/60 animate-float animation-delay-300" />
+      <div className="absolute bottom-20 left-20 h-2 w-2 rounded-full bg-indigo-400/60 animate-float animation-delay-500" />
+      <div className="absolute top-1/3 left-1/4 h-1 w-1 rounded-full bg-white/40 animate-sparkle" />
+      <div className="absolute bottom-1/3 right-1/4 h-1.5 w-1.5 rounded-full bg-amber-400/50 animate-sparkle animation-delay-700" />
+      
+      {/* Header */}
+      <CardHeader className="pb-4 relative border-b border-white/10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:shadow-teal-500/50 transition-all duration-500">
+                <Calendar className="h-7 w-7 text-white" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center animate-pulse">
+                <span className="text-[10px] text-white font-bold">{appointments.length}</span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight">Yaklaşan Randevular</h3>
+              <p className="text-sm text-slate-400 flex items-center gap-2">
+                <span className="flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                Canlı takip aktif
+              </p>
+            </div>
+          </div>
+          <Link href="/panel/randevu">
+            <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300 hover:bg-white/10 gap-1 group/btn">
+              <span>Tümünü Gör</span>
+              <ChevronRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-5 relative space-y-5">
+        {/* Hafta Özeti - Animated Stats */}
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { label: 'Bu Hafta', value: weekSummary.total, color: 'from-slate-500 to-slate-600', icon: Calendar },
+            { label: 'Bekliyor', value: weekSummary.planned, color: 'from-teal-500 to-cyan-600', icon: Clock },
+            { label: 'Tamamlandı', value: weekSummary.completed, color: 'from-emerald-500 to-green-600', icon: CheckCircle2 },
+            { label: 'İptal/Gelmedi', value: weekSummary.cancelled, color: 'from-red-500 to-rose-600', icon: AlertCircle }
+          ].map((stat, idx) => (
+            <div 
+              key={stat.label}
+              className="relative group/stat p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-default overflow-hidden"
+              style={{ animationDelay: `${idx * 100}ms` }}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover/stat:opacity-10 transition-opacity duration-300`} />
+              <div className="relative">
+                <stat.icon className="h-4 w-4 text-slate-500 mb-2 group-hover/stat:scale-110 transition-transform" />
+                <p className="text-2xl font-bold text-white tabular-nums group-hover/stat:scale-105 transition-transform origin-left">
+                  {stat.value}
+                </p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">{stat.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Randevu Listesi */}
+        {appointments.length === 0 ? (
+          <div className="text-center py-10 relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-teal-500/10 to-cyan-500/10 blur-2xl animate-pulse" />
+            </div>
+            <div className="relative">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-slate-700 to-slate-800 mb-4 border border-white/10 shadow-xl">
+                <Calendar className="h-10 w-10 text-slate-400" />
+              </div>
+              <p className="text-lg font-medium text-white mb-2">Yaklaşan randevu yok</p>
+              <p className="text-sm text-slate-500 mb-5">Yeni bir randevu planlamaya ne dersin?</p>
+              <Link href="/panel/randevu">
+                <Button className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-400 hover:to-cyan-500 text-white shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 transition-all duration-300 hover:scale-105">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Yeni Randevu Oluştur
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {appointments.map((apt, index) => {
+              const isToday = new Date(apt.appointment_date).toDateString() === new Date().toDateString();
+              const timeRemaining = getTimeRemaining(apt.appointment_date, apt.start_time);
+              const participant = getParticipantIcon(apt.participant_type);
+              const ParticipantIcon = participant.icon;
+              const isActive = activeCard === apt.id;
+              
+              return (
+                <Link href="/panel/randevu" key={apt.id}>
+                  <div 
+                    className={`group/card relative p-4 rounded-2xl border transition-all duration-500 cursor-pointer overflow-hidden
+                      ${isToday 
+                        ? 'bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border-teal-500/30 hover:border-teal-400/50' 
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                      }
+                      ${isActive ? 'scale-[1.02] shadow-2xl' : 'hover:scale-[1.01]'}
+                    `}
+                    style={{ animationDelay: `${index * 150}ms` }}
+                    onMouseEnter={() => setActiveCard(apt.id)}
+                    onMouseLeave={() => setActiveCard(null)}
+                  >
+                    {/* Animated Background on Hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${participant.color} opacity-0 group-hover/card:opacity-5 transition-opacity duration-500`} />
+                    
+                    {/* Urgent Pulse Effect */}
+                    {timeRemaining.urgent && !timeRemaining.passed && (
+                      <div className="absolute inset-0 rounded-2xl animate-pulse-border" />
+                    )}
+                    
+                    <div className="relative flex items-center gap-4">
+                      {/* Avatar/Icon */}
+                      <div className="relative">
+                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${participant.color} flex items-center justify-center shadow-lg transition-all duration-300 group-hover/card:scale-110 group-hover/card:rotate-3`}>
+                          <ParticipantIcon className="h-7 w-7 text-white" />
+                        </div>
+                        {isToday && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 border-2 border-slate-900 animate-bounce">
+                            <Sparkles className="h-2 w-2 text-white m-0.5" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-white truncate group-hover/card:text-teal-300 transition-colors">
+                            {apt.participant_name}
+                          </p>
+                          <Badge className={`${participant.bg} text-slate-700 border-0 text-[10px] px-2 py-0`}>
+                            {getParticipantLabel(apt.participant_type)}
+                          </Badge>
+                          {isToday && (
+                            <Badge className="bg-teal-500/20 text-teal-300 border-teal-500/30 text-[10px] px-2 py-0 animate-pulse">
+                              Bugün
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-400 truncate mb-2">{apt.participant_class}</p>
+                        
+                        {/* Time Info */}
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="flex items-center gap-1.5 text-slate-500">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span className="font-medium">{formatDate(apt.appointment_date)}</span>
+                          </span>
+                          <span className="flex items-center gap-1.5 text-slate-500">
+                            <Clock className="h-3.5 w-3.5" />
+                            <span className="font-medium">{formatTime(apt.start_time)}</span>
+                          </span>
+                          {apt.purpose && (
+                            <span className="flex items-center gap-1.5 text-slate-500 truncate">
+                              <MessageSquare className="h-3.5 w-3.5 flex-shrink-0" />
+                              <span className="truncate">{apt.purpose}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Time Remaining Badge */}
+                      <div className="flex flex-col items-end gap-2">
+                        <div className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300
+                          ${timeRemaining.passed 
+                            ? 'bg-slate-500/20 text-slate-400'
+                            : timeRemaining.urgent 
+                              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30 animate-pulse' 
+                              : 'bg-white/10 text-white'
+                          }`}
+                        >
+                          {timeRemaining.passed ? '⏰ Geçti' : `⏱ ${timeRemaining.text}`}
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-slate-600 group-hover/card:text-teal-400 group-hover/card:translate-x-1 transition-all duration-300" />
+                      </div>
+                    </div>
+                    
+                    {/* Progress Bar for Today's Appointments */}
+                    {isToday && !timeRemaining.passed && (
+                      <div className="mt-3 pt-3 border-t border-white/5">
+                        <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+                          <span>Randevuya kalan süre</span>
+                          <span className="text-teal-400 font-medium">{timeRemaining.text}</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                          <div 
+                            className="h-full rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-1000 animate-shimmer relative"
+                            style={{ 
+                              width: `${Math.max(5, 100 - (parseInt(timeRemaining.text) / 60) * 100)}%` 
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+        
+        {/* Quick Actions */}
+        {appointments.length > 0 && (
+          <div className="flex gap-2 pt-2">
+            <Link href="/panel/randevu" className="flex-1">
+              <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 transition-all duration-300">
+                <Calendar className="h-4 w-4 mr-2" />
+                Yeni Randevu
+              </Button>
+            </Link>
+            <Link href="/panel/randevu/bildirimler" className="flex-1">
+              <Button variant="ghost" className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 transition-all duration-300">
+                <Bell className="h-4 w-4 mr-2" />
+                Bildirim Gönder
+              </Button>
+            </Link>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function PanelOzetPage() {
   const { stats, loadingStats, statsError, fetchStats } = usePanelData();
   const [showCharts, setShowCharts] = useState(true);
@@ -850,6 +1235,9 @@ export default function PanelOzetPage() {
           </div>
         </div>
       </div>
+
+      {/* Yaklaşan Randevular - En Üstte */}
+      <UpcomingAppointmentsWidget />
 
       {statsError && (
         <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
