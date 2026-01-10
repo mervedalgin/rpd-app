@@ -40,7 +40,8 @@ import {
   Share2,
   ChevronRight,
   Star,
-  Zap
+  Zap,
+  Wand2
 } from "lucide-react";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
@@ -157,6 +158,7 @@ export default function BelgePage() {
   const [documentContent, setDocumentContent] = useState<string>("");
   const [exportingWord, setExportingWord] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
   
   // Veli Çağrısı için tarih ve saat
   const [meetingDate, setMeetingDate] = useState<string>("");
@@ -644,6 +646,51 @@ ${signature}`,
     toast.success("Telegram açılıyor...");
   };
 
+  // AI ile belgeyi geliştir
+  const generateWithAI = async () => {
+    if (!documentContent) {
+      toast.error("Önce bir belge içeriği oluşturun");
+      return;
+    }
+
+    setGeneratingAI(true);
+    
+    try {
+      const response = await fetch("/api/generate-document", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          documentType: selectedDocument,
+          currentContent: documentContent,
+          studentName: selectedStudent?.text || "",
+          studentClass: selectedClassText || "",
+          meetingDate: meetingDate || undefined,
+          meetingTime: meetingTime || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Belge oluşturulamadı");
+      }
+
+      const data = await response.json();
+      
+      if (data.document) {
+        setDocumentContent(data.document);
+        setHasUnsavedChanges(true);
+        toast.success("Belge AI ile geliştirildi! ✨");
+      }
+    } catch (error) {
+      console.error("AI generation error:", error);
+      toast.error(error instanceof Error ? error.message : "AI ile belge oluşturulamadı");
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
+
   // Word olarak indir
   const downloadAsWord = () => {
     if (!documentContent) return;
@@ -1078,6 +1125,30 @@ ${signature}`,
                 
                 {/* Eylem Butonları */}
                 <div className="flex flex-wrap items-center gap-1.5">
+                  {/* AI ile Geliştir */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1 bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0 hover:from-violet-600 hover:to-purple-700 shadow-sm"
+                    onClick={generateWithAI}
+                    disabled={generatingAI || !documentContent}
+                    title="AI ile belgeyi geliştir"
+                  >
+                    {generatingAI ? (
+                      <>
+                        <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                        <span className="hidden sm:inline">Gemini...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">AI Geliştir</span>
+                      </>
+                    )}
+                  </Button>
+                  
+                  <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block" />
+                  
                   {/* Düzenleme */}
                   <Button
                     size="sm"
