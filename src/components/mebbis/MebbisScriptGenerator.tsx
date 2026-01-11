@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Copy, Download, Play, CheckCircle } from 'lucide-react';
+import { Copy, Download, Play, CheckCircle, Terminal, FileJson, Package, Sparkles, Zap, AlertTriangle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { MebbisFormData, MebbisBulkFormData } from '@/types/mebbis';
@@ -787,127 +787,211 @@ fake-useragent==1.4.0
 requests==2.31.0`;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Play className="h-5 w-5" />
-          Oluşturulan Selenium Kodu {isBulkMode && `(${recordsToProcess.length} Kayıt)`}
+    <Card className="overflow-hidden border-0 shadow-2xl bg-white/80 backdrop-blur-xl">
+      <CardHeader className="relative overflow-hidden pb-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-2xl" />
+        <CardTitle className="relative flex items-center gap-3">
+          <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg">
+            <Play className="h-5 w-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Selenium Kodu Hazır
+              </span>
+              {isBulkMode && (
+                <span className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full shadow-md">
+                  {recordsToProcess.length} Kayıt
+                </span>
+              )}
+            </div>
+            <p className="text-sm font-normal text-gray-500 mt-0.5">Otomasyon kodu başarıyla oluşturuldu</p>
+          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="p-4 bg-green-50 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="text-green-500 h-5 w-5" />
-            <span className="font-medium text-green-700">
-              {isBulkMode ? 'Çoklu kayıt kodu başarıyla oluşturuldu!' : 'Kod başarıyla oluşturuldu!'}
-            </span>
-          </div>
-          <p className="text-sm text-green-600">
-            {isBulkMode
-              ? `${recordsToProcess.length} adet kayıt için toplu Python kodu oluşturuldu.`
-              : 'Aşağıdaki Python kodunu kopyalayarak çalıştırabilirsiniz.'}
-          </p>
-        </div>
-
-        {/* Requirements */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Gerekli Kütüphaneler (requirements.txt):</h3>
-          <div className="relative bg-gray-50 rounded-lg p-3 border">
-            <pre className="text-sm text-gray-800 font-mono whitespace-pre-wrap">
-              {requirements}
-            </pre>
-            <button
-              onClick={() => navigator.clipboard.writeText(requirements)}
-              className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700 transition-colors"
-              title="Kopyala"
-            >
-              <Copy className="h-4 w-4" />
-            </button>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Terminalde çalıştırın: <code className="bg-gray-200 px-1 rounded">pip install -r requirements.txt</code>
-          </p>
-        </div>
-
-        {/* Python Script */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-700">
-              {isBulkMode ? 'Çoklu Kayıt Python Kodu:' : 'Python Automation Kodu:'}
-            </h3>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopy}
-                className={copied ? 'bg-green-100 text-green-700' : ''}
-              >
-                {copied ? <CheckCircle className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                {copied ? 'Kopyalandı!' : 'Kopyala'}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="h-4 w-4 mr-1" />
-                İndir
-              </Button>
+      <CardContent className="space-y-6 p-6">
+        {/* Success Banner */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border border-emerald-200/50 p-5">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-400/20 to-green-400/20 rounded-full blur-2xl" />
+          <div className="relative flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-emerald-400 rounded-xl blur-md opacity-40 animate-pulse" />
+              <div className="relative p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg">
+                <CheckCircle className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
+                {isBulkMode ? 'Çoklu Kayıt Kodu Hazır!' : 'Kod Başarıyla Oluşturuldu!'}
+                <Sparkles className="h-4 w-4 text-amber-500" />
+              </h3>
+              <p className="text-sm text-emerald-600">
+                {isBulkMode
+                  ? `${recordsToProcess.length} adet kayıt için toplu Python kodu oluşturuldu.`
+                  : 'Aşağıdaki Python kodunu kopyalayarak çalıştırabilirsiniz.'}
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="relative bg-gray-900 rounded-lg p-4 border overflow-x-auto max-h-96 overflow-y-auto">
-            <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">
-              {script}
-            </pre>
+        {/* Requirements Section */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border border-amber-200/50 p-5">
+          <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-amber-400/20 to-orange-400/20 rounded-full blur-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-amber-800 flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Gerekli Kütüphaneler
+              </h3>
+              <button
+                onClick={() => navigator.clipboard.writeText(requirements)}
+                className="text-xs text-amber-700 hover:text-amber-900 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-amber-100 transition-colors"
+              >
+                <Copy className="h-3 w-3" />
+                Kopyala
+              </button>
+            </div>
+            <div className="relative bg-amber-900/5 rounded-xl p-4 border border-amber-200/50">
+              <pre className="text-sm text-amber-900 font-mono whitespace-pre-wrap">
+                {requirements}
+              </pre>
+            </div>
+            <p className="text-xs text-amber-700 mt-2 flex items-center gap-1">
+              <Terminal className="h-3 w-3" />
+              <code className="bg-amber-100 px-2 py-0.5 rounded font-mono">pip install -r requirements.txt</code>
+            </p>
+          </div>
+        </div>
+
+        {/* Python Script Section */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 border border-slate-700/50 shadow-2xl">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 rounded-full blur-3xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-slate-800/50">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-red-500" />
+                  <span className="w-3 h-3 rounded-full bg-yellow-500" />
+                  <span className="w-3 h-3 rounded-full bg-green-500" />
+                </div>
+                <h3 className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                  <Terminal className="h-4 w-4" />
+                  {isBulkMode ? 'rpd_automation_bulk.py' : 'rpd_automation.py'}
+                </h3>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  className={`border-slate-600 bg-slate-700/50 hover:bg-slate-600 text-slate-200 transition-all duration-300 ${
+                    copied ? 'bg-emerald-600 border-emerald-500 text-white' : ''
+                  }`}
+                >
+                  {copied ? <CheckCircle className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {copied ? 'Kopyalandı!' : 'Kopyala'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleDownload}
+                  className="border-slate-600 bg-slate-700/50 hover:bg-slate-600 text-slate-200"
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  İndir
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative p-4 overflow-x-auto max-h-96 overflow-y-auto custom-scrollbar">
+              <pre className="text-sm text-emerald-400 font-mono whitespace-pre-wrap leading-relaxed">
+                {script}
+              </pre>
+            </div>
           </div>
         </div>
 
         {/* JSON Data Section */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-700">
-              {isBulkMode ? 'Çoklu Kayıt JSON Verisi:' : 'JSON Verisi:'}
-            </h3>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleCopyJson}>
-                <Copy className="h-4 w-4 mr-1" />
-                JSON Kopyala
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDownloadJson} className="bg-purple-100 text-purple-700 hover:bg-purple-200">
-                <Download className="h-4 w-4 mr-1" />
-                JSON İndir
-              </Button>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-purple-50 to-violet-50 border border-indigo-200/50 p-5">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 rounded-full blur-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-indigo-800 flex items-center gap-2">
+                <FileJson className="h-4 w-4" />
+                {isBulkMode ? 'Çoklu Kayıt JSON Verisi' : 'JSON Verisi'}
+              </h3>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCopyJson}
+                  className="border-indigo-200 bg-white/50 hover:bg-indigo-50 text-indigo-700"
+                >
+                  <Copy className="h-3 w-3 mr-1" />
+                  Kopyala
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleDownloadJson} 
+                  className="border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700"
+                >
+                  <Download className="h-3 w-3 mr-1" />
+                  İndir
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <div className="relative bg-slate-800 rounded-lg p-4 border overflow-x-auto max-h-48 overflow-y-auto">
-            <pre className="text-sm text-blue-300 font-mono whitespace-pre-wrap">
-              {jsonData}
-            </pre>
+            <div className="relative bg-slate-800 rounded-xl p-4 border border-indigo-200/30 overflow-x-auto max-h-48 overflow-y-auto">
+              <pre className="text-sm text-blue-300 font-mono whitespace-pre-wrap">
+                {jsonData}
+              </pre>
+            </div>
           </div>
         </div>
 
-        <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-          <h4 className="font-medium text-amber-800 mb-2">
-            {isBulkMode ? 'Çoklu Kayıt Kullanım Talimatları:' : 'Kullanım Talimatları:'}
-          </h4>
-          <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
-            <li>Python 3.7+ ve Chrome tarayıcısının sisteminizde kurulu olduğundan emin olun</li>
-            <li>Yukarıdaki requirements.txt dosyasındaki kütüphaneleri yükleyin</li>
-            <li>
-              Python kodunu <strong>rpd_automation{isBulkMode ? '_bulk' : ''}.py</strong> olarak kaydedin
-            </li>
-            <li>
-              Kodu çalıştırın: <code className="bg-amber-200 px-1 rounded">python rpd_automation{isBulkMode ? '_bulk' : ''}.py</code>
-            </li>
-            <li>Script 3 adet sürücü yöntemi dener: undetected-chrome, webdriver-manager, PATH</li>
-            <li>Tarayıcı açıldığında MEB sistemine manuel giriş yapın</li>
-            <li>&quot;Sayfa Bulundu Veri Girmeye Hazır&quot; mesajını gördüğünüzde otomatik işlem başlayacak</li>
-            {isBulkMode && (
-              <li className="font-medium text-amber-800">
-                ÇOKLU KAYIT: {recordsToProcess.length} adet kayıt sırayla işlenecek
-              </li>
-            )}
-            <li>Script popup&apos;ları otomatik kapatacak ve JS ile form doldurma yapacak</li>
-            <li>Hata durumunda debug dosyaları (screenshot + HTML) otomatik kaydedilir</li>
-          </ol>
+        {/* Instructions */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 border border-sky-200/50 p-5">
+          <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-sky-400/20 to-blue-400/20 rounded-full blur-2xl" />
+          <div className="relative">
+            <h4 className="font-semibold text-sky-800 mb-4 flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              {isBulkMode ? 'Çoklu Kayıt Kullanım Talimatları' : 'Kullanım Talimatları'}
+            </h4>
+            <ol className="space-y-2">
+              {[
+                'Python 3.7+ ve Chrome tarayıcısının sisteminizde kurulu olduğundan emin olun',
+                'Yukarıdaki requirements.txt dosyasındaki kütüphaneleri yükleyin',
+                `Python kodunu ${isBulkMode ? 'rpd_automation_bulk.py' : 'rpd_automation.py'} olarak kaydedin`,
+                `Kodu çalıştırın: python ${isBulkMode ? 'rpd_automation_bulk.py' : 'rpd_automation.py'}`,
+                'Script 3 adet sürücü yöntemi dener: undetected-chrome, webdriver-manager, PATH',
+                'Tarayıcı açıldığında MEB sistemine manuel giriş yapın',
+                '"Sayfa Bulundu Veri Girmeye Hazır" mesajını gördüğünüzde otomatik işlem başlayacak',
+                ...(isBulkMode ? [`ÇOKLU KAYIT: ${recordsToProcess.length} adet kayıt sırayla işlenecek`] : []),
+                'Hata durumunda debug dosyaları (screenshot + HTML) otomatik kaydedilir'
+              ].map((step, index) => (
+                <li key={index} className="flex items-start gap-3 text-sm text-sky-800">
+                  <span className="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                    {index + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {/* Warning Note */}
+        <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200/50">
+          <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-amber-800">
+            <p className="font-medium">Önemli Not</p>
+            <p className="text-amber-700 mt-1">
+              Script popup&apos;ları otomatik kapatacak ve JS ile form doldurma yapacak. 
+              İşlem sırasında tarayıcıyı kapatmayın veya başka bir pencereye geçmeyin.
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>
