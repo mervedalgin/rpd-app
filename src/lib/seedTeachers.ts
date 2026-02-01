@@ -54,8 +54,8 @@ const SEED_TEACHERS: TeacherRecord[] = [
   },
   {
     teacherId: "t8",
-    teacherName: "MUSTAFA İNCEDAL",
-    teacherNameNormalized: "mustafa incedal",
+    teacherName: "RABİA KILIÇ",
+    teacherNameNormalized: "rabia kilic",
     sinifSubeKey: "22151847#3",
     sinifSubeDisplay: "3. Sınıf / A Şubesi"
   },
@@ -75,8 +75,8 @@ const SEED_TEACHERS: TeacherRecord[] = [
   },
   {
     teacherId: "t11",
-    teacherName: "FATMA ARSLAN",
-    teacherNameNormalized: "fatma arslan",
+    teacherName: "YASEMİN SÖKMEN",
+    teacherNameNormalized: "yasemin sokmen",
     sinifSubeKey: "22150551#3",
     sinifSubeDisplay: "3. Sınıf / D Şubesi"
   },
