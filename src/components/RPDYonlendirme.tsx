@@ -660,7 +660,9 @@ export default function RPDYonlendirme() {
                     control={form.control}
                     name="sinifSube"
                     render={({ field }) => {
-                      const t = teacherOptions.find(t => t.value === form.getValues('ogretmenAdi'));
+                      const selectedTeacher = form.watch('ogretmenAdi');
+                      const t = teacherOptions.find(t => t.value === selectedTeacher);
+                      const selectedClass = sinifSubeList.find(s => s.value === field.value);
                       return (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2 text-gray-700 font-medium text-sm sm:text-base">
@@ -668,24 +670,32 @@ export default function RPDYonlendirme() {
                             Sınıf *
                             {t && <Badge variant="secondary" className="text-[10px] sm:text-xs bg-indigo-100 text-indigo-700">Otomatik</Badge>}
                           </FormLabel>
-                          <Select
-                            onValueChange={(value) => { field.onChange(value); handleSinifChange(value); }}
-                            value={field.value}
-                            disabled={Boolean(t)}
-                          >
+                          {t ? (
+                            // Öğretmen seçiliyse sınıfı doğrudan göster (disabled select yerine)
                             <FormControl>
-                              <SelectTrigger className={`border-2 border-gray-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99] ${Boolean(t) ? 'bg-indigo-50/50 border-indigo-200' : ''}`}>
-                                <SelectValue placeholder="🏫 Sınıf seçin" />
-                              </SelectTrigger>
+                              <div className="border-2 border-indigo-200 bg-indigo-50/50 backdrop-blur-sm min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl flex items-center text-gray-700">
+                                🏫 {t.sinifSubeDisplay}
+                              </div>
                             </FormControl>
-                            <SelectContent className="max-h-[40vh]">
-                              {(t ? sinifSubeList.filter(s => s.value === t.sinifSubeKey) : sinifSubeList).map((sinif) => (
-                                <SelectItem key={sinif.value} value={sinif.value}>
-                                  {sinif.text}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          ) : (
+                            <Select
+                              onValueChange={(value) => { field.onChange(value); handleSinifChange(value); }}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="border-2 border-gray-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
+                                  <SelectValue placeholder="🏫 Sınıf seçin">{selectedClass?.text}</SelectValue>
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="max-h-[40vh]">
+                                {sinifSubeList.map((sinif) => (
+                                  <SelectItem key={sinif.value} value={sinif.value}>
+                                    {sinif.text}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
                           <FormMessage />
                         </FormItem>
                       );
@@ -707,7 +717,7 @@ export default function RPDYonlendirme() {
                             <Badge variant="secondary" className="text-[10px] sm:text-xs bg-purple-100 text-purple-700">{ogrenciList.length}</Badge>
                           )}
                         </FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className={`border-2 border-gray-200 hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99] ${ogrenciLoading ? 'animate-pulse' : ''}`}>
                               <SelectValue placeholder={ogrenciLoading ? "🔄 Yükleniyor..." : "👤 Öğrenci seçin"} />
