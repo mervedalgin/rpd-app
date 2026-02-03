@@ -110,8 +110,8 @@ const SEED_TEACHERS: TeacherRecord[] = [
   },
   {
     teacherId: "t16",
-    teacherName: "MÜNİRE ALTUNBAŞAK",
-    teacherNameNormalized: "munire altunbasak",
+    teacherName: "ELİF AÇIKGÖZLÜ",
+    teacherNameNormalized: "elif acikgozlu",
     sinifSubeKey: "22643016#0",
     sinifSubeDisplay: "Ana Sınıfı / C Şubesi"
   },
