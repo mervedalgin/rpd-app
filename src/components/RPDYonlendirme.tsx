@@ -351,29 +351,29 @@ export default function RPDYonlendirme() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-linear-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         </div>
         <div className="text-center relative z-10">
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
-            <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-gradient-to-r from-transparent via-white to-transparent mx-auto" style={{ animationDuration: '1s' }}></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-linear-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
+            <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-linear-to-r from-transparent via-white to-transparent mx-auto" style={{ animationDuration: '1s' }}></div>
           </div>
-          <p className="text-xl font-medium bg-gradient-to-r from-gray-700 to-blue-600 bg-clip-text text-transparent animate-pulse">Veriler yükleniyor...</p>
+          <p className="text-xl font-medium bg-linear-to-r from-gray-700 to-blue-600 bg-clip-text text-transparent animate-pulse">Veriler yükleniyor...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 pb-20 md:pb-0 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100 pb-20 md:pb-0 relative overflow-hidden">
       {/* Animated Background Elements - Enhanced */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-emerald-400/10 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-linear-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-linear-to-r from-emerald-400/10 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         {/* Yeni hareketli parçacıklar */}
         <div className="absolute top-20 left-20 w-3 h-3 bg-blue-400/30 rounded-full animate-float-slow"></div>
         <div className="absolute top-40 right-40 w-2 h-2 bg-purple-400/30 rounded-full animate-float-slow" style={{ animationDelay: '1s' }}></div>
@@ -394,7 +394,7 @@ export default function RPDYonlendirme() {
             </div>
             
             {/* Live Clock */}
-            <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-full shadow-md border border-blue-100">
+            <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-linear-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-full shadow-md border border-blue-100">
               <Clock className="w-3 h-3 text-blue-600 animate-pulse" />
               <span className="text-[10px] sm:text-xs font-mono font-bold text-blue-700">
                 {currentTime.toLocaleTimeString('tr-TR')}
@@ -402,7 +402,7 @@ export default function RPDYonlendirme() {
             </div>
 
             {/* Session Timer - Hide on very small screens */}
-            <div className="hidden xs:flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-sm rounded-full shadow-md border border-emerald-100">
+            <div className="hidden xs:flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-sm rounded-full shadow-md border border-emerald-100">
               <Timer className="w-3 h-3 text-emerald-600" />
               <span className="text-[10px] sm:text-xs font-mono font-medium text-emerald-700">{sessionDuration}</span>
             </div>
@@ -431,12 +431,12 @@ export default function RPDYonlendirme() {
           <div className="flex items-center justify-center mb-2 md:mb-4 group">
             <div className="relative">
               <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 md:h-14 md:w-14 text-blue-600 mr-2 md:mr-3 group-hover:text-purple-600 hover:scale-110 transition-all duration-300 drop-shadow-lg" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+              <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-linear-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                 <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />
               </div>
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-gradient-to-r from-gray-800 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-800 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 RPD Yönlendirme
               </h1>
             </div>
@@ -451,7 +451,7 @@ export default function RPDYonlendirme() {
             </div>
             <div className="h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+                className="h-full bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${formProgress}%` }}
               ></div>
             </div>
@@ -463,7 +463,7 @@ export default function RPDYonlendirme() {
           {/* Mevcut Öğrenciler */}
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 shadow-lg border border-gray-100 hover:shadow-xl active:scale-[0.98] transition-all duration-300 group">
             <div className="flex items-center justify-between">
-              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div className="p-1.5 sm:p-2 bg-linear-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div className="text-right">
@@ -472,14 +472,14 @@ export default function RPDYonlendirme() {
               </div>
             </div>
             <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full" style={{ width: '70%' }}></div>
+              <div className="h-full bg-linear-to-r from-purple-400 to-purple-600 rounded-full" style={{ width: '70%' }}></div>
             </div>
           </div>
 
           {/* Bekleyen Yönlendirmeler */}
           <div className={`bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 shadow-lg border active:scale-[0.98] transition-all duration-300 group ${pulseAnimation ? 'ring-2 ring-emerald-400 animate-pulse-soft' : 'border-gray-100'}`}>
             <div className="flex items-center justify-between">
-              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div className="p-1.5 sm:p-2 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Target className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div className="text-right">
@@ -488,7 +488,7 @@ export default function RPDYonlendirme() {
               </div>
             </div>
             <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300" style={{ width: yonlendirilenOgrenciler.length > 0 ? '100%' : '0%' }}></div>
+              <div className="h-full bg-linear-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300" style={{ width: yonlendirilenOgrenciler.length > 0 ? '100%' : '0%' }}></div>
             </div>
           </div>
         </div>
@@ -544,7 +544,7 @@ export default function RPDYonlendirme() {
         {/* Activity Log Panel */}
         {showActivityLog && recentActivity.length > 0 && (
           <div ref={activityRef} className="mb-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-scale-in">
-            <div className="p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white flex items-center justify-between">
+            <div className="p-4 bg-linear-to-r from-blue-500 to-indigo-500 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <History className="w-5 h-5" />
                 <span className="font-semibold">Son Aktiviteler</span>
@@ -580,8 +580,8 @@ export default function RPDYonlendirme() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-8 px-1">
           {/* Form Kartı - Mobile Enhanced */}
           <Card className="shadow-xl shadow-blue-500/10 backdrop-blur-sm bg-white/80 border-0 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group animate-slide-in-left">
-            <CardHeader className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-t-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <CardHeader className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-t-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               {/* Animated dots */}
               <div className="absolute top-2 right-2 flex gap-1">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/30 rounded-full animate-pulse"></div>
@@ -596,7 +596,7 @@ export default function RPDYonlendirme() {
                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 ml-2 text-amber-300 animate-pulse" />
               </CardTitle>
               <CardDescription className="text-blue-100 text-xs sm:text-sm md:text-base flex items-center gap-2">
-                <Rocket className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <Rocket className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Yönlendirme bilgilerini girin</span>
               </CardDescription>
             </CardHeader>
@@ -638,7 +638,7 @@ export default function RPDYonlendirme() {
                             }}
                             value={field.value}
                           >
-                            <SelectTrigger className="border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
+                            <SelectTrigger className="border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
                               <SelectValue placeholder="🧑‍🏫 Öğretmen seçin" />
                             </SelectTrigger>
                             <SelectContent className="max-h-[40vh]">
@@ -673,7 +673,7 @@ export default function RPDYonlendirme() {
                           {t ? (
                             // Öğretmen seçiliyse sınıfı doğrudan göster (disabled select yerine)
                             <FormControl>
-                              <div className="border-2 border-indigo-200 bg-indigo-50/50 backdrop-blur-sm min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl flex items-center text-gray-700">
+                              <div className="border-2 border-indigo-200 bg-indigo-50/50 backdrop-blur-sm min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl flex items-center text-gray-700">
                                 🏫 {t.sinifSubeDisplay}
                               </div>
                             </FormControl>
@@ -683,7 +683,7 @@ export default function RPDYonlendirme() {
                               value={field.value}
                             >
                               <FormControl>
-                                <SelectTrigger className="border-2 border-gray-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
+                                <SelectTrigger className="border-2 border-gray-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
                                   <SelectValue placeholder="🏫 Sınıf seçin">{selectedClass?.text}</SelectValue>
                                 </SelectTrigger>
                               </FormControl>
@@ -719,7 +719,7 @@ export default function RPDYonlendirme() {
                         </FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger className={`border-2 border-gray-200 hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-[48px] sm:min-h-[52px] px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99] ${ogrenciLoading ? 'animate-pulse' : ''}`}>
+                            <SelectTrigger className={`border-2 border-gray-200 hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99] ${ogrenciLoading ? 'animate-pulse' : ''}`}>
                               <SelectValue placeholder={ogrenciLoading ? "🔄 Yükleniyor..." : "👤 Öğrenci seçin"} />
                             </SelectTrigger>
                           </FormControl>
@@ -782,14 +782,14 @@ export default function RPDYonlendirme() {
                           </div>
                         )}
                         
-                        <div className="grid grid-cols-1 gap-1.5 sm:gap-2 md:gap-3 border-2 border-gray-200 rounded-xl p-2.5 sm:p-3 md:p-4 bg-gradient-to-br from-white/50 to-gray-50/50 backdrop-blur-sm">
+                        <div className="grid grid-cols-1 gap-1.5 sm:gap-2 md:gap-3 border-2 border-gray-200 rounded-xl p-2.5 sm:p-3 md:p-4 bg-linear-to-br from-white/50 to-gray-50/50 backdrop-blur-sm">
                           {filteredReasons.map((neden, index) => (
                             <label 
                               key={neden} 
-                              className="flex items-center space-x-3 min-h-[44px] sm:min-h-[48px] group cursor-pointer animate-fade-in p-1.5 sm:p-2 rounded-lg hover:bg-emerald-50/50 active:bg-emerald-100/50 transition-colors"
+                              className="flex items-center space-x-3 min-h-11 sm:min-h-12 group cursor-pointer animate-fade-in p-1.5 sm:p-2 rounded-lg hover:bg-emerald-50/50 active:bg-emerald-100/50 transition-colors"
                               style={{ animationDelay: `${index * 0.02}s` }}
                             >
-                              <div className="relative flex-shrink-0">
+                              <div className="relative shrink-0">
                                 <input
                                   type="checkbox"
                                   id={neden}
@@ -805,7 +805,7 @@ export default function RPDYonlendirme() {
                                   className="absolute inset-0 w-6 h-6 sm:w-7 sm:h-7 opacity-0 cursor-pointer"
                                 />
                                 <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${field.value?.includes(neden)
-                                    ? 'bg-gradient-to-br from-emerald-500 to-teal-600 border-emerald-500 shadow-lg shadow-emerald-500/30 scale-105'
+                                    ? 'bg-linear-to-br from-emerald-500 to-teal-600 border-emerald-500 shadow-lg shadow-emerald-500/30 scale-105'
                                     : 'border-gray-300 hover:border-emerald-400 hover:bg-emerald-50'
                                   }`}>
                                   {field.value?.includes(neden) && (
@@ -842,7 +842,7 @@ export default function RPDYonlendirme() {
                         </FormLabel>
                         <FormControl>
                           <textarea
-                            className="w-full min-h-[80px] sm:min-h-[100px] rounded-xl border-2 border-gray-200 hover:border-amber-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 bg-white/70 backdrop-blur-sm hover:bg-white/90 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base shadow-sm outline-none transition-all duration-300 resize-none hover:shadow-md"
+                            className="w-full min-h-20 sm:min-h-25 rounded-xl border-2 border-gray-200 hover:border-amber-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 bg-white/70 backdrop-blur-sm hover:bg-white/90 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base shadow-sm outline-none transition-all duration-300 resize-none hover:shadow-md"
                             placeholder="📝 Örn: Öğrenci sürekli ağlıyor..."
                             {...field}
                           />
@@ -855,8 +855,8 @@ export default function RPDYonlendirme() {
 
                   {/* Submit Button - Mobile Enhanced */}
                   <div className="animate-fade-in" style={{ animationDelay: '0.35s' }}>
-                  <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 min-h-[52px] sm:min-h-[56px] text-sm sm:text-base font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform active:scale-[0.98] hover:scale-[1.01] transition-all duration-300 relative overflow-hidden group rounded-xl">
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                  <Button type="submit" className="w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 min-h-13 sm:min-h-14 text-sm sm:text-base font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform active:scale-[0.98] hover:scale-[1.01] transition-all duration-300 relative overflow-hidden group rounded-xl">
+                    <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                     <div className="flex items-center justify-center gap-2 relative z-10">
                       <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
                       <span>Öğrenci Ekle</span>
@@ -871,8 +871,8 @@ export default function RPDYonlendirme() {
 
           {/* Yönlendirilen Öğrenciler Listesi - Mobile Enhanced */}
           <Card className={`shadow-xl shadow-green-500/10 backdrop-blur-sm bg-white/80 border-0 hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500 group animate-slide-in-right ${pulseAnimation ? 'ring-2 ring-emerald-400' : ''}`}>
-            <CardHeader className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white rounded-t-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <CardHeader className="bg-linear-to-r from-green-600 via-emerald-600 to-teal-600 text-white rounded-t-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               {/* Live indicator */}
               <div className="absolute top-2 right-2 flex items-center gap-2">
                 <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 bg-white/20 rounded-full text-[10px] sm:text-xs">
@@ -892,7 +892,7 @@ export default function RPDYonlendirme() {
                 </Badge>
               </CardTitle>
               <CardDescription className="text-green-100 text-xs sm:text-sm md:text-base flex items-center gap-2">
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Rehberliğe gönderilecekler</span>
               </CardDescription>
             </CardHeader>
@@ -900,10 +900,10 @@ export default function RPDYonlendirme() {
               {yonlendirilenOgrenciler.length === 0 ? (
                 <div className="text-center py-6 sm:py-8 md:py-12 text-gray-500">
                   <div className="relative inline-block mb-3 sm:mb-4">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-linear-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
                       <Users className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 animate-pulse" />
                     </div>
-                    <div className="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                    <div className="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-linear-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                   </div>
                   <p className="text-sm sm:text-base font-medium text-gray-600 animate-fade-in">Henüz öğrenci yok</p>
                   <p className="text-xs sm:text-sm text-gray-400 mt-1 sm:mt-2">Forma ekleyince burada görünecek</p>
@@ -917,38 +917,38 @@ export default function RPDYonlendirme() {
                   {yonlendirilenOgrenciler.map((ogrenci, index) => (
                     <div
                       key={ogrenci.id}
-                      className="flex items-start justify-between p-2.5 sm:p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border border-gray-100 gap-2 sm:gap-3 hover:shadow-md hover:border-emerald-200 active:scale-[0.99] transition-all duration-300 animate-fade-in group/item"
+                      className="flex items-start justify-between p-2.5 sm:p-4 bg-linear-to-r from-gray-50 to-gray-100/50 rounded-xl border border-gray-100 gap-2 sm:gap-3 hover:shadow-md hover:border-emerald-200 active:scale-[0.99] transition-all duration-300 animate-fade-in group/item"
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-lg flex-shrink-0">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-lg shrink-0">
                             {ogrenci.ogrenciAdi.charAt(0)}
                           </div>
                           <div className="min-w-0">
                             <div className="font-semibold text-gray-800 text-xs sm:text-sm md:text-base truncate group-hover/item:text-emerald-700 transition-colors">{ogrenci.ogrenciAdi}</div>
                             <div className="text-[10px] sm:text-xs text-gray-500 flex items-center gap-1">
-                              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
+                              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" />
                               <span className="truncate">{ogrenci.tarih}</span>
                             </div>
                           </div>
                         </div>
                         <div className="ml-9 sm:ml-10 space-y-0.5 sm:space-y-1">
                           <div className="text-[10px] sm:text-xs md:text-sm text-gray-600 flex items-center gap-1">
-                            <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-indigo-500 flex-shrink-0" />
+                            <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-indigo-500 shrink-0" />
                             <span className="truncate">{ogrenci.sinifSube}</span>
                           </div>
                           <div className="text-[10px] sm:text-xs md:text-sm text-gray-600 flex items-center gap-1">
-                            <UserCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-500 flex-shrink-0" />
+                            <UserCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-500 shrink-0" />
                             <span className="truncate">{ogrenci.ogretmenAdi}</span>
                           </div>
-                          <Badge variant="outline" className="mt-1 sm:mt-2 text-[10px] sm:text-xs bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-purple-100 transition-all duration-300 shadow-sm">
+                          <Badge variant="outline" className="mt-1 sm:mt-2 text-[10px] sm:text-xs bg-linear-to-r from-blue-50 to-purple-50 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-purple-100 transition-all duration-300 shadow-sm">
                             <Target className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                             <span className="truncate">{ogrenci.yonlendirmeNedeni}</span>
                           </Badge>
                           {ogrenci.not && (
                             <div className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2 italic flex items-start gap-1 bg-amber-50 p-1.5 sm:p-2 rounded-lg border border-amber-100">
-                              <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3 mt-0.5 text-amber-600 flex-shrink-0" />
+                              <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3 mt-0.5 text-amber-600 shrink-0" />
                               <span className="line-clamp-2 sm:line-clamp-none">{ogrenci.not}</span>
                             </div>
                           )}
@@ -958,7 +958,7 @@ export default function RPDYonlendirme() {
                         variant="ghost"
                         size="sm"
                         onClick={() => removeStudent(ogrenci.id)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] p-2 rounded-full active:scale-95 transition-all duration-200 group/btn flex-shrink-0"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 p-2 rounded-full active:scale-95 transition-all duration-200 group/btn shrink-0"
                       >
                         <X className="h-4 w-4 sm:h-5 sm:w-5 group-hover/btn:rotate-90 transition-transform duration-200" />
                       </Button>
@@ -966,12 +966,12 @@ export default function RPDYonlendirme() {
                   ))}
                   
                   {/* List Summary - Mobile Enhanced */}
-                  <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100 flex items-center justify-between">
+                  <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-linear-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100 flex items-center justify-between">
                     <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-emerald-700">
-                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                       <span><strong>{yonlendirilenOgrenciler.length}</strong> öğrenci hazır</span>
                     </div>
-                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 animate-bounce flex-shrink-0" />
+                    <Rocket className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 animate-bounce shrink-0" />
                   </div>
                 </div>
               )}
@@ -996,10 +996,10 @@ export default function RPDYonlendirme() {
               </div>
               <Button
                 onClick={sendToGuidance}
-                className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-[56px] sm:min-h-[60px] text-base sm:text-lg font-semibold shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/40 transform active:scale-[0.98] transition-all duration-300 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none rounded-xl"
+                className="w-full bg-linear-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-14 sm:min-h-15 text-base sm:text-lg font-semibold shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/40 transform active:scale-[0.98] transition-all duration-300 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none rounded-xl"
                 disabled={yonlendirilenOgrenciler.length === 0 || sendingLoading}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 {sendingLoading ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
@@ -1023,7 +1023,7 @@ export default function RPDYonlendirme() {
             <div className="container mx-auto px-4 max-w-7xl">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-8">
                 <div></div> {/* Boş alan - form alanı için */}
-                <div className="bg-gradient-to-r from-white/80 to-gray-50/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-gray-100">
+                <div className="bg-linear-to-r from-white/80 to-gray-50/80 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-gray-100">
                   {/* Stats row */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
@@ -1044,10 +1044,10 @@ export default function RPDYonlendirme() {
                   
                   <Button
                     onClick={sendToGuidance}
-                    className="w-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-[52px] text-sm font-semibold shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 transform hover:scale-[1.01] transition-all duration-300 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-green-500/30 rounded-xl"
+                    className="w-full bg-linear-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 min-h-13 text-sm font-semibold shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 transform hover:scale-[1.01] transition-all duration-300 relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-green-500/30 rounded-xl"
                     disabled={yonlendirilenOgrenciler.length === 0 || sendingLoading}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                    <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                     {sendingLoading ? (
                       <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
