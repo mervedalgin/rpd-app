@@ -320,6 +320,10 @@ export function useNewReferralNotification(
 }
 
 // Bildirim izin banneri
+interface NotificationPermissionProps {
+  onPermissionChange?: (permission: NotificationPermission) => void;
+}
+
 export function NotificationPermissionBanner({ onPermissionChange }: NotificationPermissionProps) {
   const { permission, isSupported, requestPermission } = useNotificationPermission();
   const [dismissed, setDismissed] = useState(false);
