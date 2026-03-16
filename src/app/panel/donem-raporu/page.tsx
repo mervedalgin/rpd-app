@@ -267,127 +267,25 @@ export default function DonemRaporuPage() {
       toast.error('Önce rapor verilerini yükleyin');
       return;
     }
-    
+
     setIsGenerating(true);
-    
+
     try {
-      // jsPDF dinamik import
-      const { default: jsPDF } = await import('jspdf');
-      
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      let y = 20;
-      
-      // Başlık
-      doc.setFontSize(18);
-      doc.text('DUMLUPINAR ILKOKULU', pageWidth / 2, y, { align: 'center' });
-      y += 8;
-      doc.setFontSize(14);
-      doc.text('Rehberlik ve Psikolojik Danismanlik Hizmetleri', pageWidth / 2, y, { align: 'center' });
-      y += 8;
-      doc.text(`${reportData.period} Raporu`, pageWidth / 2, y, { align: 'center' });
-      y += 6;
-      doc.setFontSize(10);
-      doc.text(`(${new Date(reportData.startDate).toLocaleDateString('tr-TR')} - ${new Date(reportData.endDate).toLocaleDateString('tr-TR')})`, pageWidth / 2, y, { align: 'center' });
-      y += 15;
-      
-      // Genel İstatistikler
-      doc.setFontSize(12);
-      doc.text('GENEL ISTATISTIKLER', 14, y);
-      y += 8;
-      doc.setFontSize(10);
-      
-      const stats = [
-        `Toplam Gorulen Ogrenci: ${reportData.totalStudents}`,
-        `Toplam Yonlendirme: ${reportData.totalReferrals}`,
-        `Tamamlanan Gorusme: ${reportData.totalAppointments}`,
-        `Disiplin Olaylari: ${reportData.totalDiscipline}`,
-        `Sinif Etkinlikleri: ${reportData.totalClassActivities}`,
-        `Veli Iletisimleri: ${reportData.totalParentContacts}`
-      ];
-      
-      stats.forEach(stat => {
-        doc.text(stat, 20, y);
-        y += 6;
-      });
-      
-      y += 5;
-      
-      // RAM Yönlendirmeleri
-      doc.setFontSize(12);
-      doc.text('RAM YONLENDIRMELERI', 14, y);
-      y += 8;
-      doc.setFontSize(10);
-      doc.text(`Toplam RAM Basvurusu: ${reportData.ramReferrals}`, 20, y);
-      y += 6;
-      doc.text(`Sonuclanan: ${reportData.ramCompleted}`, 20, y);
-      y += 6;
-      doc.text(`Devam Eden: ${reportData.ramPending}`, 20, y);
-      y += 10;
-      
-      // Risk Durumu
-      doc.setFontSize(12);
-      doc.text('RISK TAKIBI', 14, y);
-      y += 8;
-      doc.setFontSize(10);
-      doc.text(`Aktif Risk Takibindeki Ogrenci: ${reportData.riskStudentsActive}`, 20, y);
-      y += 6;
-      doc.text(`Yuksek/Kritik Risk: ${reportData.riskStudentsCritical}`, 20, y);
-      y += 10;
-      
-      // Yönlendirme Nedenleri
-      if (Object.keys(reportData.referralsByReason).length > 0) {
-        doc.setFontSize(12);
-        doc.text('YONLENDIRME NEDENLERI', 14, y);
-        y += 8;
-        doc.setFontSize(10);
-        
-        Object.entries(reportData.referralsByReason).forEach(([reason, count]) => {
-          const label = REASON_LABELS[reason] || reason;
-          doc.text(`${label}: ${count}`, 20, y);
-          y += 6;
-        });
-        y += 5;
-      }
-      
-      // Sınıf Etkinlikleri
-      if (Object.keys(reportData.activitiesByType).length > 0) {
-        // Sayfa kontrolü
-        if (y > 250) {
-          doc.addPage();
-          y = 20;
-        }
-        
-        doc.setFontSize(12);
-        doc.text('SINIF ETKINLIKLERI', 14, y);
-        y += 8;
-        doc.setFontSize(10);
-        
-        Object.entries(reportData.activitiesByType).forEach(([type, count]) => {
-          const label = ACTIVITY_LABELS[type] || type;
-          doc.text(`${label}: ${count}`, 20, y);
-          y += 6;
-        });
-        y += 5;
-      }
-      
-      // Alt bilgi
-      const pageCount = doc.internal.pages.length - 1;
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.text(
-          `Olusturma Tarihi: ${new Date().toLocaleDateString('tr-TR')} - Sayfa ${i}/${pageCount}`,
-          pageWidth / 2,
-          290,
-          { align: 'center' }
-        );
-      }
-      
-      // PDF'i indir
-      doc.save(`RPD_${reportData.period.replace(' ', '_')}_Raporu_${selectedYear}.pdf`);
+      const { pdf } = await import('@react-pdf/renderer');
+      const { DonemRaporuPDF } = await import('@/components/pdf/DonemRaporuPDF');
+
+      const blob = await pdf(
+        <DonemRaporuPDF data={reportData} year={selectedYear} />
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `RPD_${reportData.period.replace(' ', '_')}_Raporu_${selectedYear}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
       toast.success('PDF raporu oluşturuldu');
-      
+
     } catch (error) {
       console.error('PDF oluşturulamadı:', error);
       toast.error('PDF oluşturulurken hata oluştu');

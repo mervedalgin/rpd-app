@@ -29,8 +29,7 @@ import {
   Activity
 } from "lucide-react";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import React from "react";
 import { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, HeadingLevel, AlignmentType, WidthType, BorderStyle } from "docx";
 import { saveAs } from "file-saver";
 import { usePanelData } from "../hooks";
@@ -236,79 +235,33 @@ export default function NedenlerPage() {
   };
 
   // PDF Export fonksiyonu
-  const exportToPDF = (reason: string, students: { student_name: string; class_display: string; date?: string }[]) => {
-    const doc = new jsPDF();
-    
-    // Türkçe karakter desteği için
-    doc.setFont("helvetica");
-    
-    // Başlık
-    doc.setFontSize(18);
-    doc.setTextColor(234, 88, 12); // Orange color
-    doc.text("RPD Yönlendirme Raporu", 14, 20);
-    
-    // Alt başlık
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Yönlendirme Nedeni: ${reason}`, 14, 32);
-    
-    // Dönem bilgisi
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Dönem: ${periodLabels[reasonTimeFilter]}`, 14, 40);
-    doc.text(`Toplam Öğrenci: ${students.length}`, 14, 46);
-    doc.text(`Rapor Tarihi: ${new Date().toLocaleDateString('tr-TR')}`, 14, 52);
-    
-    // Tablo
-    const tableData = students.map((s, idx) => [
-      (idx + 1).toString(),
-      s.student_name,
-      s.class_display,
-      s.date ? new Date(s.date).toLocaleDateString('tr-TR') : '-'
-    ]);
-    
-    autoTable(doc, {
-      startY: 60,
-      head: [['#', 'Öğrenci Adı', 'Sınıf', 'Tarih']],
-      body: tableData,
-      theme: 'striped',
-      headStyles: {
-        fillColor: [234, 88, 12],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold'
-      },
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-      },
-      columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 70 },
-        2: { cellWidth: 50 },
-        3: { cellWidth: 35 }
-      }
-    });
-    
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        `Sayfa ${i} / ${pageCount}`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: 'center' }
-      );
+  const exportToPDF = async (reason: string, students: { student_name: string; class_display: string; date?: string }[]) => {
+    try {
+      const { pdf } = await import('@react-pdf/renderer');
+      const { NedenRaporuPDF } = await import('@/components/pdf/NedenRaporuPDF');
+
+      const blob = await pdf(
+        <NedenRaporuPDF
+          reason={reason}
+          students={students}
+          periodLabel={periodLabels[reasonTimeFilter]}
+        />
+      ).toBlob();
+
+      const safeReason = reason.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s]/g, '').replace(/\s+/g, '_').substring(0, 30);
+      const fileName = `RPD_${safeReason}_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("PDF dosyası indirildi");
+    } catch (error) {
+      console.error("PDF oluşturulamadı:", error);
+      toast.error("PDF oluşturulurken hata oluştu");
     }
-    
-    // Dosya adını oluştur
-    const safeReason = reason.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s]/g, '').replace(/\s+/g, '_').substring(0, 30);
-    const fileName = `RPD_${safeReason}_${new Date().toISOString().slice(0, 10)}.pdf`;
-    
-    doc.save(fileName);
-    toast.success("PDF dosyası indirildi");
   };
 
   // Word Export fonksiyonu
