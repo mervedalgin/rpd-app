@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error("Supabase error:", error);
       return NextResponse.json(
-        { error: "Görevler alınamadı", details: error.message },
+        { error: "Görevler alınamadı" },
         { status: 500 }
       );
     }
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Supabase insert error:", error);
       return NextResponse.json(
-        { error: "Görev oluşturulamadı", details: error.message },
+        { error: "Görev oluşturulamadı" },
         { status: 500 }
       );
     }
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
     if (error) {
       console.error("Supabase update error:", error);
       return NextResponse.json(
-        { error: "Görev güncellenemedi", details: error.message },
+        { error: "Görev güncellenemedi" },
         { status: 500 }
       );
     }
@@ -180,7 +180,7 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error("Supabase delete error:", error);
       return NextResponse.json(
-        { error: "Görev silinemedi", details: error.message },
+        { error: "Görev silinemedi" },
         { status: 500 }
       );
     }

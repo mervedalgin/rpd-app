@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json(
-        { error: 'Mesaj gönderilemedi', details: data.description },
+        { error: 'Mesaj gönderilemedi' },
         { status: 400 }
       );
     }

@@ -52,7 +52,10 @@ export const YONLENDIRME_NEDENLERI = [
   "Ailevi Travması Olan",
   "Maddi Durumu Yetersiz",
   "Göçmen / Mülteci (Suriyeli)",
-  "RAM'a yönlendirilmesi gereken"
+  "RAM'a yönlendirilmesi gereken",
+  "Psikolojik Danışmaya İhtiyaç Duyan",
+  "Rehberliğe İhtiyaç Duyan",
+  "Aile Görüşmesine İhtiyaç Duyan"
 ] as const;
 
 export type YonlendirmeNedeni = typeof YONLENDIRME_NEDENLERI[number];

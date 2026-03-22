@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Supabase discipline insert error:', error);
       return NextResponse.json(
-        { error: 'Disiplin kaydı oluşturulamadı: ' + error.message },
+        { error: 'Disiplin kaydı oluşturulamadı' },
         { status: 500 }
       );
     }
@@ -88,7 +88,8 @@ export async function GET(request: NextRequest) {
     if (studentId) {
       query = query.eq('student_id', studentId);
     } else if (studentName) {
-      query = query.ilike('student_name', `%${studentName}%`);
+      const sanitizedName = studentName.slice(0, 100);
+      query = query.ilike('student_name', `%${sanitizedName}%`);
     }
 
     const { data, error } = await query;
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Supabase discipline fetch error:', error);
       return NextResponse.json(
-        { error: 'Disiplin kayıtları getirilemedi: ' + error.message },
+        { error: 'Disiplin kayıtları getirilemedi' },
         { status: 500 }
       );
     }
@@ -159,7 +160,7 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error('Supabase discipline delete error:', error);
       return NextResponse.json(
-        { error: 'Disiplin kaydı silinemedi: ' + error.message },
+        { error: 'Disiplin kaydı silinemedi' },
         { status: 500 }
       );
     }
