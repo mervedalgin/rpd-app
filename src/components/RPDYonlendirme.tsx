@@ -679,7 +679,15 @@ export default function RPDYonlendirme() {
                             </FormControl>
                           ) : (
                             <Select
-                              onValueChange={(value) => { field.onChange(value); handleSinifChange(value); }}
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                handleSinifChange(value);
+                                // Sınıfa ait öğretmeni otomatik seç
+                                const matchedTeacher = teacherOptions.find(t => t.sinifSubeKey === value);
+                                if (matchedTeacher) {
+                                  form.setValue('ogretmenAdi', matchedTeacher.value, { shouldValidate: true });
+                                }
+                              }}
                               value={field.value}
                             >
                               <FormControl>
