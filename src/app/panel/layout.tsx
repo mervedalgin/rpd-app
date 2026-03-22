@@ -51,7 +51,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const MASTER_PASSWORD = "sagopa";
+const MASTER_PASSWORD = process.env.NEXT_PUBLIC_PANEL_PASSWORD || "sagopa";
 const MAX_ATTEMPTS = 3;
 const SESSION_KEY = "panel_authenticated";
 const LOCKOUT_KEY = "panel_lockout";
@@ -475,6 +475,7 @@ export default function PanelLayout({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
+                    aria-label="Panel şifresi"
                     className="w-full px-4 py-3.5 pr-12 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-white placeholder-slate-500"
                     autoFocus
                     required
@@ -482,6 +483,7 @@ export default function PanelLayout({
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -534,27 +536,25 @@ export default function PanelLayout({
           </p>
         </div>
 
-        <style jsx global>{`
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-          }
-          .animate-shake {
-            animation: shake 0.5s ease-in-out;
-          }
-        `}</style>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)]">
+      {/* Skip to main content link */}
+      <a
+        href="#panel-main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[200] focus:top-16 focus:left-4 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg"
+      >
+        Ana içeriğe atla
+      </a>
       {/* Mobil Üst Bar */}
       <div className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
         <div className="px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setSidebarOpen(true)}
+            aria-label="Menüyü aç"
             className="flex items-center gap-3 text-slate-700 hover:text-blue-600 transition-all group"
           >
             <div className="p-2 rounded-xl bg-slate-100 group-hover:bg-blue-50 transition-colors">
@@ -568,6 +568,7 @@ export default function PanelLayout({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowSearch(true)}
+              aria-label="Menüde ara"
               className="p-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-all"
             >
               <Search className="h-5 w-5" />
@@ -604,6 +605,7 @@ export default function PanelLayout({
               />
               <button
                 onClick={() => setShowSearch(false)}
+                aria-label="Aramayı kapat"
                 className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
               >
                 <X className="h-5 w-5" />
@@ -700,6 +702,7 @@ export default function PanelLayout({
             {/* Mobil Kapat */}
             <button
               onClick={() => setSidebarOpen(false)}
+              aria-label="Menüyü kapat"
               className="lg:hidden p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 transition-colors"
             >
               <X className="h-5 w-5" />
@@ -708,6 +711,7 @@ export default function PanelLayout({
             {/* Desktop Collapse */}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              aria-label={sidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt"}
               className="hidden lg:flex p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
             >
               <ChevronRight className={`h-4 w-4 transition-transform ${sidebarCollapsed ? "" : "rotate-180"}`} />
@@ -730,7 +734,7 @@ export default function PanelLayout({
         )}
 
         {/* Menü Kategorileri */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <nav aria-label="Panel navigasyonu" className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {menuCategories.map((category) => (
             <div key={category.title} className="mb-2">
               {/* Kategori Başlığı */}
@@ -837,6 +841,7 @@ export default function PanelLayout({
               <button
                 onClick={handleLogout}
                 title="Çıkış Yap"
+                aria-label="Çıkış Yap"
                 className="w-full flex justify-center p-2.5 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
               >
                 <LogOut className="h-4 w-4" />
@@ -847,7 +852,7 @@ export default function PanelLayout({
       </aside>
 
       {/* Ana İçerik */}
-      <main className="flex-1 p-4 lg:p-6 overflow-auto mt-16 lg:mt-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <main id="panel-main-content" className="flex-1 p-4 lg:p-6 overflow-auto mt-16 lg:mt-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
         {children}
       </main>
     </div>

@@ -122,7 +122,7 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error('Supabase referral delete error:', error);
       return NextResponse.json(
-        { error: 'Yönlendirme kaydı silinemedi: ' + error.message },
+        { error: 'Yönlendirme kaydı silinemedi' },
         { status: 500 }
       );
     }

@@ -55,9 +55,10 @@ export async function GET(request: NextRequest) {
       query = query.eq("priority", priority);
     }
 
-    // Arama filtresi
+    // Arama filtresi (max 100 karakter)
     if (search) {
-      query = query.ilike("participant_name", `%${search}%`);
+      const sanitizedSearch = search.slice(0, 100);
+      query = query.ilike("participant_name", `%${sanitizedSearch}%`);
     }
 
     const { data, error } = await query;
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error("Supabase error:", error);
       return NextResponse.json(
-        { error: "Randevular alınamadı", details: error.message },
+        { error: "Randevular alınamadı" },
         { status: 500 }
       );
     }
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Supabase insert error:", error);
       return NextResponse.json(
-        { error: "Randevu oluşturulamadı", details: error.message },
+        { error: "Randevu oluşturulamadı" },
         { status: 500 }
       );
     }
@@ -185,7 +186,7 @@ export async function PUT(request: NextRequest) {
     if (error) {
       console.error("Supabase update error:", error);
       return NextResponse.json(
-        { error: "Randevu güncellenemedi", details: error.message },
+        { error: "Randevu güncellenemedi" },
         { status: 500 }
       );
     }
@@ -228,7 +229,7 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error("Supabase delete error:", error);
       return NextResponse.json(
-        { error: "Randevu silinemedi", details: error.message },
+        { error: "Randevu silinemedi" },
         { status: 500 }
       );
     }

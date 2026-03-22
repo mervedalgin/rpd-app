@@ -149,11 +149,11 @@ Lütfen yukarıdaki bilgilere göre ${reportType === "idare" ? "idare bilgilendi
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       console.error("Gemini API Error:", errorData);
       return NextResponse.json(
-        { error: "Gemini API hatası: " + (errorData.error?.message || "Bilinmeyen hata") },
-        { status: response.status }
+        { error: "Rapor oluşturma servisi şu anda kullanılamıyor" },
+        { status: 502 }
       );
     }
 
