@@ -38,6 +38,10 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
+// Sınıf/Öğrenci tipleri
+interface SinifSube { value: string; text: string }
+interface Ogrenci { value: string; text: string }
+
 // Risk öğrenci tipi
 interface RiskStudent {
   id: string;
@@ -97,6 +101,11 @@ export default function RiskTakipPage() {
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   
+  // Sınıf/Öğrenci dropdown verileri
+  const [sinifList, setSinifList] = useState<SinifSube[]>([]);
+  const [ogrenciList, setOgrenciList] = useState<Ogrenci[]>([]);
+  const [ogrenciLoading, setOgrenciLoading] = useState(false);
+
   // Yeni öğrenci formu
   const [formData, setFormData] = useState({
     student_name: '',
@@ -115,7 +124,43 @@ export default function RiskTakipPage() {
   // Verileri yükle
   useEffect(() => {
     loadRiskStudents();
+    loadSinifList();
   }, []);
+
+  // Sınıf listesini yükle
+  const loadSinifList = async () => {
+    try {
+      const res = await fetch('/api/data');
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json.sinifSubeList)) {
+          setSinifList(json.sinifSubeList);
+        }
+      }
+    } catch (error) {
+      console.error('Sınıf listesi yüklenemedi:', error);
+    }
+  };
+
+  // Sınıf seçildiğinde öğrenci listesini yükle
+  const loadOgrenciList = async (sinifValue: string) => {
+    if (!sinifValue) {
+      setOgrenciList([]);
+      return;
+    }
+    setOgrenciLoading(true);
+    try {
+      const res = await fetch(`/api/students?sinifSube=${encodeURIComponent(sinifValue)}`);
+      if (res.ok) {
+        const json = await res.json();
+        setOgrenciList(Array.isArray(json) ? json : Array.isArray(json.students) ? json.students : []);
+      }
+    } catch (error) {
+      console.error('Öğrenci listesi yüklenemedi:', error);
+    } finally {
+      setOgrenciLoading(false);
+    }
+  };
   
   const loadRiskStudents = async () => {
     setIsLoading(true);
@@ -157,15 +202,32 @@ export default function RiskTakipPage() {
             updated_at: new Date().toISOString()
           })
           .eq('id', editingStudent.id);
-        
+
         if (error) throw error;
         toast.success('Kayıt güncellendi');
       } else {
         const { error } = await supabase
           .from('risk_students')
           .insert(formData);
-        
+
         if (error) throw error;
+
+        // Öğrenci geçmişine uyarı kaydı düş
+        const riskLevel = RISK_LEVELS.find(l => l.value === formData.risk_level)?.label || formData.risk_level;
+        const riskTypes = formData.risk_type
+          .map(t => RISK_TYPES.find(rt => rt.value === t)?.label || t)
+          .join(', ');
+
+        await supabase.from('referrals').insert({
+          teacher_name: 'Rehberlik Servisi',
+          class_key: formData.class_key,
+          class_display: formData.class_display,
+          student_name: formData.student_name,
+          reason: 'Risk Takip Listesine Eklendi',
+          note: `Bu öğrenci risk takip listesindedir. Risk seviyesi: ${riskLevel}. Risk türü: ${riskTypes}.${formData.description ? ' Açıklama: ' + formData.description : ''}`,
+          source: 'risk-takip',
+        });
+
         toast.success('Öğrenci risk listesine eklendi');
       }
       
@@ -228,6 +290,9 @@ export default function RiskTakipPage() {
       next_follow_up_date: student.next_follow_up_date || '',
       notes: student.notes || ''
     });
+    if (student.class_key) {
+      loadOgrenciList(student.class_key);
+    }
     setShowForm(true);
   };
   
@@ -367,20 +432,45 @@ export default function RiskTakipPage() {
             {/* Temel Bilgiler */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Öğrenci Adı *</Label>
-                <Input
-                  value={formData.student_name}
-                  onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
-                  placeholder="Öğrenci adı soyadı"
-                />
+                <Label>Sınıf *</Label>
+                <select
+                  value={formData.class_key}
+                  onChange={(e) => {
+                    const selected = sinifList.find(s => s.value === e.target.value);
+                    setFormData({
+                      ...formData,
+                      class_key: e.target.value,
+                      class_display: selected?.text || '',
+                      student_name: ''
+                    });
+                    setOgrenciList([]);
+                    if (e.target.value) {
+                      loadOgrenciList(e.target.value);
+                    }
+                  }}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="">Sınıf seçin</option>
+                  {sinifList.map(sinif => (
+                    <option key={sinif.value} value={sinif.value}>{sinif.text}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
-                <Label>Sınıf</Label>
-                <Input
-                  value={formData.class_display}
-                  onChange={(e) => setFormData({ ...formData, class_display: e.target.value, class_key: e.target.value })}
-                  placeholder="Örn: 4-A"
-                />
+                <Label>Öğrenci Adı *</Label>
+                <select
+                  value={formData.student_name}
+                  onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
+                  disabled={!formData.class_key || ogrenciLoading}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {ogrenciLoading ? 'Yükleniyor...' : !formData.class_key ? 'Önce sınıf seçin' : 'Öğrenci seçin'}
+                  </option>
+                  {ogrenciList.map(ogrenci => (
+                    <option key={ogrenci.value} value={ogrenci.text}>{ogrenci.text}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label>Risk Seviyesi *</Label>
