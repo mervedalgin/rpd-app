@@ -27,10 +27,10 @@ export default function OgrencilerPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          class_key: newStudentClass,
-          class_display: classText,
-          student_name: newStudentName.trim(),
-          student_number: newStudentNumber.trim(),
+          classKey: newStudentClass,
+          classDisplay: classText,
+          studentName: newStudentName.trim(),
+          studentNumber: newStudentNumber.trim(),
         }),
       });
       if (!res.ok) {
