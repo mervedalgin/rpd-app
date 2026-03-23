@@ -325,7 +325,7 @@ export default function RandevuBildirimlerPage() {
       .replace(/\s+/g, '')
       .replace(/[\/\-\.]/g, '');
     
-    // Önce key ile tam eşleştir (örn: "22602658#0", "22154388#1")
+    // Önce key ile tam eşleştir (örn: "23484080#0", "23484076#1")
     let teacher = teachers.find(t => t.sinifSubeKey === classKeyOrDisplay);
     
     // Bulamazsa display text ile tam eşleştir
