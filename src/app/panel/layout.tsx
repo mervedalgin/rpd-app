@@ -254,6 +254,12 @@ const menuCategories: MenuCategory[] = [
         icon: Bot,
         color: "sky"
       },
+      {
+        href: "/panel/mebbis/daily-json",
+        label: "Daily JSON",
+        icon: FileText,
+        color: "emerald"
+      },
     ]
   }
 ];

@@ -103,20 +103,16 @@
       "text": "126 GİZEM GENÇ"
     },
     {
-      "value": "65644241608",
-      "text": "131 HACİRE GENÇ"
-    },
-    {
       "value": "65620226100",
       "text": "134 MİRAÇ YAŞAR"
     },
     {
-      "value": "66937182158",
-      "text": "389 HÜSEYİN CAN KARADAL"
+      "value": "99459587736",
+      "text": "145 ELİF DERVİŞ"
     },
     {
-      "value": "17708984082",
-      "text": "408 MUHAMMED EMİN ÖZTÜRK"
+      "value": "66937182158",
+      "text": "389 HÜSEYİN CAN KARADAL"
     },
     {
       "value": "99951475852",
@@ -127,11 +123,19 @@
       "text": "473 ALLADDİN MOHAMMED"
     },
     {
-      "value": "99759516382",
-      "text": "486 MUHAMMED ABID"
+      "value": "99291581206",
+      "text": "481 ZEYNEB ALİ"
+    },
+    {
+      "value": "99024590154",
+      "text": "560 DİLAN ALİ"
     }
   ],
   "Ogrenci_Ana Sınıfı _ B Şubesi": [
+    {
+      "value": "99390421816",
+      "text": "97 MUHAMMED ABDİ"
+    },
     {
       "value": "36110209484",
       "text": "110 YILDIZ KILIÇ"
@@ -163,10 +167,6 @@
     {
       "value": "16403865924",
       "text": "197 FİLİZ AŞCI"
-    },
-    {
-      "value": "16913849506",
-      "text": "227 HADİCE MİRAY BOZKURT"
     },
     {
       "value": "32792320592",
@@ -219,12 +219,28 @@
     {
       "value": "22715656396",
       "text": "432 İBRAHİM HALİL BAYRAM"
+    },
+    {
+      "value": "41045044888",
+      "text": "483 EMİNE AYLİN ASLAN"
+    },
+    {
+      "value": "12650188854",
+      "text": "999 ASMİN DEMİR"
     }
   ],
   "Ogrenci_Ana Sınıfı _ C Şubesi": [
     {
+      "value": "40358234740",
+      "text": "4 ABDUSSAMED GENÇ"
+    },
+    {
       "value": "31241542530",
       "text": "10 FATMA KILIÇ"
+    },
+    {
+      "value": "16064877212",
+      "text": "21 NİLAY POLAT"
     },
     {
       "value": "65065244608",
@@ -235,16 +251,16 @@
       "text": "51 ESMA NUR EL MUHAMMED"
     },
     {
-      "value": "30134409004",
-      "text": "64 MEHMET EMİN KURT"
-    },
-    {
       "value": "16574086760",
       "text": "70 AYŞEGÜL KIRMIZI"
     },
     {
       "value": "99423504400",
       "text": "85 LEVET ABDİ"
+    },
+    {
+      "value": "65644241608",
+      "text": "131 HACİRE GENÇ"
     },
     {
       "value": "49561761470",
@@ -271,16 +287,8 @@
       "text": "418 YUSUF KAYRA KÜÇÜK"
     },
     {
-      "value": "99288504218",
-      "text": "424 NASİM ELKENCO"
-    },
-    {
       "value": "99813568548",
       "text": "435 KAYS MUHAMMED"
-    },
-    {
-      "value": "41045044888",
-      "text": "483 EMİNE AYLİN ASLAN"
     },
     {
       "value": "99984558546",
@@ -309,12 +317,24 @@
   ],
   "Ogrenci_Ana Sınıfı _ D Şubesi": [
     {
-      "value": "40148075010",
-      "text": "57 HATİCE GAMZE KILIÇ"
+      "value": "99549579726",
+      "text": "104 MERVAN EŞŞAHABİ"
     },
     {
       "value": "99318468930",
       "text": "114 SÜMBÜL MUHAMMET"
+    },
+    {
+      "value": "59041445462",
+      "text": "162 TÜRKAN NUR ÖZÜPERK"
+    },
+    {
+      "value": "99837466530",
+      "text": "182 ENES ELHASAN"
+    },
+    {
+      "value": "99549485430",
+      "text": "348 SEFA ALİ"
     },
     {
       "value": "99876525304",
@@ -347,6 +367,10 @@
     {
       "value": "99354524966",
       "text": "500 HÜSEYİN ELHASAN"
+    },
+    {
+      "value": "99993632268",
+      "text": "763 HAMİDE EL MUHAMMED"
     }
   ],
   "Ogrenci_1. Sınıf _ A Şubesi": [
@@ -359,40 +383,16 @@
       "text": "75 EREZ TAŞ"
     },
     {
-      "value": "99252024834",
-      "text": "102 YASİN HAMZA"
-    },
-    {
       "value": "99051300962",
       "text": "105 ALİ BOZAN"
-    },
-    {
-      "value": "99866135940",
-      "text": "137 HALE HÜSEYİN"
-    },
-    {
-      "value": "99029702132",
-      "text": "138 SİDRA CASIM"
     },
     {
       "value": "99909340980",
       "text": "150 MUSTAFA NASEN"
     },
     {
-      "value": "99836996526",
-      "text": "245 EMEL ELSELUM"
-    },
-    {
       "value": "99479720052",
       "text": "259 EMİNE ELİSA"
-    },
-    {
-      "value": "23183639904",
-      "text": "268 HANİFİ ASAF TAŞ"
-    },
-    {
-      "value": "99848484004",
-      "text": "289 ZİYAD UMAR"
     },
     {
       "value": "99735169380",
@@ -461,14 +461,6 @@
     {
       "value": "99581800000",
       "text": "1007 NERMİN EL ALLUS"
-    },
-    {
-      "value": "99956526764",
-      "text": "2005 MUHAMMED MAHMUD"
-    },
-    {
-      "value": "99046563518",
-      "text": "2023 SUBHİ ELAHMED"
     }
   ],
   "Ogrenci_1. Sınıf _ B Şubesi": [
@@ -497,10 +489,6 @@
       "text": "111 VATAN İBRAHİM"
     },
     {
-      "value": "99435256564",
-      "text": "115 FEHED İSA"
-    },
-    {
       "value": "22091845360",
       "text": "180 GÜLER KARADAL"
     },
@@ -509,16 +497,8 @@
       "text": "251 EMEL WALW"
     },
     {
-      "value": "99620988652",
-      "text": "287 YASMİN UMAR"
-    },
-    {
       "value": "99353855894",
       "text": "310 MELİKE DERVİŞ"
-    },
-    {
-      "value": "99042069458",
-      "text": "321 SELMA EL ĞIREYBI"
     },
     {
       "value": "99543050702",
@@ -553,14 +533,6 @@
       "text": "467 SALİHA REYYAN TÜMEN"
     },
     {
-      "value": "29576427158",
-      "text": "470 ZELİHA YAŞAR"
-    },
-    {
-      "value": "99546351776",
-      "text": "489 MÜFİDE GÜL MELUHİ"
-    },
-    {
       "value": "99552259332",
       "text": "491 RODA OSO"
     },
@@ -571,37 +543,9 @@
     {
       "value": "99296707380",
       "text": "1003 AHMED EL MİRİ"
-    },
-    {
-      "value": "99899658058",
-      "text": "1970 EMİNE AL İSA"
-    },
-    {
-      "value": "99578271974",
-      "text": "1979 GAYS ELAZAT"
-    },
-    {
-      "value": "99055563226",
-      "text": "1986 KAMER ELMUHAMMED"
-    },
-    {
-      "value": "99263133006",
-      "text": "2003 MUHAMMED ELMUHAMMED"
     }
   ],
   "Ogrenci_1. Sınıf _ C Şubesi": [
-    {
-      "value": "99666350970",
-      "text": "17 FATMA OSMAN"
-    },
-    {
-      "value": "99899499286",
-      "text": "44 SABAH ELKENAVİ"
-    },
-    {
-      "value": "99885139608",
-      "text": "49 MUSTAFA OSMAN"
-    },
     {
       "value": "99801299782",
       "text": "52 HAMZA HECCAN"
@@ -619,24 +563,12 @@
       "text": "76 ESRA EL MUHAMMED"
     },
     {
-      "value": "16304869670",
-      "text": "125 ADİLE İZCİ"
-    },
-    {
-      "value": "99080958042",
-      "text": "337 MUHAMMED ŞİBEN"
-    },
-    {
-      "value": "99263153288",
-      "text": "361 YASEMİN ELKENAVİ"
+      "value": "99060290612",
+      "text": "179 HASAN EL HASAN"
     },
     {
       "value": "99498014712",
       "text": "377 MUHAMMED RIZA SAİD"
-    },
-    {
-      "value": "99885059104",
-      "text": "382 EMİRA EL ALLUS"
     },
     {
       "value": "99183001966",
@@ -653,10 +585,6 @@
     {
       "value": "30368400778",
       "text": "439 BERAT MUHAMMET DEMİR"
-    },
-    {
-      "value": "39476097016",
-      "text": "458 İBRAHİM HALİL İZCİ"
     },
     {
       "value": "45709889112",
@@ -689,14 +617,6 @@
     {
       "value": "99651228956",
       "text": "552 ENES ELHAMMO"
-    },
-    {
-      "value": "99205857724",
-      "text": "1980 FATIMA SABBAGH"
-    },
-    {
-      "value": "99017693510",
-      "text": "1991 MECİD ELMUHAMMED"
     }
   ],
   "Ogrenci_1. Sınıf _ D Şubesi": [
@@ -705,12 +625,12 @@
       "text": "33 OSMAN EL HALAF"
     },
     {
-      "value": "99140764606",
-      "text": "35 ĞUFRAN ELKENAVİ"
-    },
-    {
       "value": "99318128360",
       "text": "46 REVAN MUHAMMET"
+    },
+    {
+      "value": "12023205690",
+      "text": "49 ELVAN ATAŞ"
     },
     {
       "value": "99045245996",
@@ -721,8 +641,8 @@
       "text": "65 HALİT NASEN"
     },
     {
-      "value": "99390421816",
-      "text": "97 MUHAMMED ABDİ"
+      "value": "99090302552",
+      "text": "69 ABDURRAHMAN ĞİREYBİ"
     },
     {
       "value": "44215939298",
@@ -741,20 +661,12 @@
       "text": "248 HALİL ELHÜSEYİN"
     },
     {
-      "value": "99692374582",
-      "text": "338 RİMES ŞİBEN"
-    },
-    {
       "value": "72358001220",
       "text": "421 EBRAR ADA ASLAN"
     },
     {
       "value": "72361001156",
       "text": "422 HİRA NUR ASLAN"
-    },
-    {
-      "value": "99186208812",
-      "text": "423 NAĞAM ELKENCO"
     },
     {
       "value": "99378445346",
@@ -807,16 +719,9 @@
     {
       "value": "99459179306",
       "text": "551 MERVE ELHÜSEYİN"
-    },
-    {
-      "value": "99599810572",
-      "text": "899 ĞALİD ALALI"
-    },
-    {
-      "value": "99188730342",
-      "text": "2007 MUSTAFA FATO"
     }
   ],
+  "Ogrenci_1. Sınıf _ Geçici Şube": [],
   "Ogrenci_2. Sınıf _ A Şubesi": [
     {
       "value": "99140746886",
@@ -861,10 +766,6 @@
     {
       "value": "99416512108",
       "text": "216 EMNİ DALONA"
-    },
-    {
-      "value": "99147094362",
-      "text": "240 ESİL GASİS"
     },
     {
       "value": "99311675922",
@@ -917,14 +818,6 @@
     {
       "value": "99470984088",
       "text": "391 FATIMA ZEHRA ELHUMEDİ"
-    },
-    {
-      "value": "99455605946",
-      "text": "446 HİBE ELASİ"
-    },
-    {
-      "value": "99080906326",
-      "text": "944 ŞAM ELİSA"
     }
   ],
   "Ogrenci_2. Sınıf _ B Şubesi": [
@@ -937,12 +830,8 @@
       "text": "79 HÜSEYİN ALKHLIF"
     },
     {
-      "value": "99905914512",
-      "text": "92 ÖMER ELDEDDU"
-    },
-    {
-      "value": "99750117526",
-      "text": "98 ABDULKERİM OSMAN"
+      "value": "35816219094",
+      "text": "112 ZEYNEP YAĞMUR KARAKURT"
     },
     {
       "value": "99311860984",
@@ -981,10 +870,6 @@
       "text": "284 HİRANUR KIZILATEŞ"
     },
     {
-      "value": "99185629076",
-      "text": "285 REDUR AHMED"
-    },
-    {
       "value": "66289203938",
       "text": "318 MÜSLÜM POLAT"
     },
@@ -1005,8 +890,8 @@
       "text": "359 HAVVANUR ATMACA"
     },
     {
-      "value": "99093043322",
-      "text": "384 MERVE ĞIREYBİ"
+      "value": "63454297730",
+      "text": "372 FAHRİYE TURAN"
     },
     {
       "value": "99678101966",
@@ -1025,18 +910,14 @@
       "text": "966 MUNE HAMDAVİ"
     },
     {
-      "value": "99291015220",
-      "text": "1004 HELİN ESAAD"
-    },
-    {
       "value": "67858151360",
       "text": "2020 SABİHA NUR ÖLMEZ"
     }
   ],
   "Ogrenci_2. Sınıf _ C Şubesi": [
     {
-      "value": "40130075516",
-      "text": "21 HAMZA DENİZER"
+      "value": "99396073286",
+      "text": "26 AYE ELHALAF"
     },
     {
       "value": "65614225966",
@@ -1069,10 +950,6 @@
     {
       "value": "71977013836",
       "text": "149 BÜŞRA KILIÇ"
-    },
-    {
-      "value": "99269513802",
-      "text": "230 SABAH ELİBRAHİM"
     },
     {
       "value": "99210253528",
@@ -1123,10 +1000,6 @@
       "text": "360 MENESSA ARSLAN"
     },
     {
-      "value": "63454297730",
-      "text": "372 FAHRİYE TURAN"
-    },
-    {
       "value": "99245963478",
       "text": "378 NUR DADAN"
     },
@@ -1135,27 +1008,15 @@
       "text": "401 EMİNE NUR ÇAKIR"
     },
     {
-      "value": "99125563606",
-      "text": "445 ABDURRAHMAN ŞEYH MUHAMMED"
-    },
-    {
       "value": "51925682222",
       "text": "448 EMİRHAN KILIÇ"
     },
     {
       "value": "40052078398",
       "text": "499 YAĞIZ EYMEN ERKILIÇ"
-    },
-    {
-      "value": "99560784918",
-      "text": "1952 NESRİN YASİN"
     }
   ],
   "Ogrenci_3. Sınıf _ A Şubesi": [
-    {
-      "value": "49351768474",
-      "text": "38 YUSUF BERAT ALOĞLU"
-    },
     {
       "value": "99005605778",
       "text": "74 ERİC ELHAMMO"
@@ -1163,10 +1024,6 @@
     {
       "value": "99122374748",
       "text": "95 NASIR GATİT"
-    },
-    {
-      "value": "34370267596",
-      "text": "106 FATMA TAŞOĞLU"
     },
     {
       "value": "52045678096",
@@ -1213,10 +1070,6 @@
       "text": "596 YILDIZ ATMACA"
     },
     {
-      "value": "99302165746",
-      "text": "703 AYAD ELALİ"
-    },
-    {
       "value": "48127808772",
       "text": "964 FATMA ZEHRA OKYAY"
     },
@@ -1257,10 +1110,6 @@
     {
       "value": "99411085478",
       "text": "234 ŞEHED ALKHLIF"
-    },
-    {
-      "value": "99404696186",
-      "text": "275 FATMA EL ALLUS"
     },
     {
       "value": "99413258382",
@@ -1329,10 +1178,6 @@
       "text": "220 İLEF ELZAKİ"
     },
     {
-      "value": "99795780150",
-      "text": "222 MERYEM ELAZİMİ"
-    },
-    {
       "value": "99092766390",
       "text": "232 CENE ELİSA"
     },
@@ -1353,24 +1198,12 @@
       "text": "254 HATİCE TAYLAN"
     },
     {
-      "value": "59977415300",
-      "text": "257 BEYZAGÜL TAŞ"
-    },
-    {
       "value": "27338502112",
       "text": "269 HATİCE TÜMEN"
     },
     {
       "value": "99257778374",
       "text": "280 HACE ELHAMMO"
-    },
-    {
-      "value": "99869759136",
-      "text": "282 EMİNE GASİS"
-    },
-    {
-      "value": "99260947354",
-      "text": "286 TESNİM OSMAN"
     },
     {
       "value": "57481497140",
@@ -1415,10 +1248,6 @@
       "text": "239 ZEHRANUR KAYA"
     },
     {
-      "value": "99263610118",
-      "text": "241 ELYAS ELZAKI"
-    },
-    {
       "value": "25532562000",
       "text": "252 ŞENEL KIZILATEŞ"
     },
@@ -1451,10 +1280,6 @@
     {
       "value": "46504863130",
       "text": "9 YAŞAR ELMAOĞLU"
-    },
-    {
-      "value": "99509475266",
-      "text": "13 MERYEM ĞIREYBİ"
     },
     {
       "value": "99383195816",
@@ -1545,20 +1370,8 @@
       "text": "262 PERİHAN BALOĞLU"
     },
     {
-      "value": "99925814434",
-      "text": "272 ALİ HASAN"
-    },
-    {
       "value": "99185644208",
       "text": "277 VELE ELĞERİBİ"
-    },
-    {
-      "value": "99545627490",
-      "text": "301 MAHMUD ABUREŞ"
-    },
-    {
-      "value": "99413146276",
-      "text": "442 ÖMER HACHAMDO"
     }
   ],
   "Ogrenci_4. Sınıf _ B Şubesi": [
@@ -1567,20 +1380,12 @@
       "text": "24 HASAN CASİM"
     },
     {
-      "value": "32405332776",
-      "text": "67 ARMAĞAN KIZILTOPRAK"
-    },
-    {
       "value": "60460398208",
       "text": "93 HASAN POLAT"
     },
     {
       "value": "47722822688",
       "text": "100 İBRAHİM HALİL TAYLAN"
-    },
-    {
-      "value": "99997698680",
-      "text": "101 MUHAMMED NASIR"
     },
     {
       "value": "19286769952",
@@ -1597,10 +1402,6 @@
     {
       "value": "19928748604",
       "text": "159 HİRA GÜL İMRAK"
-    },
-    {
-      "value": "99689709670",
-      "text": "192 İBRAHİM MELUHİ"
     },
     {
       "value": "65107242524",
@@ -1627,16 +1428,8 @@
       "text": "265 PRENSES ATMACA"
     },
     {
-      "value": "99893698944",
-      "text": "270 MUHAMMED ELAHMED"
-    },
-    {
       "value": "65122258708",
       "text": "291 HİLAL GENÇ"
-    },
-    {
-      "value": "99311305652",
-      "text": "296 AHMED SALİH"
     },
     {
       "value": "45763887918",
@@ -1652,10 +1445,6 @@
     }
   ],
   "Ogrenci_4. Sınıf _ C Şubesi": [
-    {
-      "value": "99707262316",
-      "text": "43 MUNE ZAZA"
-    },
     {
       "value": "99026686152",
       "text": "62 ABDULLAH ELGANİM"
@@ -1721,14 +1510,6 @@
       "text": "271 SABİHA KORKMAZ"
     },
     {
-      "value": "99253796280",
-      "text": "278 AYŞE HAMMUDİ"
-    },
-    {
-      "value": "99965589088",
-      "text": "283 LUAY MUHAMMED"
-    },
-    {
       "value": "99335610152",
       "text": "290 MUHAMMED ELMUHAMMED"
     },
@@ -1745,560 +1526,12 @@
       "text": "397 MURAT ENES BİNGÖL"
     },
     {
-      "value": "99956315030",
-      "text": "399 MUSA İBRAHİM"
-    },
-    {
       "value": "37081402072",
       "text": "916 AHMET ATAŞ"
     },
     {
-      "value": "99893397984",
-      "text": "1057 HALİD EL AVVAD"
-    },
-    {
       "value": "54547594744",
       "text": "1114 MİRAÇ EVREN KOT"
-    },
-    {
-      "value": "99809012604",
-      "text": "2059 ZUBEYDE AHMED"
-    }
-  ],
-  "RPD_Hizmet_Turu": [
-    {
-      "value": "7",
-      "text": "D - DESTEK HİZMETLER"
-    },
-    {
-      "value": "5",
-      "text": "Ö - GELİŞİMSEL VE ÖNLEYİCİ HİZMETLER"
-    },
-    {
-      "value": "6",
-      "text": "İ - İYİLEŞTİRİCİ HİZMETLER"
-    }
-  ],
-  "Asama1_D___DESTEK_HİZMETLER": [
-    {
-      "value": "20",
-      "text": "DM - Müşavirlik"
-    }
-  ],
-  "Asama2_DM___Müşavirlik": [
-    {
-      "value": "22",
-      "text": "DMÖ - Öğretmene Yönelik"
-    },
-    {
-      "value": "21",
-      "text": "DMV - Veliye Yönelik"
-    }
-  ],
-  "Asama3_DM___Müşavirlik": [
-    {
-      "value": "108",
-      "text": "DMÖG - Aile"
-    },
-    {
-      "value": "116",
-      "text": "DMÖG - Akademik Konular"
-    },
-    {
-      "value": "110",
-      "text": "DMÖG - Okula ve Çevreye Uyum"
-    },
-    {
-      "value": "113",
-      "text": "DMÖG - Problem Davranış"
-    },
-    {
-      "value": "112",
-      "text": "DMÖG - Psikolojik Uyum"
-    },
-    {
-      "value": "109",
-      "text": "DMÖG - Sağlık"
-    },
-    {
-      "value": "1341",
-      "text": "DMÖG - Sevk Bilgilendirme"
-    },
-    {
-      "value": "111",
-      "text": "DMÖG - Sosyal Uyum"
-    },
-    {
-      "value": "114",
-      "text": "DMÖG - Sosyoekonomik Konular"
-    },
-    {
-      "value": "115",
-      "text": "DMÖG - Yöneltme Yerleştirme"
-    }
-  ],
-  "Asama1_Ö___GELİŞİMSEL_VE_ÖN": [
-    {
-      "value": "12",
-      "text": "ÖOV - Bilgi Verme Çalışmaları"
-    },
-    {
-      "value": "11",
-      "text": "ÖOB - Bireyi Tanıma Çalışmaları"
-    },
-    {
-      "value": "13",
-      "text": "ÖOY - Yöneltme Ve İzleme"
-    }
-  ],
-  "Asama2_ÖOV___Bilgi_Ver": [
-    {
-      "value": "15",
-      "text": "ÖOVE - Akademik Gelişim"
-    },
-    {
-      "value": "16",
-      "text": "ÖOVM - Kariyer Gelişimi"
-    },
-    {
-      "value": "14",
-      "text": "ÖOVK - Sosyal Duygusal Gelişim"
-    }
-  ],
-  "Asama3_ÖOV___Bilgi_Ver": [
-    {
-      "value": "53",
-      "text": "ÖOVEb - Başarısızlık Nedenleri"
-    },
-    {
-      "value": "365",
-      "text": "ÖOVEb - Çalışma Programı Hazırlama"
-    },
-    {
-      "value": "50",
-      "text": "ÖOVEb - Ders Seçimi"
-    },
-    {
-      "value": "368",
-      "text": "ÖOVEb - Devamsızlığı Önleme"
-    },
-    {
-      "value": "54",
-      "text": "ÖOVEb - Devamsızlık Nedenleri"
-    },
-    {
-      "value": "366",
-      "text": "ÖOVEb - Dikkat Geliştirme Çalışmaları"
-    },
-    {
-      "value": "362",
-      "text": "ÖOVEb - Hedef Belirleme"
-    },
-    {
-      "value": "364",
-      "text": "ÖOVEb - Motivasyon"
-    },
-    {
-      "value": "40",
-      "text": "ÖOVEb - Okul Kuralları"
-    },
-    {
-      "value": "367",
-      "text": "ÖOVEb - Okul ve Çevresindeki Eğitim Olanakları"
-    },
-    {
-      "value": "681",
-      "text": "ÖOVEb - Okula ve Çevreye Uyum"
-    },
-    {
-      "value": "51",
-      "text": "ÖOVEb - Okulda Seçilebilecek Alan/Dal"
-    },
-    {
-      "value": "38",
-      "text": "ÖOVEb - Okulun Fiziksel İmkanları"
-    },
-    {
-      "value": "39",
-      "text": "ÖOVEb - Okulun Sosyokültürel İmkanları"
-    },
-    {
-      "value": "41",
-      "text": "ÖOVEb - Öğrenciyi İlgilendiren Yönetmelikler"
-    },
-    {
-      "value": "47",
-      "text": "ÖOVEb - Öğrenme Stilleri"
-    },
-    {
-      "value": "363",
-      "text": "ÖOVEb - Öz Disiplin Geliştirme"
-    },
-    {
-      "value": "42",
-      "text": "ÖOVEb - Rehberlik ve Psikolojik Danışma Servisinin Tanıtılması"
-    },
-    {
-      "value": "46",
-      "text": "ÖOVEb - Serbest Zamanı Değerlendirme"
-    },
-    {
-      "value": "49",
-      "text": "ÖOVEb - Sınav Kaygısı"
-    },
-    {
-      "value": "48",
-      "text": "ÖOVEb - Sınavda Başarılı Olma Stratejileri"
-    },
-    {
-      "value": "43",
-      "text": "ÖOVEb - Sosyal Kulüpler"
-    },
-    {
-      "value": "683",
-      "text": "ÖOVEb - Üst Öğrenimde Yararlanılacak Burslar ve Barınma Olanakları"
-    },
-    {
-      "value": "52",
-      "text": "ÖOVEb - Üst Öğrenime Geçiş Sınavları"
-    },
-    {
-      "value": "44",
-      "text": "ÖOVEb - Verimli Ders Çalışma"
-    },
-    {
-      "value": "682",
-      "text": "ÖOVEb - Yurt Dışı Eğitim Olanakları"
-    },
-    {
-      "value": "45",
-      "text": "ÖOVEb - Zamanı Yönetimi"
-    }
-  ],
-  "Asama2_ÖOB___Bireyi_Ta": [
-    {
-      "value": "23",
-      "text": "B.K.P.1.c - Yaşam Pencerem"
-    },
-    {
-      "value": "24",
-      "text": "B.K.G.4.c - Öğrenci Bilgi Formu"
-    },
-    {
-      "value": "25",
-      "text": "B.K.G.12.c - Yol Haritam"
-    },
-    {
-      "value": "26",
-      "text": "B.K.O.1.c - Bana Kendini Anlat"
-    },
-    {
-      "value": "28",
-      "text": "B.K.G.3.c - Kendimi Tanıyorum"
-    },
-    {
-      "value": "29",
-      "text": "ÖOB99 - Diğer"
-    },
-    {
-      "value": "582",
-      "text": "B.K.A.7.c - Şiddet Algısı Anketi"
-    },
-    {
-      "value": "583",
-      "text": "B.K.A.8.c - Şiddet Sıklığı Anketi"
-    },
-    {
-      "value": "584",
-      "text": "B.K.A.9.c - Şiddet Meşruiyeti Anketi"
-    },
-    {
-      "value": "585",
-      "text": "B.K.A.10.c - Şiddet Algısı Anketi (Veli)"
-    },
-    {
-      "value": "586",
-      "text": "B.G.G.10.c - Şiddet Sıklığı Anketi (Veli)"
-    },
-    {
-      "value": "587",
-      "text": "B.K.A.12.c - Şiddet Meşruiyeti Anketi (Veli)"
-    },
-    {
-      "value": "588",
-      "text": "B.K.A.11.c - Şiddet Algısı Anketi (Öğretmen)"
-    },
-    {
-      "value": "589",
-      "text": "B.G.G.11.c - Şiddet Sıklığı Anketi (Öğretmen)"
-    },
-    {
-      "value": "590",
-      "text": "B.K.A.13.c - Şiddet Meşruiyeti Anketi (Öğretmen 4-6.sınıf)"
-    },
-    {
-      "value": "591",
-      "text": "B.K.A.14.c - Şiddet Meşruiyeti Anketi (Öğretmen 7-12. Sınıf)"
-    },
-    {
-      "value": "673",
-      "text": "B.K.İ.1.c - Verimli Ders Çalışma Kontrol Listesi"
-    },
-    {
-      "value": "674",
-      "text": "B.G.G.2.c - Çocuğumu Tanıyorum Formu"
-    },
-    {
-      "value": "675",
-      "text": "B.G.G.1.c - Aile içi Gözlem Formu"
-    },
-    {
-      "value": "676",
-      "text": "B.G.G.3.c - DEHB Gözlem Formu"
-    },
-    {
-      "value": "677",
-      "text": "B.G.G.4.c - Ev Ziyaret Formu"
-    },
-    {
-      "value": "678",
-      "text": "B.G.G.7.c - Öğrenci Gözlem Kaydı"
-    },
-    {
-      "value": "679",
-      "text": "B.G.G.8.a - Özel Öğrenme Güçlüğü Gözlem Formu"
-    },
-    {
-      "value": "680",
-      "text": "B.K.G.7.c - Öğrenci-Öngörüşme Formu"
-    },
-    {
-      "value": "1309",
-      "text": "RAM (WISC-R) - RAM (WISC-R)"
-    },
-    {
-      "value": "964",
-      "text": "B.K.A.2.C - Devamsızlık Nedenleri Anketi"
-    },
-    {
-      "value": "1310",
-      "text": "RAM (LEITER) - RAM (LEITER)"
-    },
-    {
-      "value": "1311",
-      "text": "RAM (ASİS) - RAM (ASİS)"
-    },
-    {
-      "value": "1312",
-      "text": "RAM (S.BİNET) - RAM (S.BİNET)"
-    },
-    {
-      "value": "1313",
-      "text": "RAM (ÖGT) - RAM (ÖGT)"
-    }
-  ],
-  "Asama3_ÖOB___Bireyi_Ta": [
-    {
-      "value": "293",
-      "text": "B.K.P.1.c.2 - Yaşam Pencerem - Geribildirim"
-    },
-    {
-      "value": "892",
-      "text": "B.K.P.1.c.3 - Yaşam Pencerem - Sonuç Değerlendirme"
-    },
-    {
-      "value": "286",
-      "text": "B.K.P.1.c.1 - Yaşam Pencerem - Uygulama"
-    }
-  ],
-  "Asama2_ÖOY___Yöneltme_": [
-    {
-      "value": "64",
-      "text": "ÖOYb - Alan/Dal Tercihleri"
-    },
-    {
-      "value": "1331",
-      "text": "ÖOYb - Değişen Ben-Sosyal Kültürel Faaliyetler"
-    },
-    {
-      "value": "1332",
-      "text": "ÖOYb - Risk Haritası-Sosyal Kültürel Faaliyetler"
-    },
-    {
-      "value": "65",
-      "text": "ÖOYb - Seçmeli Ders"
-    },
-    {
-      "value": "66",
-      "text": "ÖOYb - Sosyal Kulüpler"
-    },
-    {
-      "value": "67",
-      "text": "ÖOYb - Üst Öğrenim Kurumuna Geçen Öğrencilerin İzlenmesi"
-    }
-  ],
-  "Asama1_İ___İYİLEŞTİRİCİ_HİZ": [
-    {
-      "value": "17",
-      "text": "İB - Bireysel Psikolojik Danışma"
-    },
-    {
-      "value": "18",
-      "text": "İP - Psikososyal Müdahale"
-    },
-    {
-      "value": "19",
-      "text": "İS - Sevk (Yönlendirme)"
-    }
-  ],
-  "Asama2_İB___Bireysel_P": [
-    {
-      "value": "71",
-      "text": "İB - Aile"
-    },
-    {
-      "value": "76",
-      "text": "İB - Davranış Sorunları"
-    },
-    {
-      "value": "1032",
-      "text": "İB - OBM"
-    },
-    {
-      "value": "1569",
-      "text": "İB - Okul öncesi-Arkadaşlık İlişkileri Geliştirme Psikoeğitim Programı(Zorba)"
-    },
-    {
-      "value": "1338",
-      "text": "İB - Okul öncesi-Arkadaşlık İlişkileri Geliştirme Psikoeğitm Programı(Maruz Kalan)"
-    },
-    {
-      "value": "73",
-      "text": "İB - Okula Ve Çevreye Uyum"
-    },
-    {
-      "value": "75",
-      "text": "İB - Psikolojik Uyum"
-    },
-    {
-      "value": "72",
-      "text": "İB - Sağlık"
-    },
-    {
-      "value": "74",
-      "text": "İB - Sosyal Uyum"
-    },
-    {
-      "value": "77",
-      "text": "İB - Sosyoekonomik Konular"
-    },
-    {
-      "value": "1336",
-      "text": "İB - Travma Sonrası Grup Temelli Müdahale Programı (TS-GTM)"
-    },
-    {
-      "value": "78",
-      "text": "İB - Yöneltme Yerleştirme"
-    }
-  ],
-  "Asama2_İP___Psikososya": [
-    {
-      "value": "592",
-      "text": "İPbB - Bildirim Yükümlülüğü"
-    },
-    {
-      "value": "594",
-      "text": "İPbİ - İntihar"
-    },
-    {
-      "value": "593",
-      "text": "İPbT - Koruyucu ve Destekleyici Tedbir"
-    }
-  ],
-  "Asama3_İP___Psikososya": [
-    {
-      "value": "628",
-      "text": "İPbB - Cinsel İstismar"
-    },
-    {
-      "value": "597",
-      "text": "İPbB - Duygusal İhmal"
-    },
-    {
-      "value": "627",
-      "text": "İPbB - Duygusal İstismar"
-    },
-    {
-      "value": "596",
-      "text": "İPbB - Eğitim İle İlgili İhmal"
-    },
-    {
-      "value": "629",
-      "text": "İPbB - Ekonomik İstismar"
-    },
-    {
-      "value": "595",
-      "text": "İPbB - Fiziksel İhmal"
-    },
-    {
-      "value": "626",
-      "text": "İPbB - Fiziksel İstismar"
-    },
-    {
-      "value": "631",
-      "text": "İPbB - Madde Bulundurma"
-    },
-    {
-      "value": "630",
-      "text": "İPbB - Madde Kullanımı"
-    },
-    {
-      "value": "632",
-      "text": "İPbB - Madde Satışı"
-    },
-    {
-      "value": "625",
-      "text": "İPbB - Sağlık İhmali"
-    }
-  ],
-  "Asama2_İS___Sevk_(Yönl": [
-    {
-      "value": "97",
-      "text": "İS - Diğer"
-    },
-    {
-      "value": "91",
-      "text": "İS - RAM Rehberlik ve Psikolojik Danışma Hizmetleri Bölümüne Yönlendirme"
-    },
-    {
-      "value": "92",
-      "text": "İS - Sağlık Kuruluşuna Yönlendirme"
-    }
-  ],
-  "Calisma_Yeri": [
-    {
-      "value": "1",
-      "text": "Rehberlik Servisi"
-    },
-    {
-      "value": "2",
-      "text": "Ev (Ziyaret)"
-    },
-    {
-      "value": "3",
-      "text": "Sınıf (Gözlem)"
-    },
-    {
-      "value": "4",
-      "text": "Diğer"
-    },
-    {
-      "value": "5",
-      "text": "RAM"
-    },
-    {
-      "value": "6",
-      "text": "Bilsem"
     }
   ]
 }
