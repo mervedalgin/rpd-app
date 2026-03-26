@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { loadStudentData } from '@/lib/data';
+import { resolveAsama } from '@/lib/mebbis-mapping';
 
 export const runtime = 'nodejs';
 
-// Sabit değerler (daily.json yapısına göre)
-const HIZMET_TURU = "5";
-const ASAMA1 = "12";
-const ASAMA2 = "14";
-const ASAMA3 = "35";
+// Sabit değerler
 const CALISMA_YERI = "1";
 const GORUSME_SURESI = 20; // dakika
 
@@ -72,10 +69,10 @@ async function generateDailyJson(targetDate: string, specificStudents?: string[]
 
   const studentData = loadStudentData();
 
-  // Yönlendirilen öğrencileri al
+  // Yönlendirilen öğrencileri al (reason ve note dahil)
   let query = supabase
     .from('referrals')
-    .select('id, student_name, class_display, created_at')
+    .select('id, student_name, class_display, reason, note, created_at')
     .gte('created_at', `${targetDate}T00:00:00`)
     .lte('created_at', `${targetDate}T23:59:59`)
     .order('created_at', { ascending: true });
@@ -112,13 +109,16 @@ async function generateDailyJson(targetDate: string, specificStudents?: string[]
     const ogrenci = resolveStudentTC(ref.student_name, ref.class_display, studentData);
     const { saat_bas, saat_bitis } = calculateTimes(START_HOUR, START_MINUTE, index);
 
+    // Dinamik aşama eşleştirmesi: neden + nota göre
+    const asama = resolveAsama(ref.reason, ref.note);
+
     return {
       sinif_sube,
       ogrenci,
-      hizmet_turu: HIZMET_TURU,
-      asama1: ASAMA1,
-      asama2: ASAMA2,
-      asama3: ASAMA3,
+      hizmet_turu: asama.hizmet_turu,
+      asama1: asama.asama1,
+      asama2: asama.asama2,
+      asama3: asama.asama3,
       tarih,
       tarih_alt,
       saat_bas,
