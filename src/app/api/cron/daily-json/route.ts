@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { loadStudentData } from '@/lib/data';
+import { resolveAsama } from '@/lib/mebbis-mapping';
 
 export const runtime = 'nodejs';
 
@@ -9,10 +10,6 @@ export const runtime = 'nodejs';
 // Örnek: cron-job.org, Vercel Cron, GitHub Actions, vb.
 
 // Sabit değerler
-const HIZMET_TURU = "5";
-const ASAMA1 = "12";
-const ASAMA2 = "14";
-const ASAMA3 = "35";
 const CALISMA_YERI = "1";
 const GORUSME_SURESI = 20;
 
@@ -73,10 +70,10 @@ export async function GET() {
     const turkeyTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
     const todayStr = turkeyTime.toISOString().slice(0, 10);
 
-    // Bugünkü yönlendirmeleri al
+    // Bugünkü yönlendirmeleri al (reason ve note dahil)
     const { data: referrals, error } = await supabase
       .from('referrals')
-      .select('id, student_name, class_display, created_at')
+      .select('id, student_name, class_display, reason, note, created_at')
       .gte('created_at', `${todayStr}T00:00:00`)
       .lte('created_at', `${todayStr}T23:59:59`)
       .order('created_at', { ascending: true });
@@ -107,13 +104,16 @@ export async function GET() {
       const ogrenci = resolveStudentTC(ref.student_name, ref.class_display, studentData);
       const { saat_bas, saat_bitis } = calculateTimes(START_HOUR, START_MINUTE, index);
 
+      // Dinamik aşama eşleştirmesi: neden + nota göre
+      const asama = resolveAsama(ref.reason, ref.note);
+
       return {
         sinif_sube,
         ogrenci,
-        hizmet_turu: HIZMET_TURU,
-        asama1: ASAMA1,
-        asama2: ASAMA2,
-        asama3: ASAMA3,
+        hizmet_turu: asama.hizmet_turu,
+        asama1: asama.asama1,
+        asama2: asama.asama2,
+        asama3: asama.asama3,
         tarih,
         tarih_alt,
         saat_bas,
