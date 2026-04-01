@@ -58,3 +58,26 @@ Thumbs.db
 /temp/
 /logs/
 .env.local
+
+# Binary files - should not be in git
+*.exe
+*.zip
+
+# Data files with potential PII
+data.json
+data2.json
+daily.json
+bulk_*.json
+
+# AI/Tool directories
+.agents/
+.kiro/
+.qoder/
+.claude/logs/
+.claude/agent-memory/
+
+# Kalfa OS runtime files
+Scratchpad.md
+Daily Notes/
+Task Board.md
+skills-lock.json

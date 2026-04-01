@@ -2,17 +2,20 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // Server-side (API routes) veya client-side (tarayıcı) için uygun değişkeni seç
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase configuration missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+if (!supabaseUrl || !supabaseKey) {
+  console.warn("Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.");
 }
 
-const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey)
+const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-// Helper function - supabase null ise hata fırlat
+/**
+ * Returns the Supabase client or throws if not configured.
+ * Prefer this over the direct `supabase` export.
+ */
 export function getSupabase(): SupabaseClient {
   if (!_supabaseClient) {
     throw new Error("Supabase is not configured. Please check your environment variables.");
@@ -20,6 +23,5 @@ export function getSupabase(): SupabaseClient {
   return _supabaseClient;
 }
 
-// Backward compatibility - supabase'i null olmayan bir şekilde export et
-// Runtime'da null olabilir ama TypeScript'e null olmadığını söylüyoruz
+// Backward compatibility export - prefer getSupabase() for new code
 export const supabase = _supabaseClient as SupabaseClient;

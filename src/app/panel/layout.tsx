@@ -51,7 +51,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const MASTER_PASSWORD = process.env.NEXT_PUBLIC_PANEL_PASSWORD || "sagopa";
 const MAX_ATTEMPTS = 3;
 const SESSION_KEY = "panel_authenticated";
 const LOCKOUT_KEY = "panel_lockout";
@@ -340,32 +339,43 @@ export default function PanelLayout({
     checkAuth();
   }, [router]);
 
-  // Şifre kontrolü
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  // Şifre kontrolü — server-side doğrulama
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password === MASTER_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, "true");
-      setIsAuthenticated(true);
-      toast.success("Giriş başarılı! Panele yönlendiriliyorsunuz...");
-      setPassword("");
-      setAttempts(0);
-    } else {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      setPassword("");
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 500);
-      
-      if (newAttempts >= MAX_ATTEMPTS) {
-        localStorage.setItem(LOCKOUT_KEY, new Date().toISOString());
-        toast.error("3 yanlış deneme! Ana sayfaya yönlendiriliyorsunuz...");
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
+
+    try {
+      const res = await fetch("/api/panel-auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+
+      if (data.authenticated) {
+        sessionStorage.setItem(SESSION_KEY, "true");
+        setIsAuthenticated(true);
+        toast.success("Giriş başarılı! Panele yönlendiriliyorsunuz...");
+        setPassword("");
+        setAttempts(0);
       } else {
-        toast.error(`Yanlış şifre! Kalan deneme hakkı: ${MAX_ATTEMPTS - newAttempts}`);
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        setPassword("");
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 500);
+
+        if (newAttempts >= MAX_ATTEMPTS) {
+          localStorage.setItem(LOCKOUT_KEY, new Date().toISOString());
+          toast.error("3 yanlış deneme! Ana sayfaya yönlendiriliyorsunuz...");
+          setTimeout(() => {
+            router.push("/");
+          }, 1500);
+        } else {
+          toast.error(`Yanlış şifre! Kalan deneme hakkı: ${MAX_ATTEMPTS - newAttempts}`);
+        }
       }
+    } catch {
+      toast.error("Bağlantı hatası oluştu");
     }
   };
 
