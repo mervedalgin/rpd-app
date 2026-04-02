@@ -63,9 +63,7 @@ Thumbs.db
 *.exe
 *.zip
 
-# Data files with potential PII
-data.json
-data2.json
+# Data files
 daily.json
 bulk_*.json
 
