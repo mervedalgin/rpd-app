@@ -227,19 +227,26 @@ export default function DailyJsonPage() {
     toast.success("JSON panoya kopyalandı");
   };
 
-  // Otomatik tetikle (test)
+  // Bugünün tarihini al ve /api/daily-json üzerinden otomatik oluştur
   const triggerAutoGenerate = async () => {
     setGenerating(true);
     const toastId = toast.loading("Otomatik JSON oluşturuluyor...");
     try {
-      const res = await fetch("/api/cron/daily-json", { method: "POST" });
+      const now = new Date();
+      const todayStr = now.toLocaleDateString("en-CA", { timeZone: "Europe/Istanbul" }); // YYYY-MM-DD
+
+      const res = await fetch("/api/daily-json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target_date: todayStr, source: "auto" }),
+      });
       const result = await res.json();
 
       if (res.ok && result.success) {
-        if (result.count === 0) {
+        if (result.data.record_count === 0) {
           toast.info("Bugün yönlendirme bulunamadı", { id: toastId });
         } else {
-          toast.success(`Otomatik JSON oluşturuldu: ${result.count} kayıt`, { id: toastId });
+          toast.success(`Otomatik JSON oluşturuldu: ${result.data.record_count} kayıt`, { id: toastId });
           fetchJsons();
         }
       } else {
