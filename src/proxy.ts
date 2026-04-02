@@ -6,15 +6,22 @@ const CRON_SECRET = process.env.CRON_SECRET;
 function isAllowedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
+  const host = request.headers.get("host") || request.nextUrl.host;
 
-  if (!appUrl) {
-    // Development fallback: allow if no APP_URL configured
-    return process.env.NODE_ENV === "development";
+  // Same-origin check: compare origin/referer against the request's own host
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      if (originHost === host) return true;
+    } catch { /* invalid origin */ }
   }
 
-  if (origin && origin.startsWith(appUrl)) return true;
-  if (referer && referer.startsWith(appUrl)) return true;
+  if (referer) {
+    try {
+      const refererHost = new URL(referer).host;
+      if (refererHost === host) return true;
+    } catch { /* invalid referer */ }
+  }
 
   return false;
 }
