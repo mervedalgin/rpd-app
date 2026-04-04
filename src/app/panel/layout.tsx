@@ -48,7 +48,8 @@ import {
   Phone,
   PieChart,
   Bot,
-  MapPin
+  MapPin,
+  ClipboardCheck
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -235,6 +236,12 @@ const menuCategories: MenuCategory[] = [
         label: "Belge Oluştur",
         icon: FileText,
         color: "purple"
+      },
+      {
+        href: "/panel/akademik-tutanak",
+        label: "Akademik Tutanak",
+        icon: ClipboardCheck,
+        color: "teal"
       },
       {
         href: "/panel/disiplin",

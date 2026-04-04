@@ -94,7 +94,14 @@ export async function GET() {
       });
     }
 
-    const studentData = loadStudentData();
+    let studentData: ReturnType<typeof loadStudentData>;
+    try {
+      studentData = loadStudentData();
+    } catch (dataErr) {
+      console.error('data.json yüklenemedi:', dataErr);
+      // data.json okunamazsa TC/sınıf eşleştirmesi olmadan devam et
+      studentData = { Sinif_Sube: [] } as ReturnType<typeof loadStudentData>;
+    }
     const { tarih, tarih_alt } = formatDate(todayStr);
     const START_HOUR = 12;
     const START_MINUTE = 40;

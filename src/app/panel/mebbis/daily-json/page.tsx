@@ -19,6 +19,7 @@ import {
   Save,
   Copy,
   Zap,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -291,6 +292,29 @@ export default function DailyJsonPage() {
               >
                 <Zap className={`h-4 w-4 mr-2 ${generating ? "animate-spin" : ""}`} />
                 Bugünü Oluştur
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={async () => {
+                  const toastId = toast.loading("Cron test ediliyor...");
+                  try {
+                    const res = await fetch("/api/cron/daily-json", { method: "POST" });
+                    const result = await res.json();
+                    if (res.ok && result.success) {
+                      toast.success(`Cron çalıştı: ${result.count} kayıt (${result.date})`, { id: toastId });
+                      fetchJsons();
+                    } else {
+                      toast.error(`Cron hatası: ${result.error || JSON.stringify(result)}`, { id: toastId });
+                    }
+                  } catch (e) {
+                    toast.error("Cron bağlantı hatası: " + (e instanceof Error ? e.message : ""), { id: toastId });
+                  }
+                }}
+                className="bg-amber-500/30 hover:bg-amber-500/50 text-white border-0"
+              >
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Cron Test
               </Button>
               <Button
                 variant="secondary"

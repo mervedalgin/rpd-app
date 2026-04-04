@@ -45,9 +45,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Cron endpoints: require cron secret or bearer token
+  // Cron endpoints: require cron secret, bearer token, or same-origin (panel)
   if (pathname.startsWith("/api/cron/")) {
-    if (hasValidCronSecret(request) || hasBearerToken(request)) {
+    if (hasValidCronSecret(request) || hasBearerToken(request) || isAllowedOrigin(request)) {
       return NextResponse.next();
     }
     return NextResponse.json({ error: "Yetkisiz cron erişimi" }, { status: 401 });
