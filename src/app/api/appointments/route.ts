@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { appointmentCreateSchema, appointmentUpdateSchema, validateBody } from "@/lib/validation";
 
 // GET - Randevuları listele
 export async function GET(request: NextRequest) {
@@ -92,48 +93,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    
-    const {
-      appointment_date,
-      start_time,
-      duration = 15,
-      participant_type,
-      participant_name,
-      participant_class,
-      participant_phone,
-      topic_tags = [],
-      location = "guidance_office",
-      purpose,
-      preparation_note,
-      priority = "normal",
-      template_type
-    } = body;
-
-    // Zorunlu alan kontrolü
-    if (!appointment_date || !start_time || !participant_type || !participant_name) {
-      return NextResponse.json(
-        { error: "Tarih, saat, katılımcı türü ve isim zorunludur" },
-        { status: 400 }
-      );
+    const result = validateBody(appointmentCreateSchema, body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
+    const validated = result.data;
 
     const { data, error } = await supabase
       .from("appointments")
       .insert({
-        appointment_date,
-        start_time,
-        duration,
-        participant_type,
-        participant_name,
-        participant_class,
-        participant_phone,
-        topic_tags,
-        location,
-        purpose,
-        preparation_note,
-        priority,
+        ...validated,
         status: "planned",
-        template_type
       })
       .select()
       .single();
@@ -167,14 +137,11 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, ...updateData } = body;
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "Randevu ID zorunludur" },
-        { status: 400 }
-      );
+    const result = validateBody(appointmentUpdateSchema, body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
+    const { id, ...updateData } = result.data;
 
     const { data, error } = await supabase
       .from("appointments")

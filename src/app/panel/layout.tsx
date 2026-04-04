@@ -47,7 +47,8 @@ import {
   BellRing,
   Phone,
   PieChart,
-  Bot
+  Bot,
+  MapPin
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -257,6 +258,12 @@ const menuCategories: MenuCategory[] = [
         href: "/panel/mebbis/daily-json",
         label: "Daily JSON",
         icon: FileText,
+        color: "emerald"
+      },
+      {
+        href: "/panel/okul-disi-etkinlik",
+        label: "Okul Dışı Etkinlik",
+        icon: MapPin,
         color: "emerald"
       },
     ]

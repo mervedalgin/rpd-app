@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { reportRequestSchema, validateBody } from "@/lib/validation";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-interface ReportRequest {
-  studentName: string;
-  studentClass: string;
-  appointmentDate: string;
-  topicTags: string[];
-  purpose: string;
-  outcome: string;
-  decisions: string[];
-  sessionNotes: string;
-  reportType: "idare" | "ogretmen" | "veli" | "rehberlik";
-}
 
 const REPORT_PROMPTS: Record<string, string> = {
   idare: `Sen bir okul psikolojik danışmanısın. Aşağıdaki bilgilere göre okul idaresi için resmi bir bilgilendirme raporu hazırla.
@@ -75,23 +64,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body: ReportRequest = await request.json();
-    const { studentName, studentClass, appointmentDate, topicTags, purpose, outcome, decisions, sessionNotes, reportType } = body;
-
-    if (!sessionNotes || !reportType) {
-      return NextResponse.json(
-        { error: "Görüşme notları ve rapor tipi gereklidir" },
-        { status: 400 }
-      );
+    const body = await request.json();
+    const result = validateBody(reportRequestSchema, body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
+    const { studentName, studentClass, appointmentDate, topicTags, purpose, outcome, decisions, sessionNotes, reportType } = result.data;
 
     const systemPrompt = REPORT_PROMPTS[reportType];
-    if (!systemPrompt) {
-      return NextResponse.json(
-        { error: "Geçersiz rapor tipi" },
-        { status: 400 }
-      );
-    }
 
     const userPrompt = `
 Öğrenci Bilgileri:

@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { documentRequestSchema, validateBody } from "@/lib/validation";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-type DocumentType = "veli-mektubu" | "veli-cagrisi" | "ogretmen-mektubu" | "ogretmen-tavsiyesi" | "idare-mektubu" | "disiplin-kurulu";
-
-interface DocumentRequest {
-  documentType: DocumentType;
-  currentContent: string;
-  studentName: string;
-  studentClass: string;
-  meetingDate?: string;
-  meetingTime?: string;
-}
 
 // Her belge türü için HTML format talimatları
 const HTML_FORMAT_INSTRUCTION = `
@@ -40,6 +30,8 @@ YAPISAL ŞABLON (BU YAPIYI KORU):
 
 Öğrenci adını her zaman tırnak içinde ve kalın yaz: "<strong>Öğrenci Adı</strong>"
 `;
+
+type DocumentType = "veli-mektubu" | "veli-cagrisi" | "ogretmen-mektubu" | "ogretmen-tavsiyesi" | "idare-mektubu" | "disiplin-kurulu";
 
 const DOCUMENT_PROMPTS: Record<DocumentType, string> = {
   "veli-mektubu": `Sen deneyimli bir okul psikolojik danışmanısın. Mevcut veli mektubunu geliştir.
@@ -147,15 +139,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body: DocumentRequest = await request.json();
-    const { documentType, currentContent, studentName, studentClass, meetingDate, meetingTime } = body;
-
-    if (!documentType || !currentContent) {
-      return NextResponse.json(
-        { error: "Belge türü ve mevcut içerik gereklidir" },
-        { status: 400 }
-      );
+    const body = await request.json();
+    const result = validateBody(documentRequestSchema, body);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
+    const { documentType, currentContent, studentName, studentClass, meetingDate, meetingTime } = result.data;
 
     const systemPrompt = DOCUMENT_PROMPTS[documentType];
     if (!systemPrompt) {
