@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
+
+const supabase = getSupabaseServer();
 import { loadStudentData } from '@/lib/data';
 import { resolveAsama } from '@/lib/mebbis-mapping';
 

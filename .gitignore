@@ -66,6 +66,14 @@ Thumbs.db
 # Data files
 daily.json
 bulk_*.json
+data.json
+data2.json
+
+# Sensitive config
+.mcp.json
+
+# Generated data
+/var/
 
 # AI/Tool directories
 .agents/

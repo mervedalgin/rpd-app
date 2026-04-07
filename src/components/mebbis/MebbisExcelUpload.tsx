@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Upload, File, CheckCircle, AlertCircle, Sparkles, FileSpreadsheet, CloudUpload, Database } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { MebbisExcelData } from '@/types/mebbis';
@@ -59,30 +59,46 @@ const MebbisExcelUpload: React.FC<MebbisExcelUploadProps> = ({
       setUploadProgress(prev => Math.min(prev + 10, 90));
     }, 100);
 
+    // Dosya boyutu kontrolü (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Dosya boyutu 5MB\'dan büyük olamaz.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array' });
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(data);
 
       const excelData: MebbisExcelData = {};
 
-      workbook.SheetNames.forEach(sheetName => {
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      workbook.worksheets.forEach(worksheet => {
+        const sheetName = worksheet.name;
+        const rows: (string | number)[][] = [];
 
-        if (jsonData.length > 1) {
-          const headers = jsonData[0] as string[];
+        worksheet.eachRow((row) => {
+          const rowValues: (string | number)[] = [];
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            rowValues[colNumber - 1] = cell.value != null ? (typeof cell.value === 'object' ? String(cell.value) : cell.value as string | number) : '';
+          });
+          rows.push(rowValues);
+        });
+
+        if (rows.length > 1) {
+          const headers = rows[0].map(h => String(h || ''));
           const valueIndex = headers.findIndex(h =>
-            h && h.toLowerCase().includes('değer') || h && h.toLowerCase().includes('value')
+            (h && h.toLowerCase().includes('değer')) || (h && h.toLowerCase().includes('value'))
           );
           const textIndex = headers.findIndex(h =>
-            h && h.toLowerCase().includes('metin') || h && h.toLowerCase().includes('text')
+            (h && h.toLowerCase().includes('metin')) || (h && h.toLowerCase().includes('text'))
           );
 
           if (valueIndex !== -1 && textIndex !== -1) {
             excelData[sheetName] = [];
 
-            for (let i = 1; i < jsonData.length; i++) {
-              const row = jsonData[i] as (string | number)[];
+            for (let i = 1; i < rows.length; i++) {
+              const row = rows[i];
               const value = row[valueIndex];
               const text = row[textIndex];
 
@@ -95,8 +111,8 @@ const MebbisExcelUpload: React.FC<MebbisExcelUploadProps> = ({
             }
           } else {
             excelData[sheetName] = [];
-            for (let i = 1; i < jsonData.length; i++) {
-              const row = jsonData[i] as (string | number)[];
+            for (let i = 1; i < rows.length; i++) {
+              const row = rows[i];
               if (row[0] && row[1]) {
                 excelData[sheetName].push({
                   value: String(row[0]).trim(),

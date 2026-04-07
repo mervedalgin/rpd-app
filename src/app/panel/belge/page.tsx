@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -619,9 +620,9 @@ ${signature}`,
       </html>
     `;
     
-    printWindow.document.write(htmlContent);
+    printWindow.document.write(DOMPurify.sanitize(htmlContent));
     printWindow.document.close();
-    
+
     setTimeout(() => {
       printWindow.print();
       toast.success("Yazdırma penceresi açıldı");
@@ -780,9 +781,9 @@ ${signature}`,
         </html>
       `;
       
-      printWindow.document.write(htmlContent);
+      printWindow.document.write(DOMPurify.sanitize(htmlContent));
       printWindow.document.close();
-      
+
       setTimeout(() => {
         printWindow.print();
         toast.success("PDF olarak kaydetmek için 'PDF olarak kaydet' seçin");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -744,7 +745,7 @@ export default function RandevuBildirimlerPage() {
         </html>
       `;
 
-      printWindow.document.write(htmlContent);
+      printWindow.document.write(DOMPurify.sanitize(htmlContent));
       printWindow.document.close();
       toast.success("PDF penceresi açıldı - Kaydetmek için yazdır butonuna basın");
     } catch (error) {

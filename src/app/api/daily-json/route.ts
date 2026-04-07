@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
+
+const supabase = getSupabaseServer();
 import { loadStudentData } from '@/lib/data';
 import { resolveAsama } from '@/lib/mebbis-mapping';
 
@@ -165,7 +167,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: `Listeleme hatası: ${error.message}` }, { status: 500 });
+      return NextResponse.json({ error: "Listeleme hatası" }, { status: 500 });
     }
 
     return NextResponse.json(data ?? []);
@@ -212,7 +214,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: `Kayıt hatası: ${error.message}` }, { status: 500 });
+      return NextResponse.json({ error: "Kayıt hatası" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, data });

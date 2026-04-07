@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -1454,9 +1455,9 @@ ${signature}
         </html>
       `;
       
-      printWindow.document.write(htmlContent);
+      printWindow.document.write(DOMPurify.sanitize(htmlContent));
       printWindow.document.close();
-      
+
       setTimeout(() => {
         printWindow.print();
         addActivity("PDF indirildi", selectedDocument);

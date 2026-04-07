@@ -203,20 +203,16 @@ export default function RPDYonlendirme() {
 
   // Sınıf değiştiğinde öğrenci listesini güncelle
   const handleSinifChange = async (sinifSube: string) => {
-    console.log('🔄 Sınıf değişti:', sinifSube);
-    setOgrenciLoading(true);
+        setOgrenciLoading(true);
     try {
       // URL encode yaparak # karakterinin düzgün gönderilmesini sağla
       const encodedSinifSube = encodeURIComponent(sinifSube);
-      console.log('📤 API çağrısı:', `/api/students?sinifSube=${encodedSinifSube}`);
-      const response = await fetch(`/api/students?sinifSube=${encodedSinifSube}`);
+            const response = await fetch(`/api/students?sinifSube=${encodedSinifSube}`);
       const data = await response.json();
-      console.log('📚 API Yanıtı:', Array.isArray(data) ? `${data.length} öğrenci` : typeof data, data);
-      // API'den gelen verinin array olduğundan emin ol
+            // API'den gelen verinin array olduğundan emin ol
       const ogrenciArray = Array.isArray(data) ? data : [];
       setOgrenciList(ogrenciArray);
-      console.log('✅ Öğrenci listesi güncellendi:', ogrenciArray.length, 'öğrenci');
-      form.setValue("ogrenci", ""); // Öğrenci seçimini sıfırla
+            form.setValue("ogrenci", ""); // Öğrenci seçimini sıfırla
     } catch (error) {
       console.error('❌ Öğrenci listesi yüklenirken hata:', error);
       toast.error("Öğrenci listesi yüklenirken hata oluştu");
@@ -617,11 +613,9 @@ export default function RPDYonlendirme() {
                         <FormControl>
                           <Select
                             onValueChange={(val) => {
-                              console.log('👨‍🏫 Öğretmen değişti:', val);
                               field.onChange(val);
                               const t = teacherOptions.find(t => t.value === val);
                               if (t) {
-                                console.log('🎯 Öğretmen bulundu:', t.label, '-> Sınıf:', t.sinifSubeDisplay);
                                 // auto select class and fetch students
                                 form.setValue('sinifSube', t.sinifSubeKey, { shouldValidate: true });
                                 form.setValue('ogrenci', ''); // Öğrenci seçimini sıfırla
@@ -630,7 +624,6 @@ export default function RPDYonlendirme() {
                                   handleSinifChange(t.sinifSubeKey);
                                 }, 100);
                               } else {
-                                console.log('⚠️  Öğretmen bulunamadı, listeler temizleniyor');
                                 // Öğretmen seçimi temizlenirse öğrenci listesini de temizle
                                 setOgrenciList([]);
                                 form.setValue('ogrenci', '');

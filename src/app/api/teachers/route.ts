@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   try {
-    const { records, list } = getTeachersData();
+    const { records, list } = await getTeachersData();
     const { searchParams } = new URL(req.url);
     const q = searchParams.get('q');
     if (q) {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   try {
     const { action } = await req.json();
     if (action === 'import') {
-      const count = importTeachersFromExcelToStore();
+      const count = await importTeachersFromExcelToStore();
       return NextResponse.json({ imported: count });
     }
     if (action === 'seed') {

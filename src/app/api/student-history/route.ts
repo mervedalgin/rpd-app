@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
+
+const supabase = getSupabaseServer();
 
 export const runtime = 'nodejs';
 
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('referrals')
       .select('*')
-      .ilike('student_name', `%${studentName}%`)
+      .ilike('student_name', `%${studentName.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`)
       .order('created_at', { ascending: false });
 
     // Eğer sınıf da belirtilmişse filtrele

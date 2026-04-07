@@ -328,9 +328,9 @@ export default function PanelLayout({
     );
   }, [searchQuery]);
 
-  // Session kontrolü
+  // Session kontrolü - server-side cookie doğrulama
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       const lockoutTime = localStorage.getItem(LOCKOUT_KEY);
       if (lockoutTime) {
         const lockoutDate = new Date(lockoutTime);
@@ -343,13 +343,19 @@ export default function PanelLayout({
         }
       }
 
-      const authenticated = sessionStorage.getItem(SESSION_KEY);
-      if (authenticated === "true") {
-        setIsAuthenticated(true);
+      // Server-side session doğrulama (HttpOnly cookie)
+      try {
+        const res = await fetch("/api/panel-auth", { method: "GET" });
+        const data = await res.json();
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // Session geçersiz veya yok
       }
       setIsLoading(false);
     };
-    
+
     checkAuth();
   }, [router]);
 
@@ -366,7 +372,7 @@ export default function PanelLayout({
       const data = await res.json();
 
       if (data.authenticated) {
-        sessionStorage.setItem(SESSION_KEY, "true");
+        // Session artık HttpOnly cookie ile yönetiliyor (server-side)
         setIsAuthenticated(true);
         toast.success("Giriş başarılı! Panele yönlendiriliyorsunuz...");
         setPassword("");
@@ -393,9 +399,12 @@ export default function PanelLayout({
     }
   };
 
-  // Çıkış yapma
-  const handleLogout = () => {
-    sessionStorage.removeItem(SESSION_KEY);
+  // Çıkış yapma - server-side cookie temizleme
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/panel-auth", { method: "DELETE" });
+    } catch { /* ignore */ }
+    localStorage.removeItem("documentHistory");
     setIsAuthenticated(false);
     toast.success("Çıkış yapıldı!");
     router.push("/");

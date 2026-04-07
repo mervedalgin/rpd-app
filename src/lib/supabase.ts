@@ -1,11 +1,11 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Server-side (API routes) veya client-side (tarayıcı) için uygun değişkeni seç
+// Client-side: sadece anon key kullan (service_role key ASLA client'a gitmemeli)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn("Supabase configuration missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY for server-side).");
+  console.warn("Supabase configuration missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
 }
 
 const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseKey
@@ -13,8 +13,9 @@ const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseKey
   : null;
 
 /**
- * Returns the Supabase client or throws if not configured.
- * Prefer this over the direct `supabase` export.
+ * Returns the Supabase client (anon key) or throws if not configured.
+ * Safe for both client and server-side use.
+ * For admin operations in API routes, use getSupabaseServer() from '@/lib/supabase-server'.
  */
 export function getSupabase(): SupabaseClient {
   if (!_supabaseClient) {

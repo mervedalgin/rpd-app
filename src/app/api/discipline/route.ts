@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
+
+const supabase = getSupabaseServer();
 import { DisiplinRecord } from '@/types';
 
 export const runtime = 'nodejs';
@@ -89,7 +91,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('student_id', studentId);
     } else if (studentName) {
       const sanitizedName = studentName.slice(0, 100);
-      query = query.ilike('student_name', `%${sanitizedName}%`);
+      query = query.ilike('student_name', `%${sanitizedName.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`);
     }
 
     const { data, error } = await query;

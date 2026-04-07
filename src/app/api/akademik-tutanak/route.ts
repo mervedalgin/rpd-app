@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabase } from "@/lib/supabase";
+import { getSupabaseServer } from "@/lib/supabase-server";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseServer();
     const { searchParams } = new URL(request.url);
     const studentName = searchParams.get("student");
     const tutanakId = searchParams.get("id");
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 404 });
+        return NextResponse.json({ error: "Kayıt bulunamadı" }, { status: 404 });
       }
       return NextResponse.json({ tutanak: data });
     }
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Referrals fetch error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Veri yüklenirken hata oluştu" }, { status: 500 });
     }
 
     // Benzersiz öğrenci listesi çıkar
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
 // Tutanak kaydet
 export async function POST(request: NextRequest) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseServer();
     const body = await request.json();
     const { student_name, class_key, class_display, teacher_name, uyruk, tutanak_date, reasons, notes, content_html, type, template_id } = body;
 
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Tutanak insert error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Tutanak kaydedilemedi" }, { status: 500 });
     }
 
     return NextResponse.json({ tutanak: data });
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
 // Tutanak güncelle (içerik veya durum)
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseServer();
     const body = await request.json();
     const { id, content_html, status, download_count } = body;
 
@@ -220,7 +220,7 @@ export async function PUT(request: NextRequest) {
     const updates: Record<string, unknown> = {};
     if (content_html !== undefined) updates.content_html = content_html;
     if (status !== undefined) updates.status = status;
-    if (download_count !== undefined) updates.download_count = download_count;
+    // download_count kullanıcı tarafından değiştirilemez - sadece server tarafından artırılabilir
 
     const { data, error } = await supabase
       .from("academic_tutanaks")
@@ -231,7 +231,7 @@ export async function PUT(request: NextRequest) {
 
     if (error) {
       console.error("Tutanak update error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Tutanak güncellenemedi" }, { status: 500 });
     }
 
     return NextResponse.json({ tutanak: data });
@@ -244,7 +244,7 @@ export async function PUT(request: NextRequest) {
 // Tutanak sil
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseServer();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
 
 export async function POST() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Bu endpoint production ortamında devre dışıdır' }, { status: 403 });
+  }
+
+  const supabase = getSupabaseServer();
   if (!supabase) {
     return NextResponse.json(
       { error: 'Supabase yapılandırması eksik' },
@@ -50,21 +55,10 @@ CREATE INDEX IF NOT EXISTS idx_telegram_summaries_sent_at ON telegram_summaries(
 }
 
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Bu endpoint production ortamında devre dışıdır' }, { status: 403 });
+  }
   return NextResponse.json({
-    message: 'Supabase Dashboard SQL Editor\'de aşağıdaki SQL\'i çalıştırın:',
-    sql: `
-CREATE TABLE IF NOT EXISTS telegram_summaries (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  period_type VARCHAR(20) NOT NULL,
-  period_label VARCHAR(100) NOT NULL,
-  from_date DATE NOT NULL,
-  to_date DATE NOT NULL,
-  referral_count INTEGER DEFAULT 0,
-  sent_at TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_telegram_summaries_sent_at ON telegram_summaries(sent_at DESC);
-    `.trim()
+    message: 'Migration endpoint - sadece development ortamında aktif'
   });
 }

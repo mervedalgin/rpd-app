@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -540,7 +541,7 @@ export default function RandevuRaporlariPage() {
     if (report) {
       const printWindow = window.open("", "_blank");
       if (printWindow) {
-        printWindow.document.write(`
+        printWindow.document.write(DOMPurify.sanitize(`
           <html>
             <head>
               <title>Rapor</title>
@@ -553,7 +554,7 @@ export default function RandevuRaporlariPage() {
               <pre>${report}</pre>
             </body>
           </html>
-        `);
+        `));
         printWindow.document.close();
         printWindow.print();
       }

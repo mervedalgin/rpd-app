@@ -173,10 +173,11 @@ TALİMAT: Yukarıdaki HTML belgeyi geliştir.
 - Markdown kullanma, sadece HTML döndür
 - Açıklama yazma, sadece HTML içerik döndür`;
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(GEMINI_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY,
       },
       body: JSON.stringify({
         contents: [

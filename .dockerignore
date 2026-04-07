@@ -1,11 +1,24 @@
 node_modules
 .next
 .git
-.env*.local
-*.log
-.DS_Store
-Thumbs.db
-README.md
-Dockerfile
-.dockerignore
-docker-compose.yml
+.env*
+.env.local
+*.xlsx
+*.xls
+data.json
+data2.json
+daily.json
+bulk_*.json
+.mcp.json
+.claude/
+.vscode/
+.vercel/
+*.exe
+*.zip
+var/
+Scratchpad.md
+Daily Notes/
+Task Board.md
+markdown/
+kalfa-os/
+supabase/.temp/

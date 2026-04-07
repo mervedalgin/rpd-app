@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHmac, timingSafeEqual, randomBytes } from "crypto";
 
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD;
+const SESSION_SECRET = process.env.CRON_SECRET || process.env.API_SECRET_KEY || "rpd-fallback-secret";
 
 // In-memory rate limiting (IP başına 5 deneme / 5 dakika)
 const RATE_LIMIT_MAX = 5;
@@ -24,6 +26,38 @@ function getRateLimitResult(ip: string): { allowed: boolean; remaining: number }
   return { allowed: true, remaining: RATE_LIMIT_MAX - record.count };
 }
 
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
+
+function signSession(payload: string): string {
+  return createHmac("sha256", SESSION_SECRET).update(payload).digest("hex");
+}
+
+export function verifySessionCookie(cookieValue: string): boolean {
+  const parts = cookieValue.split(".");
+  if (parts.length !== 3) return false;
+  const [payload, expiry, signature] = parts;
+  // Check expiry
+  const expiryTime = parseInt(expiry, 10);
+  if (isNaN(expiryTime) || Date.now() > expiryTime) return false;
+  // Check signature
+  const expected = signSession(`${payload}.${expiry}`);
+  return safeCompare(signature, expected);
+}
+
+// GET: Session doğrulama (cookie kontrolü)
+export async function GET(request: NextRequest) {
+  const sessionCookie = request.cookies.get("panel_session")?.value;
+  if (sessionCookie && verifySessionCookie(sessionCookie)) {
+    return NextResponse.json({ authenticated: true });
+  }
+  return NextResponse.json({ authenticated: false }, { status: 401 });
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!PANEL_PASSWORD) {
@@ -34,7 +68,7 @@ export async function POST(request: NextRequest) {
                request.headers.get("x-real-ip") ||
                "unknown";
 
-    const { allowed, remaining } = getRateLimitResult(ip);
+    const { allowed } = getRateLimitResult(ip);
     if (!allowed) {
       return NextResponse.json(
         { error: "Çok fazla deneme. Lütfen 5 dakika sonra tekrar deneyin." },
@@ -49,17 +83,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Şifre gerekli" }, { status: 400 });
     }
 
-    if (password === PANEL_PASSWORD) {
+    if (safeCompare(password, PANEL_PASSWORD)) {
       // Başarılı girişte sayacı sıfırla
       attempts.delete(ip);
-      return NextResponse.json({ authenticated: true });
+
+      // 8 saatlik signed session cookie oluştur
+      const payload = randomBytes(16).toString("hex");
+      const expiry = Date.now() + 8 * 60 * 60 * 1000; // 8 saat
+      const signature = signSession(`${payload}.${expiry}`);
+      const cookieValue = `${payload}.${expiry}.${signature}`;
+
+      const response = NextResponse.json({ authenticated: true });
+      response.cookies.set("panel_session", cookieValue, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 8 * 60 * 60, // 8 saat
+      });
+      return response;
     }
 
     return NextResponse.json(
-      { authenticated: false, error: `Yanlış şifre. Kalan deneme: ${remaining}` },
+      { authenticated: false, error: "Yanlış şifre" },
       { status: 401 }
     );
   } catch {
     return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
+}
+
+// DELETE: Çıkış (cookie temizleme)
+export async function DELETE() {
+  const response = NextResponse.json({ success: true });
+  response.cookies.set("panel_session", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
+  return response;
 }

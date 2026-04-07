@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHmac } from "crypto";
 
 const API_SECRET = process.env.API_SECRET_KEY;
 const CRON_SECRET = process.env.CRON_SECRET;
+const SESSION_SECRET = CRON_SECRET || API_SECRET || "rpd-fallback-secret";
 
 function isAllowedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
   const host = request.headers.get("host") || request.nextUrl.host;
 
-  // Same-origin check: compare origin/referer against the request's own host
   if (origin) {
     try {
       const originHost = new URL(origin).host;
@@ -33,12 +34,25 @@ function hasBearerToken(request: NextRequest): boolean {
 }
 
 function hasValidCronSecret(request: NextRequest): boolean {
-  if (!CRON_SECRET) return process.env.NODE_ENV === "development";
-  // Vercel cron sends "Authorization: Bearer <CRON_SECRET>"
+  if (!CRON_SECRET) {
+    // Development'ta bile cron secret zorunlu olmalı
+    return false;
+  }
   const authHeader = request.headers.get("authorization");
   if (authHeader === `Bearer ${CRON_SECRET}`) return true;
-  // Fallback: custom header
   return request.headers.get("x-cron-secret") === CRON_SECRET;
+}
+
+function hasValidSession(request: NextRequest): boolean {
+  const cookie = request.cookies.get("panel_session")?.value;
+  if (!cookie) return false;
+  const parts = cookie.split(".");
+  if (parts.length !== 3) return false;
+  const [payload, expiry, signature] = parts;
+  const expiryTime = parseInt(expiry, 10);
+  if (isNaN(expiryTime) || Date.now() > expiryTime) return false;
+  const expected = createHmac("sha256", SESSION_SECRET).update(`${payload}.${expiry}`).digest("hex");
+  return signature === expected;
 }
 
 export function proxy(request: NextRequest) {
@@ -49,21 +63,25 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Cron endpoints: require cron secret, bearer token, or same-origin (panel)
+  // Cron endpoints: ONLY cron secret or bearer token (no origin check)
   if (pathname.startsWith("/api/cron/")) {
-    if (hasValidCronSecret(request) || hasBearerToken(request) || isAllowedOrigin(request)) {
+    if (hasValidCronSecret(request) || hasBearerToken(request)) {
       return NextResponse.next();
     }
     return NextResponse.json({ error: "Yetkisiz cron erişimi" }, { status: 401 });
   }
 
-  // Public endpoints (no auth required)
-  if (pathname === "/api/config-check" || pathname === "/api/panel-auth") {
+  // Public endpoint: only panel-auth (login)
+  if (pathname === "/api/panel-auth") {
     return NextResponse.next();
   }
 
-  // All other API routes: require same-origin or bearer token
-  if (isAllowedOrigin(request) || hasBearerToken(request)) {
+  // All other API routes: require (same-origin + valid session) or bearer token
+  if (hasBearerToken(request)) {
+    return NextResponse.next();
+  }
+
+  if (isAllowedOrigin(request) && hasValidSession(request)) {
     return NextResponse.next();
   }
 

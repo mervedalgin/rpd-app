@@ -7,6 +7,7 @@ import {
   HeadingLevel,
 } from "docx";
 import { saveAs } from "file-saver";
+import DOMPurify from "isomorphic-dompurify";
 
 /**
  * Basit HTML -> DOCX dönüştürücü.
@@ -37,7 +38,7 @@ function parseHtmlToParagraphs(html: string): Paragraph[] {
 
   // Temp div to parse HTML
   const div = document.createElement("div");
-  div.innerHTML = html;
+  div.innerHTML = DOMPurify.sanitize(html);
 
   function getAlignment(el: Element): typeof AlignmentType[keyof typeof AlignmentType] | undefined {
     const style = (el as HTMLElement).style?.textAlign;

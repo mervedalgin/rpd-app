@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
 import { loadStudentData, getSinifSubeList } from '@/lib/data';
 
 export const runtime = 'nodejs';
 
 // Tek seferlik çalıştırılacak migration endpoint'i.
 // data.json içindeki mevcut öğrencileri Supabase class_students tablosuna taşır.
+// Production'da devre dışı - sadece development'ta çalışır.
 
 export async function POST(request: NextRequest) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Bu endpoint production ortamında devre dışıdır' }, { status: 403 });
+  }
+
+  const supabase = getSupabaseServer();
   if (!supabase) {
     return NextResponse.json(
       { error: 'Supabase configuration missing' },

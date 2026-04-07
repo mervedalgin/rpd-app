@@ -298,10 +298,10 @@ export default function OkulDisiEtkinlikPage() {
     const content = editorRef.current?.innerHTML || editorHtml;
     const printWindow = window.open("", "_blank");
     if (!printWindow) { toast.error("Pop-up engelleyici aktif olabilir"); return; }
-    printWindow.document.write(`<!DOCTYPE html><html><head>
+    printWindow.document.write(DOMPurify.sanitize(`<!DOCTYPE html><html><head>
       <meta charset="utf-8"><title>${editorTitle}</title>
       <style>${getResmiCss()}</style>
-    </head><body class="sayfa">${content}</body></html>`);
+    </head><body class="sayfa">${content}</body></html>`));
     printWindow.document.close();
     setTimeout(() => printWindow.print(), 500);
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -589,9 +590,9 @@ export default function OgrenciListesiPage() {
         </html>
       `;
       
-      printWindow.document.write(htmlContent);
+      printWindow.document.write(DOMPurify.sanitize(htmlContent));
       printWindow.document.close();
-      
+
       setTimeout(() => {
         printWindow.print();
         toast.success("PDF olarak kaydetmek için 'PDF olarak kaydet' seçeneğini kullanın", { id: "pdf-export" });

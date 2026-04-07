@@ -1,25 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import ExcelJS from 'exceljs';
 import { getSinifSubeList } from '@/lib/data';
 import { loadTeachersFromStore, saveTeachersToStore } from './teachersStore';
 
 // Type definitions
 interface TeacherData {
   [key: string]: unknown;
-}
-
-// Lazy import xlsx only if available to avoid build crashes when missing
-/* eslint-disable @typescript-eslint/no-require-imports */
-let XLSX: {
-  readFile: (path: string) => { SheetNames: string[], Sheets: Record<string, unknown> };
-  utils: {
-    sheet_to_json: (sheet: unknown, opts?: Record<string, unknown>) => TeacherData[];
-  };
-} | null = null;
-try {
-  XLSX = require('xlsx');
-} catch {
-  XLSX = null;
 }
 
 export interface TeacherRecord {
@@ -57,29 +44,44 @@ export function resolveKeyFromDisplay(display: string): string | null {
   return null;
 }
 
-export function loadTeachersFromExcel(): TeacherRecord[] {
+export async function loadTeachersFromExcel(): Promise<TeacherRecord[]> {
   const filePath = path.join(process.cwd(), 'teachers.xlsx');
   if (!fs.existsSync(filePath)) {
     return [];
   }
 
-  if (!XLSX) {
-    console.warn('xlsx paketi bulunamadı, teachers.xlsx okunamayacak.');
-    return [];
-  }
-
   let rows: TeacherData[] = [];
   try {
-    const wb = XLSX.readFile(filePath);
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
+    const sheet = workbook.worksheets[0];
+    if (!sheet) return [];
+
+    // Header satırını oku
+    const headerRow = sheet.getRow(1);
+    const headers: string[] = [];
+    headerRow.eachCell((cell, colNumber) => {
+      headers[colNumber] = String(cell.value || '');
+    });
+
+    // Veri satırlarını oku
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // header'ı atla
+      const rowData: TeacherData = {};
+      row.eachCell((cell, colNumber) => {
+        const header = headers[colNumber];
+        if (header) {
+          rowData[header] = cell.value ?? '';
+        }
+      });
+      rows.push(rowData);
+    });
   } catch (err) {
     console.warn(`teachers.xlsx okunamadı: ${String(err)}`);
     return [];
   }
 
   // Tahmini kolon adları: "Sınıf/Şube" veya benzeri, "Öğretmen"
-  // Kullanıcı teachers.xlsx formatını koruyacağını söyledi; en yaygın adlara bakıyoruz.
   return rows
     .map((r, idx): TeacherRecord | null => {
       const teacherName = String(r.Öğretmen || r.Ogretmen || r['Öğretmen Adı'] || r['Öğretmen Adı Soyadı'] || r.teacher || r.name || '').trim();
@@ -134,12 +136,12 @@ export function listTeachersForUI(records: TeacherRecord[]) {
   return records.map(r => ({ value: r.teacherName, label: r.teacherName, sinifSubeKey: r.sinifSubeKey, sinifSubeDisplay: r.sinifSubeDisplay }));
 }
 
-export function getTeachersData() {
+export async function getTeachersData() {
   // Prefer cached store for speed
   let records = loadTeachersFromStore();
   if (!records || records.length === 0) {
     // Try to import from Excel
-    records = loadTeachersFromExcel();
+    records = await loadTeachersFromExcel();
     if (records.length > 0) {
       try { saveTeachersToStore(records); } catch {}
     }
@@ -147,8 +149,8 @@ export function getTeachersData() {
   return { records, list: listTeachersForUI(records) };
 }
 
-export function importTeachersFromExcelToStore() {
-  const records = loadTeachersFromExcel();
+export async function importTeachersFromExcelToStore() {
+  const records = await loadTeachersFromExcel();
   if (records.length > 0) saveTeachersToStore(records);
   return records.length;
 }

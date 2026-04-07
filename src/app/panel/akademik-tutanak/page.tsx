@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -2399,7 +2400,7 @@ export default function AkademikTutanakPage() {
                       toast.success("Metin panoya kopyalandı");
                     }}
                     onPreview={() => {
-                      setPreviewHtml(editorContent);
+                      setPreviewHtml(DOMPurify.sanitize(editorContent));
                       setActiveTab("onizleme");
                     }}
                     onDownload={async () => {
@@ -2493,7 +2494,7 @@ export default function AkademikTutanakPage() {
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <Button size="sm" variant="ghost" className="text-teal-600 hover:bg-teal-50" title="Önizle" onClick={() => {
                               if (entry.content_html) {
-                                setPreviewHtml(entry.content_html);
+                                setPreviewHtml(DOMPurify.sanitize(entry.content_html));
                                 setEditorStudentName(entry.student_name);
                               } else {
                                 const s = buildStudentFromHistory();

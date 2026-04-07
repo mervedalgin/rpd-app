@@ -8,8 +8,7 @@ export async function writeToGoogleSheets(students: YonlendirilenOgrenci[]): Pro
   const range = process.env.SHEETS_RANGE || 'Sayfa1!A:G';
 
   if (!sheetsId || !serviceAccountEmail || !privateKey) {
-    console.warn('Google Sheets configuration missing. Please check environment variables in .env.local');
-    console.warn('Missing:', { sheetsId: !!sheetsId, serviceAccountEmail: !!serviceAccountEmail, privateKey: !!privateKey });
+    // Google Sheets yapılandırması eksik
     return false;
   }
 

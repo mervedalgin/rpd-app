@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseServer } from "@/lib/supabase-server";
+
+const supabase = getSupabaseServer();
 import { appointmentCreateSchema, appointmentUpdateSchema, validateBody } from "@/lib/validation";
 
 // GET - Randevuları listele
@@ -59,7 +61,7 @@ export async function GET(request: NextRequest) {
     // Arama filtresi (max 100 karakter)
     if (search) {
       const sanitizedSearch = search.slice(0, 100);
-      query = query.ilike("participant_name", `%${sanitizedSearch}%`);
+      query = query.ilike("participant_name", `%${sanitizedSearch.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`);
     }
 
     const { data, error } = await query;

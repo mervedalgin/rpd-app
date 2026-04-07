@@ -3,7 +3,9 @@ import { formatTelegramMessage } from '@/lib/data';
 import { sendTelegramMessage, formatTelegramMessageHTML } from '@/lib/telegram';
 import { writeToGoogleSheets } from '@/lib/sheets';
 import { YonlendirilenOgrenci, ReferralRecord } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseServer } from '@/lib/supabase-server';
+
+const supabase = getSupabaseServer();
 import { getTeachersData, validateTeacherClass, resolveKeyFromDisplay } from '@/lib/teachers';
 
 export const runtime = 'nodejs';
@@ -19,10 +21,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`📋 ${students.length} öğrenci için gönderim işlemi başlatılıyor...`);
-
     // Validate teacher-class mapping using teachers.xlsx
-  const { records } = getTeachersData();
+  const { records } = await getTeachersData();
     if (records.length > 0) {
       for (const s of students) {
         // s.sinifSube is display text; we validate against teacher's single allowed class
