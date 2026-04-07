@@ -34,7 +34,11 @@ function hasBearerToken(request: NextRequest): boolean {
 
 function hasValidCronSecret(request: NextRequest): boolean {
   if (!CRON_SECRET) return process.env.NODE_ENV === "development";
-  return request.headers.get("x-vercel-cron") === CRON_SECRET;
+  // Vercel cron sends "Authorization: Bearer <CRON_SECRET>"
+  const authHeader = request.headers.get("authorization");
+  if (authHeader === `Bearer ${CRON_SECRET}`) return true;
+  // Fallback: custom header
+  return request.headers.get("x-cron-secret") === CRON_SECRET;
 }
 
 export function proxy(request: NextRequest) {
