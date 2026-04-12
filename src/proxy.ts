@@ -2,26 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API_SECRET = process.env.API_SECRET_KEY;
 const CRON_SECRET = process.env.CRON_SECRET;
-const SESSION_SECRET = CRON_SECRET || API_SECRET || "rpd-fallback-secret";
-
-function hexEncode(buffer: ArrayBuffer): string {
-  return Array.from(new Uint8Array(buffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function hmacSha256(secret: string, data: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
-  return hexEncode(signature);
-}
 
 function isAllowedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
@@ -52,27 +32,13 @@ function hasBearerToken(request: NextRequest): boolean {
 }
 
 function hasValidCronSecret(request: NextRequest): boolean {
-  if (!CRON_SECRET) {
-    return false;
-  }
+  if (!CRON_SECRET) return process.env.NODE_ENV === "development";
   const authHeader = request.headers.get("authorization");
   if (authHeader === `Bearer ${CRON_SECRET}`) return true;
   return request.headers.get("x-cron-secret") === CRON_SECRET;
 }
 
-async function hasValidSession(request: NextRequest): Promise<boolean> {
-  const cookie = request.cookies.get("panel_session")?.value;
-  if (!cookie) return false;
-  const parts = cookie.split(".");
-  if (parts.length !== 3) return false;
-  const [payload, expiry, signature] = parts;
-  const expiryTime = parseInt(expiry, 10);
-  if (isNaN(expiryTime) || Date.now() > expiryTime) return false;
-  const expected = await hmacSha256(SESSION_SECRET, `${payload}.${expiry}`);
-  return signature === expected;
-}
-
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!pathname.startsWith("/api/")) {
@@ -80,21 +46,17 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api/cron/")) {
-    if (hasValidCronSecret(request) || hasBearerToken(request)) {
+    if (hasValidCronSecret(request) || hasBearerToken(request) || isAllowedOrigin(request)) {
       return NextResponse.next();
     }
     return NextResponse.json({ error: "Yetkisiz cron erişimi" }, { status: 401 });
   }
 
-  if (pathname === "/api/panel-auth") {
+  if (pathname === "/api/config-check" || pathname === "/api/panel-auth") {
     return NextResponse.next();
   }
 
-  if (hasBearerToken(request)) {
-    return NextResponse.next();
-  }
-
-  if (isAllowedOrigin(request) && (await hasValidSession(request))) {
+  if (isAllowedOrigin(request) || hasBearerToken(request)) {
     return NextResponse.next();
   }
 
