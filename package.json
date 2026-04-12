@@ -96,7 +96,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^10",
-    "eslint-config-next": "^16.2.2",
+    "eslint-config-next": "^16.2.3",
     "pg": "^8.20.0",
     "puppeteer": "^24.40.0",
     "tailwindcss": "^4",
