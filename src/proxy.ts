@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
 
 const API_SECRET = process.env.API_SECRET_KEY;
 const CRON_SECRET = process.env.CRON_SECRET;
 const SESSION_SECRET = CRON_SECRET || API_SECRET || "rpd-fallback-secret";
+
+function hexEncode(buffer: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function hmacSha256(secret: string, data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+  return hexEncode(signature);
+}
 
 function isAllowedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
@@ -42,7 +60,7 @@ function hasValidCronSecret(request: NextRequest): boolean {
   return request.headers.get("x-cron-secret") === CRON_SECRET;
 }
 
-function hasValidSession(request: NextRequest): boolean {
+async function hasValidSession(request: NextRequest): Promise<boolean> {
   const cookie = request.cookies.get("panel_session")?.value;
   if (!cookie) return false;
   const parts = cookie.split(".");
@@ -50,11 +68,11 @@ function hasValidSession(request: NextRequest): boolean {
   const [payload, expiry, signature] = parts;
   const expiryTime = parseInt(expiry, 10);
   if (isNaN(expiryTime) || Date.now() > expiryTime) return false;
-  const expected = createHmac("sha256", SESSION_SECRET).update(`${payload}.${expiry}`).digest("hex");
+  const expected = await hmacSha256(SESSION_SECRET, `${payload}.${expiry}`);
   return signature === expected;
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!pathname.startsWith("/api/")) {
@@ -76,7 +94,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isAllowedOrigin(request) && hasValidSession(request)) {
+  if (isAllowedOrigin(request) && (await hasValidSession(request))) {
     return NextResponse.next();
   }
 
