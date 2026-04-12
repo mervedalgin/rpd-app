@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,6 +92,8 @@ type SortOrder = "asc" | "desc";
 type FilterType = "all" | "referral" | "discipline";
 
 export default function OgrenciGecmisiPage() {
+  const searchParams = useSearchParams();
+
   // State
   const [classes, setClasses] = useState<ClassOption[]>([]);
   const [students, setStudents] = useState<StudentOption[]>([]);
@@ -138,6 +141,9 @@ export default function OgrenciGecmisiPage() {
     };
     loadClasses();
   }, []);
+
+  // URL'den search parametresi varsa otomatik arama yap
+  const [initialSearchDone, setInitialSearchDone] = useState(false);
 
   // Öğrencileri yükle
   const loadStudents = async (classKey: string) => {
@@ -301,6 +307,23 @@ export default function OgrenciGecmisiPage() {
       setLoadingHistory(false);
     }
   };
+
+  // URL'den gelen search parametresiyle otomatik arama
+  useEffect(() => {
+    if (initialSearchDone) return;
+    const urlSearch = searchParams.get('search');
+    if (urlSearch) {
+      setInitialSearchDone(true);
+      setSearchQuery(urlSearch);
+    }
+  }, [searchParams, initialSearchDone]);
+
+  // searchQuery set edildikten sonra otomatik arama tetikle
+  useEffect(() => {
+    if (!initialSearchDone || !searchQuery) return;
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSearchDone]);
 
   // Arama sonuçlarından öğrenci seç
   const handleSelectMatch = (match: SearchMatch) => {
