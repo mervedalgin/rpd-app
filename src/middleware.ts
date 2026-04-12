@@ -35,7 +35,6 @@ function hasBearerToken(request: NextRequest): boolean {
 
 function hasValidCronSecret(request: NextRequest): boolean {
   if (!CRON_SECRET) {
-    // Development'ta bile cron secret zorunlu olmalı
     return false;
   }
   const authHeader = request.headers.get("authorization");
@@ -55,15 +54,13 @@ function hasValidSession(request: NextRequest): boolean {
   return signature === expected;
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only protect /api/ routes
   if (!pathname.startsWith("/api/")) {
     return NextResponse.next();
   }
 
-  // Cron endpoints: ONLY cron secret or bearer token (no origin check)
   if (pathname.startsWith("/api/cron/")) {
     if (hasValidCronSecret(request) || hasBearerToken(request)) {
       return NextResponse.next();
@@ -71,12 +68,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.json({ error: "Yetkisiz cron erişimi" }, { status: 401 });
   }
 
-  // Public endpoint: only panel-auth (login)
   if (pathname === "/api/panel-auth") {
     return NextResponse.next();
   }
 
-  // All other API routes: require (same-origin + valid session) or bearer token
   if (hasBearerToken(request)) {
     return NextResponse.next();
   }
