@@ -434,71 +434,293 @@ export default function OgrenciListesiPage() {
     }
   };
 
-  // Word olarak indir
-  const downloadAsWord = () => {
+  // Word olarak indir (docx kütüphanesi ile gerçek .docx)
+  const downloadAsWord = async () => {
     if (!selectedStudent || !studentHistory) return;
-    
+
     setExportingWord(true);
     toast.loading("Word dosyası hazırlanıyor...", { id: "word-export" });
-    
+
     try {
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+              WidthType, AlignmentType, BorderStyle, HeadingLevel,
+              ShadingType, TableLayoutType } = await import("docx");
+      const { saveAs } = await import("file-saver");
+
       const classDisplay = urlClass || classes.find(c => c.value === selectedClass)?.text || "";
-      
-      let htmlContent = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="utf-8"><title>Öğrenci Geçmişi</title></head>
-        <body style="font-family: Arial, sans-serif;">
-        <h1 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">ÖĞRENCİ GEÇMİŞİ RAPORU</h1>
-        <table style="width: 100%; margin-bottom: 20px;">
-          <tr><td style="font-weight: bold; width: 150px;">Öğrenci:</td><td>${selectedStudent.text}</td></tr>
-          <tr><td style="font-weight: bold;">Sınıf:</td><td>${classDisplay}</td></tr>
-          <tr><td style="font-weight: bold;">Toplam Yönlendirme:</td><td>${studentHistory.totalReferrals}</td></tr>
-          ${studentHistory.stats.topReason ? `<tr><td style="font-weight: bold;">En Sık Neden:</td><td>${studentHistory.stats.topReason.name} (${studentHistory.stats.topReason.count})</td></tr>` : ''}
-          <tr><td style="font-weight: bold;">Rapor Tarihi:</td><td>${new Date().toLocaleDateString('tr-TR')}</td></tr>
-        </table>
-      `;
-      
-      if (studentHistory.totalReferrals === 0) {
-        htmlContent += `<p style="color: #059669; font-style: italic;">Bu öğrenci için yönlendirme kaydı bulunmuyor.</p>`;
-      } else {
-        htmlContent += `<h2 style="color: #374151; margin-top: 30px;">Yönlendirme Detayları</h2>`;
-        htmlContent += `<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-          <tr style="background-color: #f3f4f6;">
-            <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">#</th>
-            <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">Tarih</th>
-            <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">Neden</th>
-            <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">Öğretmen</th>
-            <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">Not</th>
-          </tr>`;
-        
-        studentHistory.referrals.forEach((r, idx) => {
-          const date = new Date(r.date);
-          htmlContent += `
-            <tr>
-              <td style="border: 1px solid #d1d5db; padding: 8px;">${idx + 1}</td>
-              <td style="border: 1px solid #d1d5db; padding: 8px;">${date.toLocaleDateString('tr-TR')}</td>
-              <td style="border: 1px solid #d1d5db; padding: 8px;">${r.reason}</td>
-              <td style="border: 1px solid #d1d5db; padding: 8px;">${r.teacherName}</td>
-              <td style="border: 1px solid #d1d5db; padding: 8px;">${r.notes || '-'}</td>
-            </tr>`;
+      const reportDate = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      // Yardımcı: tablo hücresi
+      const cell = (text: string, opts?: { bold?: boolean; shading?: string; width?: number; alignment?: typeof AlignmentType[keyof typeof AlignmentType] }) => {
+        return new TableCell({
+          width: opts?.width ? { size: opts.width, type: WidthType.PERCENTAGE } : undefined,
+          shading: opts?.shading ? { type: ShadingType.SOLID, color: opts.shading, fill: opts.shading } : undefined,
+          children: [new Paragraph({
+            alignment: opts?.alignment || AlignmentType.LEFT,
+            spacing: { before: 40, after: 40 },
+            children: [new TextRun({ text, bold: opts?.bold, size: 20, font: "Calibri" })]
+          })]
         });
-        
-        htmlContent += `</table>`;
+      };
+
+      // Başlık hücresi (koyu arka plan, beyaz yazı)
+      const headerCell = (text: string, width?: number) => {
+        return new TableCell({
+          width: width ? { size: width, type: WidthType.PERCENTAGE } : undefined,
+          shading: { type: ShadingType.SOLID, color: "1e3a5f", fill: "1e3a5f" },
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 60, after: 60 },
+            children: [new TextRun({ text, bold: true, size: 20, font: "Calibri", color: "FFFFFF" })]
+          })]
+        });
+      };
+
+      const sections: InstanceType<typeof Paragraph>[] = [];
+
+      // === BAŞLIK ===
+      sections.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 80 },
+          children: [new TextRun({ text: "REHBERLİK VE PSİKOLOJİK DANIŞMANLIK SERVİSİ", bold: true, size: 28, font: "Calibri", color: "1e3a5f" })]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+          children: [new TextRun({ text: "ÖĞRENCİ YÖNLENDİRME GEÇMİŞİ RAPORU", bold: true, size: 24, font: "Calibri", color: "374151" })]
+        }),
+        // ayırıcı çizgi
+        new Paragraph({
+          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "1e3a5f" } },
+          spacing: { after: 300 },
+          children: []
+        })
+      );
+
+      // === ÖĞRENCİ BİLGİLERİ TABLOSU ===
+      sections.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 200, after: 120 },
+          children: [new TextRun({ text: "ÖĞRENCİ BİLGİLERİ", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })]
+        })
+      );
+
+      const infoRows = [
+        ["Öğrenci Adı Soyadı", selectedStudent.text],
+        ["Sınıf / Şube", classDisplay],
+        ["Toplam Yönlendirme Sayısı", String(studentHistory.totalReferrals)],
+        ["Rapor Tarihi", reportDate],
+      ];
+      if (studentHistory.stats.topReason) {
+        infoRows.splice(3, 0, ["En Sık Yönlendirme Nedeni", `${studentHistory.stats.topReason.name} (${studentHistory.stats.topReason.count} kez)`]);
       }
-      
-      htmlContent += `</body></html>`;
-      
-      const blob = new Blob([htmlContent], { type: 'application/msword' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${selectedStudent.text.replace(/\s+/g, '_')}_gecmis.doc`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast.success("Word dosyası indirildi!", { id: "word-export" });
+      // İlk ve son yönlendirme tarihleri
+      if (studentHistory.referrals.length > 0) {
+        const dates = studentHistory.referrals.map(r => new Date(r.date).getTime());
+        const firstDate = new Date(Math.min(...dates)).toLocaleDateString('tr-TR');
+        const lastDate = new Date(Math.max(...dates)).toLocaleDateString('tr-TR');
+        infoRows.push(["İlk Yönlendirme Tarihi", firstDate]);
+        infoRows.push(["Son Yönlendirme Tarihi", lastDate]);
+      }
+
+      const infoTable = new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        layout: TableLayoutType.FIXED,
+        rows: infoRows.map((row, i) => new TableRow({
+          children: [
+            cell(row[0], { bold: true, width: 40, shading: i % 2 === 0 ? "f0f4f8" : "FFFFFF" }),
+            cell(row[1], { width: 60, shading: i % 2 === 0 ? "f0f4f8" : "FFFFFF" }),
+          ]
+        }))
+      });
+      sections.push(infoTable as unknown as InstanceType<typeof Paragraph>);
+
+      // === NEDEN DAGILIMI ===
+      if (Object.keys(studentHistory.stats.byReason).length > 0) {
+        sections.push(
+          new Paragraph({ spacing: { before: 400, after: 120 }, children: [] }),
+          new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            spacing: { after: 120 },
+            children: [new TextRun({ text: "YÖNLENDİRME NEDENİ DAĞILIMI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })]
+          })
+        );
+
+        const sortedReasons = Object.entries(studentHistory.stats.byReason).sort((a, b) => b[1] - a[1]);
+        const reasonTable = new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("Neden", 50), headerCell("Sayı", 25), headerCell("Oran", 25)] }),
+            ...sortedReasons.map((entry, i) => new TableRow({
+              children: [
+                cell(entry[0], { width: 50, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                cell(String(entry[1]), { width: 25, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                cell(`%${((entry[1] / studentHistory.totalReferrals) * 100).toFixed(0)}`, { width: 25, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+              ]
+            }))
+          ]
+        });
+        sections.push(reasonTable as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === OGRETMEN DAGILIMI ===
+      if (Object.keys(studentHistory.stats.byTeacher).length > 0) {
+        sections.push(
+          new Paragraph({ spacing: { before: 400, after: 120 }, children: [] }),
+          new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            spacing: { after: 120 },
+            children: [new TextRun({ text: "YÖNLENDİREN ÖĞRETMEN DAĞILIMI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })]
+          })
+        );
+
+        const sortedTeachers = Object.entries(studentHistory.stats.byTeacher).sort((a, b) => b[1] - a[1]);
+        const teacherTable = new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("Öğretmen", 50), headerCell("Sayı", 25), headerCell("Oran", 25)] }),
+            ...sortedTeachers.map((entry, i) => new TableRow({
+              children: [
+                cell(entry[0], { width: 50, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                cell(String(entry[1]), { width: 25, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                cell(`%${((entry[1] / studentHistory.totalReferrals) * 100).toFixed(0)}`, { width: 25, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+              ]
+            }))
+          ]
+        });
+        sections.push(teacherTable as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === AYLIK TREND ===
+      if (studentHistory.referrals.length > 0) {
+        const monthlyMap: Record<string, number> = {};
+        studentHistory.referrals.forEach(r => {
+          const d = new Date(r.date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          monthlyMap[key] = (monthlyMap[key] || 0) + 1;
+        });
+        const sortedMonths = Object.entries(monthlyMap).sort((a, b) => a[0].localeCompare(b[0]));
+
+        if (sortedMonths.length > 1) {
+          sections.push(
+            new Paragraph({ spacing: { before: 400, after: 120 }, children: [] }),
+            new Paragraph({
+              heading: HeadingLevel.HEADING_2,
+              spacing: { after: 120 },
+              children: [new TextRun({ text: "AYLIK YÖNLENDİRME TRENDİ", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })]
+            })
+          );
+
+          const monthNames: Record<string, string> = { "01":"Ocak","02":"Şubat","03":"Mart","04":"Nisan","05":"Mayıs","06":"Haziran","07":"Temmuz","08":"Ağustos","09":"Eylül","10":"Ekim","11":"Kasım","12":"Aralık" };
+          const trendTable = new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            layout: TableLayoutType.FIXED,
+            rows: [
+              new TableRow({ children: [headerCell("Ay", 40), headerCell("Yönlendirme Sayısı", 30), headerCell("Grafik", 30)] }),
+              ...sortedMonths.map((entry, i) => {
+                const [year, month] = entry[0].split('-');
+                const maxCount = Math.max(...sortedMonths.map(s => s[1]));
+                const bar = "\u2588".repeat(Math.round((entry[1] / maxCount) * 10));
+                return new TableRow({
+                  children: [
+                    cell(`${monthNames[month] || month} ${year}`, { width: 40, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                    cell(String(entry[1]), { width: 30, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                    cell(bar, { width: 30, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                  ]
+                });
+              })
+            ]
+          });
+          sections.push(trendTable as unknown as InstanceType<typeof Paragraph>);
+        }
+      }
+
+      // === DETAYLI YÖNLENDİRME KAYITLARI ===
+      sections.push(
+        new Paragraph({ spacing: { before: 400, after: 120 }, children: [] }),
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { after: 120 },
+          children: [new TextRun({ text: "DETAYLI YÖNLENDİRME KAYITLARI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })]
+        })
+      );
+
+      if (studentHistory.totalReferrals === 0) {
+        sections.push(new Paragraph({
+          spacing: { before: 100, after: 100 },
+          children: [new TextRun({ text: "Bu öğrenci için yönlendirme kaydı bulunmuyor.", italics: true, color: "059669", size: 22, font: "Calibri" })]
+        }));
+      } else {
+        const detailTable = new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({
+              children: [
+                headerCell("#", 6),
+                headerCell("Tarih", 16),
+                headerCell("Neden", 24),
+                headerCell("Öğretmen", 20),
+                headerCell("Not", 34),
+              ]
+            }),
+            ...studentHistory.referrals.map((r, idx) => {
+              const date = new Date(r.date);
+              const dateStr = date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+              const bg = idx % 2 === 0 ? "f9fafb" : "FFFFFF";
+              return new TableRow({
+                children: [
+                  cell(String(idx + 1), { width: 6, alignment: AlignmentType.CENTER, shading: bg }),
+                  cell(dateStr, { width: 16, shading: bg }),
+                  cell(r.reason, { width: 24, shading: bg }),
+                  cell(r.teacherName, { width: 20, shading: bg }),
+                  cell(r.notes || '-', { width: 34, shading: bg }),
+                ]
+              });
+            })
+          ]
+        });
+        sections.push(detailTable as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === FOOTER ===
+      sections.push(
+        new Paragraph({
+          border: { top: { style: BorderStyle.SINGLE, size: 4, color: "d1d5db" } },
+          spacing: { before: 400, after: 40 },
+          children: []
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 100 },
+          children: [new TextRun({ text: "Bu rapor RPD Yönlendirme Sistemi tarafından otomatik olarak oluşturulmuştur.", size: 18, font: "Calibri", color: "9ca3af", italics: true })]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 40 },
+          children: [new TextRun({ text: `Rapor Tarihi: ${reportDate}`, size: 18, font: "Calibri", color: "9ca3af" })]
+        })
+      );
+
+      const doc = new Document({
+        sections: [{
+          properties: {
+            page: {
+              margin: { top: 720, bottom: 720, right: 720, left: 720 },
+            }
+          },
+          children: sections
+        }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, `${selectedStudent.text.replace(/\s+/g, '_')}_rapor.docx`);
+
+      toast.success("Word raporu indirildi!", { id: "word-export" });
     } catch (error) {
       console.error("Word export error:", error);
       toast.error("Word dosyası oluşturulamadı", { id: "word-export" });
@@ -507,97 +729,203 @@ export default function OgrenciListesiPage() {
     }
   };
 
-  // PDF olarak indir
-  const downloadAsPdf = () => {
+  // PDF olarak indir (html2pdf.js ile gerçek PDF)
+  const downloadAsPdf = async () => {
     if (!selectedStudent || !studentHistory) return;
-    
+
     setExportingPdf(true);
     toast.loading("PDF dosyası hazırlanıyor...", { id: "pdf-export" });
-    
-    try {
-      const classDisplay = urlClass || classes.find(c => c.value === selectedClass)?.text || "";
-      
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        toast.error("Pop-up engelleyici aktif olabilir", { id: "pdf-export" });
-        setExportingPdf(false);
-        return;
-      }
-      
-      let htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Öğrenci Geçmişi - ${selectedStudent.text}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-            h1 { color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px; }
-            .info-table { width: 100%; margin-bottom: 20px; }
-            .info-table td { padding: 5px 0; }
-            .info-table td:first-child { font-weight: bold; width: 180px; }
-            h2 { color: #374151; margin-top: 30px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th { background-color: #f3f4f6; border: 1px solid #d1d5db; padding: 8px; text-align: left; }
-            td { border: 1px solid #d1d5db; padding: 8px; }
-            .no-records { color: #059669; font-style: italic; }
-            .footer { margin-top: 30px; font-size: 12px; color: #6b7280; text-align: center; }
-            @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
-          </style>
-        </head>
-        <body>
-          <h1>ÖĞRENCİ GEÇMİŞİ RAPORU</h1>
-          <table class="info-table">
-            <tr><td>Öğrenci:</td><td>${selectedStudent.text}</td></tr>
-            <tr><td>Sınıf:</td><td>${classDisplay}</td></tr>
-            <tr><td>Toplam Yönlendirme:</td><td>${studentHistory.totalReferrals}</td></tr>
-            ${studentHistory.stats.topReason ? `<tr><td>En Sık Neden:</td><td>${studentHistory.stats.topReason.name} (${studentHistory.stats.topReason.count})</td></tr>` : ''}
-            <tr><td>Rapor Tarihi:</td><td>${new Date().toLocaleDateString('tr-TR')}</td></tr>
-          </table>
-      `;
-      
-      if (studentHistory.totalReferrals === 0) {
-        htmlContent += `<p class="no-records">Bu öğrenci için yönlendirme kaydı bulunmuyor.</p>`;
-      } else {
-        htmlContent += `<h2>Yönlendirme Detayları</h2>`;
-        htmlContent += `<table>
-          <tr>
-            <th>#</th>
-            <th>Tarih</th>
-            <th>Neden</th>
-            <th>Öğretmen</th>
-            <th>Not</th>
-          </tr>`;
-        
-        studentHistory.referrals.forEach((r, idx) => {
-          const date = new Date(r.date);
-          htmlContent += `
-            <tr>
-              <td>${idx + 1}</td>
-              <td>${date.toLocaleDateString('tr-TR')}</td>
-              <td>${r.reason}</td>
-              <td>${r.teacherName}</td>
-              <td>${r.notes || '-'}</td>
-            </tr>`;
-        });
-        
-        htmlContent += `</table>`;
-      }
-      
-      htmlContent += `
-          <div class="footer">Bu rapor RPD Yönlendirme Sistemi tarafından oluşturulmuştur.</div>
-        </body>
-        </html>
-      `;
-      
-      printWindow.document.write(DOMPurify.sanitize(htmlContent));
-      printWindow.document.close();
 
-      setTimeout(() => {
-        printWindow.print();
-        toast.success("PDF olarak kaydetmek için 'PDF olarak kaydet' seçeneğini kullanın", { id: "pdf-export" });
-      }, 500);
-      
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+
+      const classDisplay = urlClass || classes.find(c => c.value === selectedClass)?.text || "";
+      const reportDate = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      // İstatistikler
+      const sortedReasons = Object.entries(studentHistory.stats.byReason).sort((a, b) => b[1] - a[1]);
+      const sortedTeachers = Object.entries(studentHistory.stats.byTeacher).sort((a, b) => b[1] - a[1]);
+
+      // Aylık trend
+      const monthlyMap: Record<string, number> = {};
+      studentHistory.referrals.forEach(r => {
+        const d = new Date(r.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        monthlyMap[key] = (monthlyMap[key] || 0) + 1;
+      });
+      const sortedMonths = Object.entries(monthlyMap).sort((a, b) => a[0].localeCompare(b[0]));
+      const monthNames: Record<string, string> = { "01":"Ocak","02":"Şubat","03":"Mart","04":"Nisan","05":"Mayıs","06":"Haziran","07":"Temmuz","08":"Ağustos","09":"Eylül","10":"Ekim","11":"Kasım","12":"Aralık" };
+
+      // İlk/son tarih
+      let firstDate = "", lastDate = "";
+      if (studentHistory.referrals.length > 0) {
+        const dates = studentHistory.referrals.map(r => new Date(r.date).getTime());
+        firstDate = new Date(Math.min(...dates)).toLocaleDateString('tr-TR');
+        lastDate = new Date(Math.max(...dates)).toLocaleDateString('tr-TR');
+      }
+
+      let html = `
+        <div id="pdf-report" style="font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; padding: 10px;">
+          <!-- BAŞLIK -->
+          <div style="text-align: center; margin-bottom: 8px;">
+            <h1 style="margin: 0; font-size: 20px; color: #1e3a5f; letter-spacing: 1px;">REHBERLİK VE PSİKOLOJİK DANIŞMANLIK SERVİSİ</h1>
+            <h2 style="margin: 4px 0 0 0; font-size: 15px; color: #4b5563; font-weight: 500;">Öğrenci Yönlendirme Geçmişi Raporu</h2>
+          </div>
+          <hr style="border: none; border-top: 2px solid #1e3a5f; margin: 10px 0 16px 0;" />
+
+          <!-- ÖĞRENCİ BİLGİLERİ -->
+          <div style="background: #f0f4f8; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 13px; color: #1e3a5f; text-transform: uppercase; letter-spacing: 0.5px;">Öğrenci Bilgileri</h3>
+            <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+              <tr><td style="padding: 4px 8px; font-weight: 600; width: 200px; color: #374151;">Öğrenci Adı Soyadı</td><td style="padding: 4px 8px;">${selectedStudent.text}</td></tr>
+              <tr><td style="padding: 4px 8px; font-weight: 600; color: #374151;">Sınıf / Şube</td><td style="padding: 4px 8px;">${classDisplay}</td></tr>
+              <tr><td style="padding: 4px 8px; font-weight: 600; color: #374151;">Toplam Yönlendirme</td><td style="padding: 4px 8px;"><strong style="font-size: 14px; color: ${studentHistory.totalReferrals >= 5 ? '#dc2626' : studentHistory.totalReferrals >= 3 ? '#d97706' : '#2563eb'};">${studentHistory.totalReferrals}</strong></td></tr>
+              ${studentHistory.stats.topReason ? `<tr><td style="padding: 4px 8px; font-weight: 600; color: #374151;">En Sık Neden</td><td style="padding: 4px 8px;">${studentHistory.stats.topReason.name} (${studentHistory.stats.topReason.count} kez)</td></tr>` : ''}
+              ${firstDate ? `<tr><td style="padding: 4px 8px; font-weight: 600; color: #374151;">İlk Yönlendirme</td><td style="padding: 4px 8px;">${firstDate}</td></tr>` : ''}
+              ${lastDate ? `<tr><td style="padding: 4px 8px; font-weight: 600; color: #374151;">Son Yönlendirme</td><td style="padding: 4px 8px;">${lastDate}</td></tr>` : ''}
+              <tr><td style="padding: 4px 8px; font-weight: 600; color: #374151;">Rapor Tarihi</td><td style="padding: 4px 8px;">${reportDate}</td></tr>
+            </table>
+          </div>
+      `;
+
+      // İSTATİSTİKLER - Neden ve Öğretmen yan yana
+      if (sortedReasons.length > 0 || sortedTeachers.length > 0) {
+        html += `<div style="display: flex; gap: 12px; margin-bottom: 16px;">`;
+
+        if (sortedReasons.length > 0) {
+          html += `
+            <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+              <h3 style="margin: 0 0 8px 0; font-size: 12px; color: #1e3a5f; text-transform: uppercase;">Neden Dağılımı</h3>
+              <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                <tr style="background: #1e3a5f; color: white;">
+                  <th style="padding: 5px 8px; text-align: left; border-radius: 4px 0 0 0;">Neden</th>
+                  <th style="padding: 5px 8px; text-align: center; width: 50px;">Sayı</th>
+                  <th style="padding: 5px 8px; text-align: center; width: 50px; border-radius: 0 4px 0 0;">Oran</th>
+                </tr>
+                ${sortedReasons.map((entry, i) => `
+                  <tr style="background: ${i % 2 === 0 ? '#f9fafb' : '#fff'};">
+                    <td style="padding: 4px 8px; border-bottom: 1px solid #f3f4f6;">${entry[0]}</td>
+                    <td style="padding: 4px 8px; text-align: center; border-bottom: 1px solid #f3f4f6; font-weight: 600;">${entry[1]}</td>
+                    <td style="padding: 4px 8px; text-align: center; border-bottom: 1px solid #f3f4f6;">%${((entry[1] / studentHistory.totalReferrals) * 100).toFixed(0)}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>`;
+        }
+
+        if (sortedTeachers.length > 0) {
+          html += `
+            <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+              <h3 style="margin: 0 0 8px 0; font-size: 12px; color: #1e3a5f; text-transform: uppercase;">Yönlendiren Öğretmen Dağılımı</h3>
+              <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                <tr style="background: #1e3a5f; color: white;">
+                  <th style="padding: 5px 8px; text-align: left; border-radius: 4px 0 0 0;">Öğretmen</th>
+                  <th style="padding: 5px 8px; text-align: center; width: 50px;">Sayı</th>
+                  <th style="padding: 5px 8px; text-align: center; width: 50px; border-radius: 0 4px 0 0;">Oran</th>
+                </tr>
+                ${sortedTeachers.map((entry, i) => `
+                  <tr style="background: ${i % 2 === 0 ? '#f9fafb' : '#fff'};">
+                    <td style="padding: 4px 8px; border-bottom: 1px solid #f3f4f6;">${entry[0]}</td>
+                    <td style="padding: 4px 8px; text-align: center; border-bottom: 1px solid #f3f4f6; font-weight: 600;">${entry[1]}</td>
+                    <td style="padding: 4px 8px; text-align: center; border-bottom: 1px solid #f3f4f6;">%${((entry[1] / studentHistory.totalReferrals) * 100).toFixed(0)}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>`;
+        }
+
+        html += `</div>`;
+      }
+
+      // AYLIK TREND
+      if (sortedMonths.length > 1) {
+        const maxCount = Math.max(...sortedMonths.map(s => s[1]));
+        html += `
+          <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #1e3a5f; text-transform: uppercase;">Aylık Yönlendirme Trendi</h3>
+            ${sortedMonths.map(entry => {
+              const [year, month] = entry[0].split('-');
+              const pct = (entry[1] / maxCount) * 100;
+              return `
+                <div style="display: flex; align-items: center; margin-bottom: 4px; font-size: 11px;">
+                  <span style="width: 90px; color: #374151; font-weight: 500;">${monthNames[month] || month} ${year}</span>
+                  <div style="flex: 1; background: #f3f4f6; border-radius: 4px; height: 18px; margin: 0 8px;">
+                    <div style="width: ${pct}%; background: linear-gradient(90deg, #3b82f6, #1e3a5f); height: 100%; border-radius: 4px; min-width: 20px;"></div>
+                  </div>
+                  <span style="width: 30px; text-align: right; font-weight: 600; color: #1e3a5f;">${entry[1]}</span>
+                </div>`;
+            }).join('')}
+          </div>`;
+      }
+
+      // DETAYLI KAYITLAR
+      html += `
+        <h3 style="margin: 0 0 10px 0; font-size: 13px; color: #1e3a5f; text-transform: uppercase; letter-spacing: 0.5px;">Detaylı Yönlendirme Kayıtları</h3>
+      `;
+
+      if (studentHistory.totalReferrals === 0) {
+        html += `<p style="color: #059669; font-style: italic; font-size: 12px;">Bu öğrenci için yönlendirme kaydı bulunmuyor.</p>`;
+      } else {
+        html += `
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px;">
+            <thead>
+              <tr style="background: #1e3a5f; color: white;">
+                <th style="padding: 6px 8px; text-align: center; width: 30px; border-radius: 4px 0 0 0;">#</th>
+                <th style="padding: 6px 8px; text-align: left; width: 80px;">Tarih</th>
+                <th style="padding: 6px 8px; text-align: left;">Neden</th>
+                <th style="padding: 6px 8px; text-align: left; width: 120px;">Öğretmen</th>
+                <th style="padding: 6px 8px; text-align: left; border-radius: 0 4px 0 0;">Not</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${studentHistory.referrals.map((r, idx) => {
+                const date = new Date(r.date);
+                const dateStr = date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                return `
+                  <tr style="background: ${idx % 2 === 0 ? '#f9fafb' : '#fff'};">
+                    <td style="padding: 5px 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">${idx + 1}</td>
+                    <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${dateStr}</td>
+                    <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${r.reason}</td>
+                    <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${r.teacherName}</td>
+                    <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${r.notes || '-'}</td>
+                  </tr>`;
+              }).join('')}
+            </tbody>
+          </table>`;
+      }
+
+      // FOOTER
+      html += `
+          <hr style="border: none; border-top: 1px solid #d1d5db; margin: 20px 0 10px 0;" />
+          <p style="text-align: center; font-size: 10px; color: #9ca3af; font-style: italic; margin: 0;">
+            Bu rapor RPD Yönlendirme Sistemi tarafından otomatik olarak oluşturulmuştur. | Rapor Tarihi: ${reportDate}
+          </p>
+        </div>`;
+
+      // Geçici DOM elementi oluştur
+      const container = document.createElement('div');
+      container.innerHTML = DOMPurify.sanitize(html);
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      document.body.appendChild(container);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (html2pdf() as any)
+        .set({
+          margin: [8, 8, 8, 8],
+          filename: `${selectedStudent.text.replace(/\s+/g, '_')}_rapor.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        })
+        .from(container.firstElementChild)
+        .save();
+
+      document.body.removeChild(container);
+
+      toast.success("PDF raporu indirildi!", { id: "pdf-export" });
     } catch (error) {
       console.error("PDF export error:", error);
       toast.error("PDF dosyası oluşturulamadı", { id: "pdf-export" });

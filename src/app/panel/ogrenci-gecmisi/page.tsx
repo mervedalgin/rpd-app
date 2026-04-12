@@ -49,11 +49,18 @@ import {
 
 interface ReferralRecord {
   id: string;
+  studentName?: string;
   reason: string;
   teacherName: string;
   classDisplay: string;
   date: string;
   notes: string | null;
+}
+
+interface SearchMatch {
+  studentName: string;
+  classDisplay: string;
+  count: number;
 }
 
 interface DisciplineRecord {
@@ -90,7 +97,9 @@ export default function OgrenciGecmisiPage() {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [resolvedClass, setResolvedClass] = useState<string>("");
+  const [searchMatches, setSearchMatches] = useState<SearchMatch[]>([]);
+
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -154,7 +163,7 @@ export default function OgrenciGecmisiPage() {
   // Öğrenci geçmişini yükle
   const loadHistory = async (studentName: string, classDisplay?: string) => {
     if (!studentName) return;
-    
+
     setLoadingHistory(true);
     try {
       // Yönlendirmeleri getir
@@ -164,6 +173,19 @@ export default function OgrenciGecmisiPage() {
       if (referralRes.ok) {
         const data = await referralRes.json();
         setReferrals(data.referrals || []);
+
+        // API'den dönen gerçek öğrenci adı ve sınıf bilgisini güncelle
+        if (data.studentName) {
+          setSelectedStudent(prev => ({
+            value: prev?.value || studentName,
+            text: data.studentName || prev?.text || studentName,
+          }));
+        }
+        if (data.classDisplay) {
+          setResolvedClass(data.classDisplay);
+        } else if (data.referrals && data.referrals.length > 0 && data.referrals[0].classDisplay) {
+          setResolvedClass(data.referrals[0].classDisplay);
+        }
       }
 
       // Disiplin kayıtlarını getir
@@ -173,6 +195,15 @@ export default function OgrenciGecmisiPage() {
       if (disciplineRes.ok) {
         const data = await disciplineRes.json();
         setDisciplineRecords(data.records || []);
+
+        // Disiplin kayıtlarından gerçek öğrenci adını al (daha güvenilir)
+        if (data.records && data.records.length > 0) {
+          const realStudent = data.records[0];
+          setSelectedStudent(prev => ({
+            value: prev?.value || studentName,
+            text: realStudent.student_name || prev?.text || studentName,
+          }));
+        }
       }
     } catch (error) {
       console.error("History load error:", error);
@@ -201,13 +232,82 @@ export default function OgrenciGecmisiPage() {
     }
   };
 
-  // Arama ile geçmiş getir
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setSelectedClass("");
-      setSelectedStudent(null);
-      loadHistory(searchQuery.trim());
+  // Arama ile öğrenci bul
+  const handleSearch = async () => {
+    const query = searchQuery.trim();
+    if (!query) return;
+
+    setSelectedClass("");
+    setSelectedStudent(null);
+    setResolvedClass("");
+    setReferrals([]);
+    setDisciplineRecords([]);
+    setSearchMatches([]);
+    setLoadingHistory(true);
+
+    try {
+      const res = await fetch(
+        `/api/student-history?studentName=${encodeURIComponent(query)}`
+      );
+      if (!res.ok) {
+        toast.error("Arama yapılamadı");
+        setLoadingHistory(false);
+        return;
+      }
+
+      const data = await res.json();
+      const allReferrals: ReferralRecord[] = data.referrals || [];
+
+      // Farklı öğrencileri grupla
+      const studentMap = new Map<string, { classDisplay: string; count: number }>();
+      allReferrals.forEach(r => {
+        const name = r.studentName || "";
+        if (!name) return;
+        const key = `${name}|||${r.classDisplay}`;
+        const existing = studentMap.get(key);
+        if (existing) {
+          existing.count++;
+        } else {
+          studentMap.set(key, { classDisplay: r.classDisplay, count: 1 });
+        }
+      });
+
+      const matches: SearchMatch[] = Array.from(studentMap.entries()).map(([key, val]) => ({
+        studentName: key.split("|||")[0],
+        classDisplay: val.classDisplay,
+        count: val.count,
+      }));
+
+      if (matches.length === 0) {
+        // Hiç sonuç yok
+        setSelectedStudent({ value: query, text: query });
+        toast.info("Bu isimle eşleşen kayıt bulunamadı");
+      } else if (matches.length === 1) {
+        // Tek öğrenci — direkt yükle
+        const m = matches[0];
+        setSelectedStudent({ value: m.studentName, text: m.studentName });
+        setResolvedClass(m.classDisplay);
+        loadHistory(m.studentName, m.classDisplay);
+        return; // loadHistory kendi finally'sinde loadingHistory'yi kapatır
+      } else {
+        // Birden fazla öğrenci — seçim göster
+        setSearchMatches(matches);
+        toast.info(`${matches.length} farklı öğrenci bulundu, lütfen birini seçin`);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      toast.error("Arama sırasında hata oluştu");
+    } finally {
+      setLoadingHistory(false);
     }
+  };
+
+  // Arama sonuçlarından öğrenci seç
+  const handleSelectMatch = (match: SearchMatch) => {
+    setSearchMatches([]);
+    setSelectedStudent({ value: match.studentName, text: match.studentName });
+    setResolvedClass(match.classDisplay);
+    loadHistory(match.studentName, match.classDisplay);
   };
 
   // Yönlendirme kaydını sil
@@ -371,36 +471,512 @@ export default function OgrenciGecmisiPage() {
 
   const totalRecords = referrals.length + disciplineRecords.length;
 
-  // Excel olarak dışa aktar
-  const handleExportExcel = () => {
-    if (totalRecords === 0) {
+  // Export state'leri
+  const [exportingWord, setExportingWord] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  // Word olarak dışa aktar (docx) — Türkçe karakter + grafik + notlar
+  const handleExportWord = async () => {
+    if (totalRecords === 0 || !selectedStudent) {
       toast.error("Dışa aktarılacak kayıt yok");
       return;
     }
 
-    const csvContent = [
-      ["Tür", "Tarih", "Neden/Ceza", "Öğretmen/Sınıf", "Notlar"].join(","),
-      ...referrals.map(r => 
-        [`Yönlendirme`, formatDate(r.date), r.reason, r.teacherName, r.notes || ""].join(",")
-      ),
-      ...disciplineRecords.map(r => 
-        [`Disiplin`, formatDate(r.event_date), `${r.penalty_type} - ${r.reason}`, r.class_display, r.notes || ""].join(",")
-      ),
-    ].join("\n");
+    setExportingWord(true);
+    toast.loading("Word raporu hazırlanıyor...", { id: "word-export" });
 
-    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ogrenci-gecmisi-${selectedStudent?.text || searchQuery}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Kayıtlar dışa aktarıldı");
+    try {
+      const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+              WidthType, AlignmentType, BorderStyle, HeadingLevel,
+              ShadingType, TableLayoutType } = await import("docx");
+      const { saveAs } = await import("file-saver");
+
+      const classDisplay = resolvedClass || classes.find(c => c.value === selectedClass)?.text || "";
+      const reportDate = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      const cell = (text: string, opts?: { bold?: boolean; shading?: string; width?: number; alignment?: typeof AlignmentType[keyof typeof AlignmentType]; color?: string; italics?: boolean }) => {
+        return new TableCell({
+          width: opts?.width ? { size: opts.width, type: WidthType.PERCENTAGE } : undefined,
+          shading: opts?.shading ? { type: ShadingType.SOLID, color: opts.shading, fill: opts.shading } : undefined,
+          children: [new Paragraph({
+            alignment: opts?.alignment || AlignmentType.LEFT,
+            spacing: { before: 40, after: 40 },
+            children: [new TextRun({ text, bold: opts?.bold, size: 20, font: "Calibri", color: opts?.color, italics: opts?.italics })]
+          })]
+        });
+      };
+
+      const headerCell = (text: string, width?: number) => {
+        return new TableCell({
+          width: width ? { size: width, type: WidthType.PERCENTAGE } : undefined,
+          shading: { type: ShadingType.SOLID, color: "1e3a5f", fill: "1e3a5f" },
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 60, after: 60 },
+            children: [new TextRun({ text, bold: true, size: 20, font: "Calibri", color: "FFFFFF" })]
+          })]
+        });
+      };
+
+      // Çubuk grafik satırı (metin bazlı)
+      const barRow = (label: string, count: number, maxCount: number, total: number, barColor: string) => {
+        const pct = ((count / total) * 100).toFixed(0);
+        const barLen = Math.max(1, Math.round((count / maxCount) * 20));
+        const bar = "\u2588".repeat(barLen);
+        return new TableRow({
+          children: [
+            cell(label, { width: 35 }),
+            new TableCell({
+              width: { size: 40, type: WidthType.PERCENTAGE },
+              children: [new Paragraph({
+                spacing: { before: 40, after: 40 },
+                children: [new TextRun({ text: bar, size: 20, font: "Calibri", color: barColor }), new TextRun({ text: ` ${count}`, bold: true, size: 20, font: "Calibri" })]
+              })]
+            }),
+            cell(`%${pct}`, { width: 25, alignment: AlignmentType.CENTER }),
+          ]
+        });
+      };
+
+      const sections: InstanceType<typeof Paragraph>[] = [];
+
+      // === BAŞLIK ===
+      sections.push(
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: "REHBERLİK VE PSİKOLOJİK DANIŞMANLIK SERVİSİ", bold: true, size: 28, font: "Calibri", color: "1e3a5f" })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: "ÖĞRENCİ GEÇMİŞİ RAPORU", bold: true, size: 24, font: "Calibri", color: "374151" })] }),
+        new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "1e3a5f" } }, spacing: { after: 300 }, children: [] })
+      );
+
+      // === ÖĞRENCİ BİLGİLERİ ===
+      sections.push(new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 200, after: 120 }, children: [new TextRun({ text: "ÖĞRENCİ BİLGİLERİ", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] }));
+
+      const riskScore = referrals.length + disciplineRecords.length * 2;
+      const riskLevel = riskScore >= 10 ? "Yüksek Risk" : riskScore >= 5 ? "Orta Risk" : "Düşük Risk";
+
+      const infoRows = [
+        ["Öğrenci Adı Soyadı", selectedStudent.text],
+        ["Sınıf / Şube", classDisplay],
+        ["Toplam Yönlendirme", String(referrals.length)],
+        ["Toplam Disiplin Kaydı", String(disciplineRecords.length)],
+        ["Toplam Kayıt", String(totalRecords)],
+        ["Risk Seviyesi", riskLevel],
+        ["Rapor Tarihi", reportDate],
+      ];
+
+      if (referrals.length > 0) {
+        const dates = referrals.map(r => new Date(r.date).getTime());
+        infoRows.splice(5, 0, ["İlk Yönlendirme", new Date(Math.min(...dates)).toLocaleDateString('tr-TR')]);
+        infoRows.splice(6, 0, ["Son Yönlendirme", new Date(Math.max(...dates)).toLocaleDateString('tr-TR')]);
+      }
+
+      sections.push(new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+        rows: infoRows.map((row, i) => new TableRow({
+          children: [
+            cell(row[0], { bold: true, width: 40, shading: i % 2 === 0 ? "f0f4f8" : "FFFFFF" }),
+            cell(row[1], { width: 60, shading: i % 2 === 0 ? "f0f4f8" : "FFFFFF", bold: row[0] === "Risk Seviyesi", color: row[0] === "Risk Seviyesi" ? (riskScore >= 10 ? "dc2626" : riskScore >= 5 ? "d97706" : "16a34a") : undefined }),
+          ]
+        }))
+      }) as unknown as InstanceType<typeof Paragraph>);
+
+      // === NEDEN DAĞILIMI (GRAFİKLİ) ===
+      if (chartData.referralReasons.length > 0) {
+        const sorted = [...chartData.referralReasons].sort((a, b) => b.count - a.count);
+        const maxCount = sorted[0].count;
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "YÖNLENDİRME NEDENİ DAĞILIMI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        sections.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("Neden", 35), headerCell("Grafik", 40), headerCell("Oran", 25)] }),
+            ...sorted.map(entry => barRow(entry.reason, entry.count, maxCount, referrals.length, "3b82f6"))
+          ]
+        }) as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === CEZA TÜRLERİ DAĞILIMI (GRAFİKLİ) ===
+      if (chartData.penaltyTypes.length > 0) {
+        const sorted = [...chartData.penaltyTypes].sort((a, b) => b.count - a.count);
+        const maxCount = sorted[0].count;
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "DİSİPLİN CEZA TÜRÜ DAĞILIMI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        sections.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("Ceza Türü", 35), headerCell("Grafik", 40), headerCell("Oran", 25)] }),
+            ...sorted.map(entry => barRow(entry.type, entry.count, maxCount, disciplineRecords.length, "d97706"))
+          ]
+        }) as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === ÖĞRETMEN DAĞILIMI (GRAFİKLİ) ===
+      if (chartData.teacherReferrals.length > 0) {
+        const maxCount = chartData.teacherReferrals[0].count;
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "YÖNLENDİREN ÖĞRETMEN DAĞILIMI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        sections.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("Öğretmen", 35), headerCell("Grafik", 40), headerCell("Oran", 25)] }),
+            ...chartData.teacherReferrals.map(entry => barRow(entry.teacher, entry.count, maxCount, referrals.length, "8b5cf6"))
+          ]
+        }) as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === AYLIK TREND ===
+      if (chartData.monthlyActivity.length > 1) {
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "AYLIK AKTİVİTE TRENDİ", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        sections.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("Ay", 34), headerCell("Yönlendirme", 22), headerCell("Disiplin", 22), headerCell("Toplam", 22)] }),
+            ...chartData.monthlyActivity.map((entry, i) => {
+              const total = entry.referrals + entry.discipline;
+              return new TableRow({
+                children: [
+                  cell(entry.month, { width: 34, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                  cell(String(entry.referrals), { width: 22, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                  cell(String(entry.discipline), { width: 22, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF" }),
+                  cell(String(total), { width: 22, alignment: AlignmentType.CENTER, shading: i % 2 === 0 ? "f9fafb" : "FFFFFF", bold: true }),
+                ]
+              });
+            })
+          ]
+        }) as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === DETAYLI YÖNLENDİRME KAYITLARI ===
+      if (referrals.length > 0) {
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "DETAYLI YÖNLENDİRME KAYITLARI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        sections.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("#", 6), headerCell("Tarih", 14), headerCell("Neden", 20), headerCell("Öğretmen", 18), headerCell("Not", 42)] }),
+            ...referrals.map((r, idx) => {
+              const bg = idx % 2 === 0 ? "f9fafb" : "FFFFFF";
+              return new TableRow({
+                children: [
+                  cell(String(idx + 1), { width: 6, alignment: AlignmentType.CENTER, shading: bg }),
+                  cell(new Date(r.date).toLocaleDateString('tr-TR'), { width: 14, shading: bg }),
+                  cell(r.reason, { width: 20, shading: bg }),
+                  cell(r.teacherName, { width: 18, shading: bg }),
+                  cell(r.notes || '-', { width: 42, shading: bg, italics: !!r.notes }),
+                ]
+              });
+            })
+          ]
+        }) as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === ÖĞRETMEN NOTLARI (ayrı bölüm) ===
+      const notesWithContent = referrals.filter(r => r.notes && r.notes.trim() !== '');
+      if (notesWithContent.length > 0) {
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "ÖĞRETMEN NOTLARI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        notesWithContent.forEach((r, idx) => {
+          const dateStr = new Date(r.date).toLocaleDateString('tr-TR');
+          sections.push(
+            new Paragraph({
+              spacing: { before: idx > 0 ? 200 : 80, after: 40 },
+              children: [
+                new TextRun({ text: `${dateStr} — ${r.teacherName}`, bold: true, size: 20, font: "Calibri", color: "374151" }),
+                new TextRun({ text: ` (${r.reason})`, size: 18, font: "Calibri", color: "6b7280" }),
+              ]
+            }),
+            new Paragraph({
+              spacing: { after: 80 },
+              indent: { left: 360 },
+              children: [new TextRun({ text: `"${r.notes}"`, size: 20, font: "Calibri", italics: true, color: "1f2937" })]
+            })
+          );
+        });
+      }
+
+      // === DETAYLI DİSİPLİN KAYITLARI ===
+      if (disciplineRecords.length > 0) {
+        sections.push(
+          new Paragraph({ spacing: { before: 400 }, children: [] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { after: 120 }, children: [new TextRun({ text: "DETAYLI DİSİPLİN KAYITLARI", bold: true, size: 24, font: "Calibri", color: "1e3a5f" })] })
+        );
+        sections.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE }, layout: TableLayoutType.FIXED,
+          rows: [
+            new TableRow({ children: [headerCell("#", 6), headerCell("Olay Tarihi", 14), headerCell("Ceza Türü", 18), headerCell("Neden", 22), headerCell("Sınıf", 16), headerCell("Not", 24)] }),
+            ...disciplineRecords.map((r, idx) => {
+              const bg = idx % 2 === 0 ? "f9fafb" : "FFFFFF";
+              return new TableRow({
+                children: [
+                  cell(String(idx + 1), { width: 6, alignment: AlignmentType.CENTER, shading: bg }),
+                  cell(r.event_date ? new Date(r.event_date).toLocaleDateString('tr-TR') : '-', { width: 14, shading: bg }),
+                  cell(r.penalty_type, { width: 18, shading: bg, bold: true }),
+                  cell(r.reason, { width: 22, shading: bg }),
+                  cell(r.class_display, { width: 16, shading: bg }),
+                  cell(r.notes || '-', { width: 24, shading: bg, italics: !!r.notes }),
+                ]
+              });
+            })
+          ]
+        }) as unknown as InstanceType<typeof Paragraph>);
+      }
+
+      // === FOOTER ===
+      sections.push(
+        new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 4, color: "d1d5db" } }, spacing: { before: 400 }, children: [] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 100 }, children: [new TextRun({ text: "Bu rapor RPD Yönlendirme Sistemi tarafından otomatik olarak oluşturulmuştur.", size: 18, font: "Calibri", color: "9ca3af", italics: true })] }),
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 40 }, children: [new TextRun({ text: `Rapor Tarihi: ${reportDate}`, size: 18, font: "Calibri", color: "9ca3af" })] })
+      );
+
+      const doc = new Document({
+        sections: [{ properties: { page: { margin: { top: 720, bottom: 720, right: 720, left: 720 } } }, children: sections }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, `${selectedStudent.text.replace(/\s+/g, '_')}_geçmiş_raporu.docx`);
+      toast.success("Word raporu indirildi!", { id: "word-export" });
+    } catch (error) {
+      console.error("Word export error:", error);
+      toast.error("Word dosyası oluşturulamadı", { id: "word-export" });
+    } finally {
+      setExportingWord(false);
+    }
   };
 
-  // Yazdır
-  const handlePrint = () => {
-    window.print();
+  // PDF olarak indir (html2pdf.js) — grafik + notlar
+  const handleExportPdf = async () => {
+    if (totalRecords === 0 || !selectedStudent) {
+      toast.error("Dışa aktarılacak kayıt yok");
+      return;
+    }
+
+    setExportingPdf(true);
+    toast.loading("PDF raporu hazırlanıyor...", { id: "pdf-export" });
+
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const DOMPurify = (await import("isomorphic-dompurify")).default;
+
+      const classDisplay = resolvedClass || classes.find(c => c.value === selectedClass)?.text || "";
+      const reportDate = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      const riskScore = referrals.length + disciplineRecords.length * 2;
+      const riskLevel = riskScore >= 10 ? "Yüksek Risk" : riskScore >= 5 ? "Orta Risk" : "Düşük Risk";
+      const riskColor = riskScore >= 10 ? "#dc2626" : riskScore >= 5 ? "#d97706" : "#16a34a";
+
+      let firstDate = "", lastDate = "";
+      if (referrals.length > 0) {
+        const dates = referrals.map(r => new Date(r.date).getTime());
+        firstDate = new Date(Math.min(...dates)).toLocaleDateString('tr-TR');
+        lastDate = new Date(Math.max(...dates)).toLocaleDateString('tr-TR');
+      }
+
+      // Çubuk grafik oluşturucu
+      const makeBarChart = (items: { label: string; count: number }[], total: number, color: string) => {
+        const maxCount = Math.max(...items.map(i => i.count));
+        return items.map(item => {
+          const pct = total > 0 ? (item.count / maxCount) * 100 : 0;
+          const pctLabel = total > 0 ? ((item.count / total) * 100).toFixed(0) : '0';
+          return `
+            <div style="display: flex; align-items: center; margin-bottom: 5px; font-size: 11px;">
+              <span style="width: 120px; color: #374151; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.label}</span>
+              <div style="flex: 1; background: #f3f4f6; border-radius: 4px; height: 20px; margin: 0 8px;">
+                <div style="width: ${pct}%; background: ${color}; height: 100%; border-radius: 4px; min-width: ${item.count > 0 ? '20px' : '0'};"></div>
+              </div>
+              <span style="width: 55px; text-align: right; font-weight: 600; color: #1e3a5f;">${item.count} <span style="font-weight: 400; color: #9ca3af;">(%${pctLabel})</span></span>
+            </div>`;
+        }).join('');
+      };
+
+      let html = `
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; padding: 10px;">
+          <div style="text-align: center; margin-bottom: 8px;">
+            <h1 style="margin: 0; font-size: 20px; color: #1e3a5f; letter-spacing: 1px;">REHBERLİK VE PSİKOLOJİK DANIŞMANLIK SERVİSİ</h1>
+            <h2 style="margin: 4px 0 0 0; font-size: 15px; color: #4b5563; font-weight: 500;">Öğrenci Geçmişi Raporu</h2>
+          </div>
+          <hr style="border: none; border-top: 2px solid #1e3a5f; margin: 10px 0 16px 0;" />
+
+          <div style="background: #f0f4f8; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 13px; color: #1e3a5f; text-transform: uppercase;">Öğrenci Bilgileri</h3>
+            <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+              <tr><td style="padding: 4px 8px; font-weight: 600; width: 200px;">Öğrenci Adı Soyadı</td><td style="padding: 4px 8px;">${selectedStudent.text}</td></tr>
+              <tr><td style="padding: 4px 8px; font-weight: 600;">Sınıf / Şube</td><td style="padding: 4px 8px;">${classDisplay}</td></tr>
+              <tr><td style="padding: 4px 8px; font-weight: 600;">Toplam Yönlendirme</td><td style="padding: 4px 8px;"><strong style="color: #2563eb;">${referrals.length}</strong></td></tr>
+              <tr><td style="padding: 4px 8px; font-weight: 600;">Toplam Disiplin</td><td style="padding: 4px 8px;"><strong style="color: #d97706;">${disciplineRecords.length}</strong></td></tr>
+              <tr><td style="padding: 4px 8px; font-weight: 600;">Risk Seviyesi</td><td style="padding: 4px 8px;"><strong style="color: ${riskColor};">${riskLevel}</strong></td></tr>
+              ${firstDate ? `<tr><td style="padding: 4px 8px; font-weight: 600;">İlk / Son Yönlendirme</td><td style="padding: 4px 8px;">${firstDate} — ${lastDate}</td></tr>` : ''}
+              <tr><td style="padding: 4px 8px; font-weight: 600;">Rapor Tarihi</td><td style="padding: 4px 8px;">${reportDate}</td></tr>
+            </table>
+          </div>`;
+
+      // GRAFİKLER - Neden ve Ceza Türü yan yana
+      const chartSections: string[] = [];
+
+      if (chartData.referralReasons.length > 0) {
+        const sorted = [...chartData.referralReasons].sort((a, b) => b.count - a.count);
+        chartSections.push(`
+          <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #1e3a5f; text-transform: uppercase;">Yönlendirme Nedenleri</h3>
+            ${makeBarChart(sorted.map(e => ({ label: e.reason, count: e.count })), referrals.length, 'linear-gradient(90deg, #3b82f6, #1e40af)')}
+          </div>`);
+      }
+
+      if (chartData.penaltyTypes.length > 0) {
+        const sorted = [...chartData.penaltyTypes].sort((a, b) => b.count - a.count);
+        chartSections.push(`
+          <div style="flex: 1; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #92400e; text-transform: uppercase;">Ceza Türleri</h3>
+            ${makeBarChart(sorted.map(e => ({ label: e.type, count: e.count })), disciplineRecords.length, 'linear-gradient(90deg, #f59e0b, #d97706)')}
+          </div>`);
+      }
+
+      if (chartSections.length > 0) {
+        html += `<div style="display: flex; gap: 12px; margin-bottom: 16px;">${chartSections.join('')}</div>`;
+      }
+
+      // Öğretmen dağılımı grafiği
+      if (chartData.teacherReferrals.length > 0) {
+        html += `
+          <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #1e3a5f; text-transform: uppercase;">Yönlendiren Öğretmen Dağılımı</h3>
+            ${makeBarChart(chartData.teacherReferrals.map(e => ({ label: e.teacher, count: e.count })), referrals.length, 'linear-gradient(90deg, #8b5cf6, #6d28d9)')}
+          </div>`;
+      }
+
+      // AYLIK TREND
+      if (chartData.monthlyActivity.length > 1) {
+        const maxCount = Math.max(...chartData.monthlyActivity.map(m => m.referrals + m.discipline));
+        html += `
+          <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #1e3a5f; text-transform: uppercase;">Aylık Aktivite Trendi</h3>
+            ${chartData.monthlyActivity.map(entry => {
+              const total = entry.referrals + entry.discipline;
+              const pct = maxCount > 0 ? (total / maxCount) * 100 : 0;
+              return `
+                <div style="display: flex; align-items: center; margin-bottom: 4px; font-size: 11px;">
+                  <span style="width: 80px; color: #374151; font-weight: 500;">${entry.month}</span>
+                  <div style="flex: 1; background: #f3f4f6; border-radius: 4px; height: 18px; margin: 0 8px;">
+                    <div style="width: ${pct}%; background: linear-gradient(90deg, #3b82f6, #1e3a5f); height: 100%; border-radius: 4px; min-width: ${total > 0 ? '20px' : '0'};"></div>
+                  </div>
+                  <span style="width: 60px; text-align: right; font-size: 10px; color: #6b7280;">${entry.referrals}Y + ${entry.discipline}D = <strong style="color: #1e3a5f;">${total}</strong></span>
+                </div>`;
+            }).join('')}
+          </div>`;
+      }
+
+      // DETAYLI YÖNLENDİRME KAYITLARI
+      if (referrals.length > 0) {
+        html += `
+          <h3 style="margin: 0 0 10px 0; font-size: 13px; color: #1e3a5f; text-transform: uppercase;">Yönlendirme Kayıtları (${referrals.length})</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px;">
+            <thead><tr style="background: #1e3a5f; color: white;">
+              <th style="padding: 6px 8px; text-align: center; width: 25px;">#</th>
+              <th style="padding: 6px 8px; text-align: left; width: 70px;">Tarih</th>
+              <th style="padding: 6px 8px; text-align: left;">Neden</th>
+              <th style="padding: 6px 8px; text-align: left; width: 100px;">Öğretmen</th>
+              <th style="padding: 6px 8px; text-align: left;">Not</th>
+            </tr></thead><tbody>
+            ${referrals.map((r, idx) => `
+              <tr style="background: ${idx % 2 === 0 ? '#f9fafb' : '#fff'};">
+                <td style="padding: 5px 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">${idx + 1}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${new Date(r.date).toLocaleDateString('tr-TR')}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${r.reason}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb;">${r.teacherName}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #e5e7eb; ${r.notes ? 'font-style: italic;' : ''}">${r.notes || '-'}</td>
+              </tr>`).join('')}
+            </tbody></table>`;
+      }
+
+      // ÖĞRETMEN NOTLARI (ayrı bölüm)
+      const notesWithContent = referrals.filter(r => r.notes && r.notes.trim() !== '');
+      if (notesWithContent.length > 0) {
+        html += `
+          <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+            <h3 style="margin: 0 0 12px 0; font-size: 13px; color: #92400e; text-transform: uppercase;">Öğretmen Notları</h3>
+            ${notesWithContent.map((r, idx) => {
+              const dateStr = new Date(r.date).toLocaleDateString('tr-TR');
+              return `
+                <div style="margin-bottom: ${idx < notesWithContent.length - 1 ? '10px' : '0'}; padding-bottom: ${idx < notesWithContent.length - 1 ? '10px' : '0'}; border-bottom: ${idx < notesWithContent.length - 1 ? '1px solid #fde68a' : 'none'};">
+                  <div style="font-size: 11px; font-weight: 600; color: #374151;">${dateStr} — ${r.teacherName} <span style="font-weight: 400; color: #9ca3af;">(${r.reason})</span></div>
+                  <div style="font-size: 12px; color: #1f2937; font-style: italic; margin-top: 3px; padding-left: 12px; border-left: 3px solid #f59e0b;">"${r.notes}"</div>
+                </div>`;
+            }).join('')}
+          </div>`;
+      }
+
+      // DETAYLI DİSİPLİN KAYITLARI
+      if (disciplineRecords.length > 0) {
+        html += `
+          <h3 style="margin: 0 0 10px 0; font-size: 13px; color: #d97706; text-transform: uppercase;">Disiplin Kayıtları (${disciplineRecords.length})</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px;">
+            <thead><tr style="background: #92400e; color: white;">
+              <th style="padding: 6px 8px; text-align: center; width: 25px;">#</th>
+              <th style="padding: 6px 8px; text-align: left; width: 70px;">Olay Tarihi</th>
+              <th style="padding: 6px 8px; text-align: left;">Ceza Türü</th>
+              <th style="padding: 6px 8px; text-align: left;">Neden</th>
+              <th style="padding: 6px 8px; text-align: left; width: 80px;">Sınıf</th>
+              <th style="padding: 6px 8px; text-align: left;">Not</th>
+            </tr></thead><tbody>
+            ${disciplineRecords.map((r, idx) => `
+              <tr style="background: ${idx % 2 === 0 ? '#fffbeb' : '#fff'};">
+                <td style="padding: 5px 8px; text-align: center; border-bottom: 1px solid #fde68a;">${idx + 1}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #fde68a;">${r.event_date ? new Date(r.event_date).toLocaleDateString('tr-TR') : '-'}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #fde68a; font-weight: 600;">${r.penalty_type}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #fde68a;">${r.reason}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #fde68a;">${r.class_display}</td>
+                <td style="padding: 5px 8px; border-bottom: 1px solid #fde68a; ${r.notes ? 'font-style: italic;' : ''}">${r.notes || '-'}</td>
+              </tr>`).join('')}
+            </tbody></table>`;
+      }
+
+      // FOOTER
+      html += `
+          <hr style="border: none; border-top: 1px solid #d1d5db; margin: 20px 0 10px 0;" />
+          <p style="text-align: center; font-size: 10px; color: #9ca3af; font-style: italic; margin: 0;">
+            Bu rapor RPD Yönlendirme Sistemi tarafından otomatik olarak oluşturulmuştur. | Rapor Tarihi: ${reportDate}
+          </p>
+        </div>`;
+
+      const container = document.createElement('div');
+      container.innerHTML = DOMPurify.sanitize(html);
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      document.body.appendChild(container);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (html2pdf() as any)
+        .set({
+          margin: [8, 8, 8, 8],
+          filename: `${selectedStudent.text.replace(/\s+/g, '_')}_geçmiş_raporu.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        })
+        .from(container.firstElementChild)
+        .save();
+
+      document.body.removeChild(container);
+      toast.success("PDF raporu indirildi!", { id: "pdf-export" });
+    } catch (error) {
+      console.error("PDF export error:", error);
+      toast.error("PDF dosyası oluşturulamadı", { id: "pdf-export" });
+    } finally {
+      setExportingPdf(false);
+    }
   };
 
   return (
@@ -516,37 +1092,47 @@ export default function OgrenciGecmisiPage() {
               
               {/* Seçili Öğrenci */}
               {selectedStudent && (
-                <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
-                  <User className="h-3 w-3 mr-1" />
-                  {selectedStudent.text}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
+                    <User className="h-3 w-3 mr-1" />
+                    {selectedStudent.text}
+                  </Badge>
+                  {(resolvedClass || classes.find(c => c.value === selectedClass)?.text) && (
+                    <Badge className="bg-white/10 text-white/90 border-0">
+                      <GraduationCap className="h-3 w-3 mr-1" />
+                      {resolvedClass || classes.find(c => c.value === selectedClass)?.text}
+                    </Badge>
+                  )}
+                </div>
               )}
             </div>
             
             <div className="flex items-center gap-2">
-              {/* CSV Export */}
+              {/* Word Export */}
               {selectedStudent && totalRecords > 0 && (
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={handleExportExcel}
+                  onClick={handleExportWord}
+                  disabled={exportingWord}
                   className="bg-white/10 hover:bg-white/20 text-white border-0"
                 >
-                  <Download className="h-4 w-4 mr-1" />
-                  CSV
+                  {exportingWord ? <RefreshCw className="h-4 w-4 mr-1 animate-spin" /> : <Download className="h-4 w-4 mr-1" />}
+                  Word
                 </Button>
               )}
-              
-              {/* Yazdır */}
+
+              {/* PDF Export */}
               {selectedStudent && totalRecords > 0 && (
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={handlePrint}
+                  onClick={handleExportPdf}
+                  disabled={exportingPdf}
                   className="bg-white/10 hover:bg-white/20 text-white border-0"
                 >
-                  <Printer className="h-4 w-4 mr-1" />
-                  Yazdır
+                  {exportingPdf ? <RefreshCw className="h-4 w-4 mr-1 animate-spin" /> : <Printer className="h-4 w-4 mr-1" />}
+                  PDF
                 </Button>
               )}
               
@@ -558,6 +1144,8 @@ export default function OgrenciGecmisiPage() {
                   onClick={() => {
                     setSelectedStudent(null);
                     setSearchQuery("");
+                    setResolvedClass("");
+                    setSearchMatches([]);
                     setReferrals([]);
                     setDisciplineRecords([]);
                   }}
@@ -641,7 +1229,7 @@ export default function OgrenciGecmisiPage() {
                   </span>
                 </div>
                 <p className="text-xs text-indigo-600 mt-1 ml-8">
-                  {classes.find(c => c.value === selectedClass)?.text}
+                  {classes.find(c => c.value === selectedClass)?.text || resolvedClass}
                 </p>
                 <div className="flex gap-2 mt-2 ml-8">
                   <Badge className="bg-blue-500 text-white border-0">
@@ -708,22 +1296,22 @@ export default function OgrenciGecmisiPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2"
-                onClick={handleExportExcel}
-                disabled={totalRecords === 0}
+                className="gap-2 text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                onClick={handleExportWord}
+                disabled={totalRecords === 0 || exportingWord}
               >
-                <Download className="h-4 w-4" />
-                Dışa Aktar
+                {exportingWord ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                Word İndir
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2"
-                onClick={handlePrint}
-                disabled={totalRecords === 0}
+                className="gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                onClick={handleExportPdf}
+                disabled={totalRecords === 0 || exportingPdf}
               >
-                <Printer className="h-4 w-4" />
-                Yazdır
+                {exportingPdf ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+                PDF İndir
               </Button>
             </div>
             <div className="flex items-center gap-2">
@@ -758,6 +1346,42 @@ export default function OgrenciGecmisiPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Arama Sonuçları - Birden Fazla Öğrenci */}
+      {searchMatches.length > 1 && (
+        <Card className="bg-white/80 backdrop-blur shadow-sm border-amber-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold text-amber-800 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-600" />
+              {searchMatches.length} Farklı Öğrenci Bulundu
+              <span className="text-sm font-normal text-slate-500">— lütfen birini seçin</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {searchMatches.map((match, idx) => (
+                <button
+                  key={`${match.studentName}-${match.classDisplay}-${idx}`}
+                  onClick={() => handleSelectMatch(match)}
+                  className="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50 hover:shadow-md transition-all text-left group"
+                >
+                  <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                    <User className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm text-slate-800 truncate">{match.studentName}</p>
+                    <p className="text-xs text-slate-500 truncate">{match.classDisplay}</p>
+                    <Badge className="mt-1 bg-blue-100 text-blue-700 border-0 text-[10px]">
+                      {match.count} yönlendirme
+                    </Badge>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-slate-300 group-hover:text-indigo-500 -rotate-90 transition-colors" />
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Grafikler ve İstatistikler */}
       {showCharts && selectedStudent && totalRecords > 0 && (
