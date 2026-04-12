@@ -38,6 +38,19 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
+// Otomatik tespit edilen risk öğrencisi
+interface DetectedRisk {
+  student_name: string;
+  class_display: string;
+  risk_score: number;
+  risk_level: 'medium' | 'high' | 'critical';
+  referral_count: number;
+  discipline_count: number;
+  total_records: number;
+  last_record_date: string;
+  top_reasons: string[];
+}
+
 // Sınıf/Öğrenci tipleri
 interface SinifSube { value: string; text: string }
 interface Ogrenci { value: string; text: string }
@@ -93,7 +106,11 @@ const STATUS_OPTIONS = [
 
 export default function RiskTakipPage() {
   const [riskStudents, setRiskStudents] = useState<RiskStudent[]>([]);
+  const [detectedRisks, setDetectedRisks] = useState<DetectedRisk[]>([]);
+  const [detectedSummary, setDetectedSummary] = useState({ high: 0, medium: 0 });
+  const [showDetected, setShowDetected] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDetecting, setIsDetecting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<RiskStudent | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -124,8 +141,57 @@ export default function RiskTakipPage() {
   // Verileri yükle
   useEffect(() => {
     loadRiskStudents();
+    loadDetectedRisks();
     loadSinifList();
   }, []);
+
+  // Otomatik risk tespiti
+  const loadDetectedRisks = async () => {
+    setIsDetecting(true);
+    try {
+      const res = await fetch('/api/risk-detection');
+      if (res.ok) {
+        const json = await res.json();
+        setDetectedRisks(json.detected || []);
+        setDetectedSummary(json.summary || { high: 0, medium: 0 });
+      }
+    } catch (error) {
+      console.error('Risk tespiti yüklenemedi:', error);
+    } finally {
+      setIsDetecting(false);
+    }
+  };
+
+  // Otomatik tespit edilen öğrenciyi risk listesine ekle
+  const addDetectedToRiskList = async (detected: DetectedRisk) => {
+    try {
+      const riskTypes: string[] = [];
+      if (detected.discipline_count > 0) riskTypes.push('siddet');
+      if (detected.referral_count >= 3) riskTypes.push('diger');
+      if (riskTypes.length === 0) riskTypes.push('diger');
+
+      const { error } = await supabase
+        .from('risk_students')
+        .insert({
+          student_name: detected.student_name,
+          class_display: detected.class_display,
+          class_key: '',
+          risk_level: detected.risk_level,
+          risk_type: riskTypes,
+          description: `Otomatik tespit: ${detected.referral_count} yönlendirme, ${detected.discipline_count} disiplin kaydı. Risk skoru: ${detected.risk_score}. En sık nedenler: ${detected.top_reasons.join(', ')}`,
+          status: 'active',
+          last_contact_date: new Date().toISOString().split('T')[0],
+        });
+
+      if (error) throw error;
+      toast.success(`${detected.student_name} risk listesine eklendi`);
+      loadRiskStudents();
+      loadDetectedRisks();
+    } catch (error) {
+      console.error('Risk listesine ekleme hatası:', error);
+      toast.error('Ekleme sırasında hata oluştu');
+    }
+  };
 
   // Sınıf listesini yükle
   const loadSinifList = async () => {
@@ -419,6 +485,120 @@ export default function RiskTakipPage() {
         </Card>
       </div>
       
+      {/* Otomatik Risk Tespiti */}
+      {detectedRisks.length > 0 && (
+        <Card className="border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="h-5 w-5 text-amber-600" />
+                Otomatik Risk Tespiti
+                <Badge className="bg-amber-100 text-amber-700 ml-2">
+                  {detectedRisks.length} öğrenci
+                </Badge>
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-orange-100 text-orange-700">
+                  {detectedSummary.high} yüksek
+                </Badge>
+                <Badge className="bg-amber-100 text-amber-700">
+                  {detectedSummary.medium} orta
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowDetected(!showDetected)}
+                >
+                  {showDetected ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={loadDetectedRisks}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isDetecting ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
+            </div>
+            <p className="text-sm text-slate-500">
+              Yönlendirme ve disiplin kayıtlarına göre otomatik tespit edilen riskli öğrenciler
+            </p>
+          </CardHeader>
+          {showDetected && (
+            <CardContent className="space-y-3 pt-0">
+              {detectedRisks.map((detected, idx) => {
+                const isHigh = detected.risk_level === 'high';
+                return (
+                  <div
+                    key={idx}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 ${
+                      isHigh
+                        ? 'bg-orange-50 border-orange-200'
+                        : 'bg-amber-50 border-amber-200'
+                    }`}
+                  >
+                    {/* Risk Skoru Dairesi */}
+                    <div className="flex-shrink-0">
+                      <div className={`w-16 h-16 rounded-full flex flex-col items-center justify-center ${
+                        isHigh ? 'bg-orange-500' : 'bg-amber-500'
+                      } text-white shadow-lg`}>
+                        <span className="text-xl font-bold leading-none">{detected.risk_score}</span>
+                        <span className="text-[10px] opacity-80">puan</span>
+                      </div>
+                    </div>
+
+                    {/* Öğrenci Bilgileri */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-slate-800">{detected.student_name}</h3>
+                        {detected.class_display && (
+                          <Badge variant="outline">{detected.class_display}</Badge>
+                        )}
+                        <Badge className={isHigh ? 'bg-orange-100 text-orange-700' : 'bg-amber-100 text-amber-700'}>
+                          {isHigh ? 'Yüksek Risk' : 'Orta Risk'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-slate-600">
+                        <span>Toplam {detected.total_records} kayıt:</span>
+                        <span className="font-medium">{detected.referral_count} yönlendirme</span>
+                        <span className="font-medium">{detected.discipline_count} disiplin</span>
+                      </div>
+                      {detected.top_reasons.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {detected.top_reasons.map((reason, i) => (
+                            <span key={i} className="text-xs px-2 py-0.5 bg-white/70 rounded-full text-slate-600">
+                              {reason}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Aksiyon */}
+                    <div className="flex-shrink-0 flex gap-2">
+                      <Link href={`/panel/ogrenci-gecmisi?search=${encodeURIComponent(detected.student_name)}`}>
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4 mr-1" />
+                          Detay
+                        </Button>
+                      </Link>
+                      <Button
+                        size="sm"
+                        className={isHigh ? 'bg-orange-600 hover:bg-orange-700' : 'bg-amber-600 hover:bg-amber-700'}
+                        onClick={() => addDetectedToRiskList(detected)}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Listeye Ekle
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          )}
+        </Card>
+      )}
+
       {/* Form */}
       {showForm && (
         <Card className="border-2 border-red-200 bg-red-50/30">
