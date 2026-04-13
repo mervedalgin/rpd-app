@@ -296,7 +296,6 @@
 
 /* Safe Area - iOS Notch/Home Bar */
 .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
-.safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
 
 /* Touch Optimizations */
 @media (hover: none) and (pointer: coarse) {
@@ -388,9 +387,3 @@ html { scroll-behavior: smooth; }
   background-clip: text;
 }
 
-/* Card Hover Effect */
-.card-hover { transition: all 0.3s ease; }
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}

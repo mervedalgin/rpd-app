@@ -215,14 +215,3 @@ export function resolveAsama(reason: string, note?: string | null): MebbisAsama 
   return result;
 }
 
-/**
- * Debug: Bir neden+not kombinasyonunun hangi aşamalara eşlendiğini gösterir
- */
-export function explainMapping(reason: string, note?: string | null): string {
-  const asama = resolveAsama(reason, note);
-  const hizmetLabel = asama.hizmet_turu === "5" ? "Önleyici"
-                    : asama.hizmet_turu === "6" ? "İyileştirici"
-                    : asama.hizmet_turu === "7" ? "Destek" : "?";
-
-  return `[${reason}${note ? ` / "${note}"` : ""}] → ${hizmetLabel} (${asama.hizmet_turu}) > ${asama.asama1} > ${asama.asama2} > ${asama.asama3 || "-"}`;
-}

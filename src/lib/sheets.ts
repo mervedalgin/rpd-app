@@ -126,31 +126,3 @@ export async function writeToGoogleSheets(students: YonlendirilenOgrenci[]): Pro
   }
 }
 
-export async function createGoogleSheetsIfNotExists(sheetsId: string): Promise<boolean> {
-  const serviceAccountEmail = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-  if (!serviceAccountEmail || !privateKey) {
-    return false;
-  }
-
-  try {
-    const auth = new google.auth.JWT({
-      email: serviceAccountEmail,
-      key: privateKey,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets']
-    });
-
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // Check if spreadsheet exists
-    await sheets.spreadsheets.get({
-      spreadsheetId: sheetsId,
-    });
-
-    return true;
-  } catch (error) {
-    console.error('Google Sheets kontrol hatası:', error);
-    return false;
-  }
-}

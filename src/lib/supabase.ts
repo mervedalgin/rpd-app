@@ -12,17 +12,4 @@ const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-/**
- * Returns the Supabase client (anon key) or throws if not configured.
- * Safe for both client and server-side use.
- * For admin operations in API routes, use getSupabaseServer() from '@/lib/supabase-server'.
- */
-export function getSupabase(): SupabaseClient {
-  if (!_supabaseClient) {
-    throw new Error("Supabase is not configured. Please check your environment variables.");
-  }
-  return _supabaseClient;
-}
-
-// Backward compatibility export - prefer getSupabase() for new code
 export const supabase = _supabaseClient as SupabaseClient;

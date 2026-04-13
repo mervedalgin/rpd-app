@@ -101,7 +101,7 @@ export async function loadTeachersFromExcel(): Promise<TeacherRecord[]> {
     .filter(Boolean) as TeacherRecord[];
 }
 
-export function buildTeacherIndex(records: TeacherRecord[]) {
+function buildTeacherIndex(records: TeacherRecord[]) {
   const byName = new Map<string, TeacherRecord>();
   const byKey = new Map<string, TeacherRecord>();
   for (const r of records) {

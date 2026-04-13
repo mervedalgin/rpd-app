@@ -27,8 +27,6 @@ import {
   Sun,
   Monitor,
   Loader2,
-  Shield,
-  Key,
   Database,
   Info,
   AlertCircle,

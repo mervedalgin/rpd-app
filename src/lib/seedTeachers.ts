@@ -136,6 +136,3 @@ export function seedTeachers(): number {
   return SEED_TEACHERS.length;
 }
 
-export function getSeedData(): TeacherRecord[] {
-  return SEED_TEACHERS;
-}
