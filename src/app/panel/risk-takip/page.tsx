@@ -259,12 +259,18 @@ export default function RiskTakipPage() {
       return;
     }
     
+    const payload = {
+      ...formData,
+      last_contact_date: formData.last_contact_date || null,
+      next_follow_up_date: formData.next_follow_up_date || null,
+    };
+
     try {
       if (editingStudent) {
         const { error } = await supabase
           .from('risk_students')
           .update({
-            ...formData,
+            ...payload,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingStudent.id);
@@ -274,34 +280,43 @@ export default function RiskTakipPage() {
       } else {
         const { error } = await supabase
           .from('risk_students')
-          .insert(formData);
+          .insert(payload);
 
         if (error) throw error;
 
-        // Öğrenci geçmişine uyarı kaydı düş
-        const riskLevel = RISK_LEVELS.find(l => l.value === formData.risk_level)?.label || formData.risk_level;
-        const riskTypes = formData.risk_type
-          .map(t => RISK_TYPES.find(rt => rt.value === t)?.label || t)
-          .join(', ');
+        if (formData.class_key && formData.class_display) {
+          const riskLevel = RISK_LEVELS.find(l => l.value === formData.risk_level)?.label || formData.risk_level;
+          const riskTypes = formData.risk_type
+            .map(t => RISK_TYPES.find(rt => rt.value === t)?.label || t)
+            .join(', ');
 
-        await supabase.from('referrals').insert({
-          teacher_name: 'Rehberlik Servisi',
-          class_key: formData.class_key,
-          class_display: formData.class_display,
-          student_name: formData.student_name,
-          reason: 'Risk Takip Listesine Eklendi',
-          note: `Bu öğrenci risk takip listesindedir. Risk seviyesi: ${riskLevel}. Risk türü: ${riskTypes}.${formData.description ? ' Açıklama: ' + formData.description : ''}`,
-          source: 'risk-takip',
-        });
+          const { error: refErr } = await supabase.from('referrals').insert({
+            teacher_name: 'Rehberlik Servisi',
+            class_key: formData.class_key,
+            class_display: formData.class_display,
+            student_name: formData.student_name,
+            reason: 'Risk Takip Listesine Eklendi',
+            note: `Bu öğrenci risk takip listesindedir. Risk seviyesi: ${riskLevel}. Risk türü: ${riskTypes}.${formData.description ? ' Açıklama: ' + formData.description : ''}`,
+            source: 'risk-takip',
+          });
+          if (refErr) console.warn('Yönlendirme kaydı oluşturulamadı:', refErr);
+        }
 
         toast.success('Öğrenci risk listesine eklendi');
       }
-      
+
       resetForm();
       loadRiskStudents();
     } catch (error) {
-      console.error('Kaydetme hatası:', error);
-      toast.error('Kaydetme sırasında hata oluştu');
+      const e = error as { message?: string; code?: string; details?: string; hint?: string };
+      console.error('Kaydetme hatası:', {
+        message: e?.message,
+        code: e?.code,
+        details: e?.details,
+        hint: e?.hint,
+        raw: error,
+      });
+      toast.error(e?.message ? `Kaydetme hatası: ${e.message}` : 'Kaydetme sırasında hata oluştu');
     }
   };
   
