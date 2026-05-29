@@ -32,7 +32,6 @@ import {
   Filter
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // Sınıf etkinliği tipi
 interface ClassActivity {
@@ -123,13 +122,12 @@ export default function SinifEtkinlikleriPage() {
   const loadActivities = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('class_activities')
-        .select('*')
-        .order('activity_date', { ascending: false });
-      
-      if (error) throw error;
-      setActivities(data || []);
+      const res = await fetch('/api/class-activities');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Veriler yüklenirken hata oluştu');
+      const data = (json.data || []) as ClassActivity[];
+      data.sort((a, b) => (b.activity_date || '').localeCompare(a.activity_date || ''));
+      setActivities(data);
     } catch (error) {
       console.error('Sınıf etkinlikleri yüklenemedi:', error);
       toast.error('Veriler yüklenirken hata oluştu');
@@ -194,22 +192,26 @@ export default function SinifEtkinlikleriPage() {
     
     try {
       if (editingActivity) {
-        const { error } = await supabase
-          .from('class_activities')
-          .update({
+        const res = await fetch('/api/class-activities', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingActivity.id,
             ...saveData,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingActivity.id);
-        
-        if (error) throw error;
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Kaydetme sırasında hata oluştu');
         toast.success('Etkinlik güncellendi');
       } else {
-        const { error } = await supabase
-          .from('class_activities')
-          .insert(saveData);
-        
-        if (error) throw error;
+        const res = await fetch('/api/class-activities', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(saveData)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Kaydetme sırasında hata oluştu');
         toast.success('Etkinlik oluşturuldu');
       }
       
@@ -226,9 +228,10 @@ export default function SinifEtkinlikleriPage() {
     if (!confirm('Bu etkinliği silmek istediğinize emin misiniz?')) return;
     
     try {
-      const { error } = await supabase.from('class_activities').delete().eq('id', id);
-      if (error) throw error;
-      
+      const res = await fetch('/api/class-activities?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Silme sırasında hata oluştu');
+
       toast.success('Etkinlik silindi');
       loadActivities();
     } catch (error) {

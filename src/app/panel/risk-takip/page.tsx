@@ -35,7 +35,6 @@ import {
   MoreHorizontal
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
 // Otomatik tespit edilen risk öğrencisi
@@ -170,9 +169,10 @@ export default function RiskTakipPage() {
       if (detected.referral_count >= 3) riskTypes.push('diger');
       if (riskTypes.length === 0) riskTypes.push('diger');
 
-      const { error } = await supabase
-        .from('risk_students')
-        .insert({
+      const res = await fetch('/api/risk-students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           student_name: detected.student_name,
           class_display: detected.class_display,
           class_key: '',
@@ -181,9 +181,10 @@ export default function RiskTakipPage() {
           description: `Otomatik tespit: ${detected.referral_count} yönlendirme, ${detected.discipline_count} disiplin kaydı. Risk skoru: ${detected.risk_score}. En sık nedenler: ${detected.top_reasons.join(', ')}`,
           status: 'active',
           last_contact_date: new Date().toISOString().split('T')[0],
-        });
-
-      if (error) throw error;
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Ekleme sırasında hata oluştu');
       toast.success(`${detected.student_name} risk listesine eklendi`);
       loadRiskStudents();
       loadDetectedRisks();
@@ -231,14 +232,18 @@ export default function RiskTakipPage() {
   const loadRiskStudents = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('risk_students')
-        .select('*')
-        .order('risk_level', { ascending: false })
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setRiskStudents(data || []);
+      const res = await fetch('/api/risk-students');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Risk listesi yüklenirken hata oluştu');
+      const data = (json.data || []) as RiskStudent[];
+      const sorted = [...data].sort((a, b) => {
+        if (a.risk_level > b.risk_level) return -1;
+        if (a.risk_level < b.risk_level) return 1;
+        if (a.created_at > b.created_at) return -1;
+        if (a.created_at < b.created_at) return 1;
+        return 0;
+      });
+      setRiskStudents(sorted);
     } catch (error) {
       console.error('Risk listesi yüklenemedi:', error);
       toast.error('Risk listesi yüklenirken hata oluştu');
@@ -267,22 +272,26 @@ export default function RiskTakipPage() {
 
     try {
       if (editingStudent) {
-        const { error } = await supabase
-          .from('risk_students')
-          .update({
+        const res = await fetch('/api/risk-students', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingStudent.id,
             ...payload,
             updated_at: new Date().toISOString()
-          })
-          .eq('id', editingStudent.id);
-
-        if (error) throw error;
+          }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Kaydetme sırasında hata oluştu');
         toast.success('Kayıt güncellendi');
       } else {
-        const { error } = await supabase
-          .from('risk_students')
-          .insert(payload);
-
-        if (error) throw error;
+        const res = await fetch('/api/risk-students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Kaydetme sırasında hata oluştu');
 
         if (formData.class_key && formData.class_display) {
           const riskLevel = RISK_LEVELS.find(l => l.value === formData.risk_level)?.label || formData.risk_level;
@@ -290,16 +299,23 @@ export default function RiskTakipPage() {
             .map(t => RISK_TYPES.find(rt => rt.value === t)?.label || t)
             .join(', ');
 
-          const { error: refErr } = await supabase.from('referrals').insert({
-            teacher_name: 'Rehberlik Servisi',
-            class_key: formData.class_key,
-            class_display: formData.class_display,
-            student_name: formData.student_name,
-            reason: 'Risk Takip Listesine Eklendi',
-            note: `Bu öğrenci risk takip listesindedir. Risk seviyesi: ${riskLevel}. Risk türü: ${riskTypes}.${formData.description ? ' Açıklama: ' + formData.description : ''}`,
-            source: 'risk-takip',
+          const refRes = await fetch('/api/referrals', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              teacher_name: 'Rehberlik Servisi',
+              class_key: formData.class_key,
+              class_display: formData.class_display,
+              student_name: formData.student_name,
+              reason: 'Risk Takip Listesine Eklendi',
+              note: `Bu öğrenci risk takip listesindedir. Risk seviyesi: ${riskLevel}. Risk türü: ${riskTypes}.${formData.description ? ' Açıklama: ' + formData.description : ''}`,
+              source: 'risk-takip',
+            }),
           });
-          if (refErr) console.warn('Yönlendirme kaydı oluşturulamadı:', refErr);
+          if (!refRes.ok) {
+            const refJson = await refRes.json().catch(() => ({}));
+            console.warn('Yönlendirme kaydı oluşturulamadı:', refJson.error || refJson);
+          }
         }
 
         toast.success('Öğrenci risk listesine eklendi');
@@ -325,9 +341,10 @@ export default function RiskTakipPage() {
     if (!confirm('Bu öğrenciyi risk listesinden kaldırmak istediğinize emin misiniz?')) return;
     
     try {
-      const { error } = await supabase.from('risk_students').delete().eq('id', id);
-      if (error) throw error;
-      
+      const res = await fetch('/api/risk-students?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Silme sırasında hata oluştu');
+
       toast.success('Öğrenci listeden kaldırıldı');
       loadRiskStudents();
     } catch (error) {

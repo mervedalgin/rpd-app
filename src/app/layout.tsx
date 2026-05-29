@@ -1,19 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Fraunces, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Gövde: Plus Jakarta Sans — sıcak, hümanist, profesyonel.
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
+// Başlıklar: Fraunces — karakterli, editöryel optik serif (Türkçe destekli).
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${jakarta.variable} ${fraunces.variable} ${geistMono.variable} antialiased`}>
         <Toaster
           position="top-right"
           richColors
@@ -45,11 +55,11 @@ export default function RootLayout({
         />
         <div className="min-h-screen flex flex-col">
           {/* Modern Glassmorphism Header */}
-          <header className="sticky top-0 z-50 border-b border-slate-200/50 bg-white/70 backdrop-blur-xl shadow-sm">
+          <header className="sticky top-0 z-50 border-b border-border/60 bg-card/70 backdrop-blur-xl shadow-sm">
             <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
               {/* Logo */}
               <Link href="/" className="group flex items-center gap-2.5 transition-all">
-                <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-blue-600 via-indigo-600 to-violet-600 shadow-lg shadow-blue-500/25 transition-all group-hover:shadow-xl group-hover:shadow-blue-500/30 group-hover:scale-105">
+                <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-primary to-[var(--chart-2)] shadow-lg shadow-primary/25 transition-all group-hover:shadow-xl group-hover:shadow-primary/30 group-hover:scale-105">
                   <svg
                     viewBox="0 0 32 32"
                     fill="none"
@@ -67,13 +77,13 @@ export default function RootLayout({
                     />
                   </svg>
                   {/* Pulse effect */}
-                  <div className="absolute inset-0 rounded-xl bg-linear-to-br from-blue-400 to-violet-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+                  <div className="absolute inset-0 rounded-xl bg-linear-to-br from-primary to-[var(--chart-2)] opacity-0 group-hover:opacity-20 transition-opacity" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-base font-bold bg-linear-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent">
+                  <span className="text-base font-bold bg-linear-to-r from-foreground via-foreground/80 to-foreground bg-clip-text text-transparent">
                     RPD
                   </span>
-                  <span className="text-[10px] font-medium text-slate-400 -mt-0.5 hidden sm:block">
+                  <span className="text-[10px] font-medium text-muted-foreground -mt-0.5 hidden sm:block">
                     Öğrenci Takip
                   </span>
                 </div>
@@ -110,7 +120,7 @@ export default function RootLayout({
                 {/* Panel Button */}
                 <Link
                   href="/panel"
-                  className="group relative inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:from-blue-500 hover:to-indigo-500 active:scale-95"
+                  className="group relative inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-primary to-[var(--chart-2)] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:opacity-95 active:scale-95"
                 >
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 

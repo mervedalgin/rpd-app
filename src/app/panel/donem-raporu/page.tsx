@@ -29,7 +29,6 @@ import {
   Heart
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 interface ReportData {
   period: string;
@@ -136,6 +135,8 @@ export default function DonemRaporuPage() {
     const { startDate, endDate } = getReportDates();
     
     try {
+      const range = `from=${encodeURIComponent(startDate)}&to=${encodeURIComponent(endDate)}`;
+
       // Paralel olarak tüm verileri çek
       const [
         referralsRes,
@@ -146,53 +147,54 @@ export default function DonemRaporuPage() {
         parentContactsRes
       ] = await Promise.all([
         // Yönlendirmeler
-        supabase
-          .from('referrals')
-          .select('*')
-          .gte('created_at', startDate)
-          .lte('created_at', endDate),
-        
+        fetch(`/api/referrals?${range}`),
         // Disiplin
-        supabase
-          .from('discipline')
-          .select('*')
-          .gte('created_at', startDate)
-          .lte('created_at', endDate),
-        
+        fetch(`/api/discipline`),
         // RAM
-        supabase
-          .from('ram_referrals')
-          .select('*')
-          .gte('created_at', startDate)
-          .lte('created_at', endDate),
-        
+        fetch(`/api/ram-referrals?${range}`),
         // Risk
-        supabase
-          .from('risk_students')
-          .select('*')
-          .eq('status', 'active'),
-        
-        // Sınıf etkinlikleri
-        supabase
-          .from('class_activities')
-          .select('*')
-          .gte('activity_date', startDate)
-          .lte('activity_date', endDate),
-        
-        // Veli iletişim
-        supabase
-          .from('parent_contacts')
-          .select('*')
-          .gte('contact_date', startDate)
-          .lte('contact_date', endDate)
+        fetch(`/api/risk-students`),
+        // Sınıf etkinlikleri (activity_date araliginda)
+        fetch(`/api/class-activities?${range}`),
+        // Veli iletişim (contact_date araliginda)
+        fetch(`/api/parent-contacts?${range}`)
       ]);
-      
-      const referrals = referralsRes.data || [];
-      const discipline = disciplineRes.data || [];
-      const ram = ramRes.data || [];
-      const risk = riskRes.data || [];
-      const activities = activitiesRes.data || [];
-      const parentContacts = parentContactsRes.data || [];
+
+      const [
+        referralsJson,
+        disciplineJson,
+        ramJson,
+        riskJson,
+        activitiesJson,
+        parentContactsJson
+      ] = await Promise.all([
+        referralsRes.json(),
+        disciplineRes.json(),
+        ramRes.json(),
+        riskRes.json(),
+        activitiesRes.json(),
+        parentContactsRes.json()
+      ]);
+
+      if (!referralsRes.ok) throw new Error(referralsJson.error || 'Yüklenemedi');
+      if (!disciplineRes.ok) throw new Error(disciplineJson.error || 'Yüklenemedi');
+      if (!ramRes.ok) throw new Error(ramJson.error || 'Yüklenemedi');
+      if (!riskRes.ok) throw new Error(riskJson.error || 'Yüklenemedi');
+      if (!activitiesRes.ok) throw new Error(activitiesJson.error || 'Yüklenemedi');
+      if (!parentContactsRes.ok) throw new Error(parentContactsJson.error || 'Yüklenemedi');
+
+      const referrals = referralsJson.data || [];
+      const allDiscipline = disciplineJson.records || [];
+      // Disiplin endpoint'i tarih filtresi almadigi icin created_at araligini JS'te uygula
+      const discipline = allDiscipline.filter((d: any) => {
+        const c = d.created_at;
+        return c && c >= startDate && c <= endDate;
+      });
+      const ram = ramJson.data || [];
+      const allRisk = riskJson.data || [];
+      const risk = allRisk.filter((r: any) => r.status === 'active');
+      const activities = activitiesJson.data || [];
+      const parentContacts = parentContactsJson.data || [];
       
       // Veri analizi
       const referralsByReason: Record<string, number> = {};

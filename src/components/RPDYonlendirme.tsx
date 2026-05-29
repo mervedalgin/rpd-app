@@ -347,34 +347,37 @@ export default function RPDYonlendirme() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen bg-[linear-gradient(135deg,hsl(38_40%_97%),hsl(176_24%_95%)_55%,hsl(34_42%_95%))] flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-linear-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-[radial-gradient(circle,hsl(176_52%_40%/0.18),transparent_70%)] rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[radial-gradient(circle,hsl(28_78%_55%/0.16),transparent_70%)] rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         </div>
         <div className="text-center relative z-10">
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-linear-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-linear-to-r from-[hsl(176_52%_32%)] to-[hsl(28_78%_55%)] mx-auto mb-6"></div>
             <div className="absolute inset-0 animate-spin rounded-full h-16 w-16 border-4 border-transparent bg-linear-to-r from-transparent via-white to-transparent mx-auto" style={{ animationDuration: '1s' }}></div>
           </div>
-          <p className="text-xl font-medium bg-linear-to-r from-gray-700 to-blue-600 bg-clip-text text-transparent animate-pulse">Veriler yükleniyor...</p>
+          <p className="text-xl font-medium bg-linear-to-r from-[hsl(185_25%_20%)] to-[hsl(176_52%_32%)] bg-clip-text text-transparent animate-pulse">Veriler yükleniyor...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100 pb-20 md:pb-0 relative overflow-hidden">
-      {/* Animated Background Elements - Enhanced */}
+    <div className="min-h-screen bg-[linear-gradient(135deg,hsl(38_40%_97%),hsl(176_24%_95%)_55%,hsl(34_42%_95%))] pb-20 md:pb-0 relative overflow-hidden">
+      {/* Atmospheric Background — teal/clay/sage gradient mesh + dokulu derinlik */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-linear-to-tr from-purple-400/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-linear-to-r from-emerald-400/10 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        {/* Yeni hareketli parçacıklar */}
-        <div className="absolute top-20 left-20 w-3 h-3 bg-blue-400/30 rounded-full animate-float-slow"></div>
-        <div className="absolute top-40 right-40 w-2 h-2 bg-purple-400/30 rounded-full animate-float-slow" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-40 left-1/3 w-4 h-4 bg-indigo-400/20 rounded-full animate-float-slow" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-pink-400/30 rounded-full animate-float-slow" style={{ animationDelay: '0.5s' }}></div>
+        {/* Gradient mesh orb'lar */}
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-[radial-gradient(circle,hsl(176_52%_40%/0.18),transparent_70%)] rounded-full blur-3xl animate-float-slow"></div>
+        <div className="absolute -bottom-48 -left-40 w-[28rem] h-[28rem] bg-[radial-gradient(circle,hsl(28_78%_55%/0.16),transparent_70%)] rounded-full blur-3xl animate-float-reverse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[32rem] h-[32rem] bg-[radial-gradient(circle,hsl(160_46%_45%/0.10),transparent_70%)] rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        {/* İnce nokta-ızgara dokusu (kenarlarda eriyen) */}
+        <div className="absolute inset-0 opacity-60 [background-image:radial-gradient(hsl(176_30%_28%/0.07)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_78%)]"></div>
+        {/* Yüzen parçacıklar (palet renkli) */}
+        <div className="absolute top-20 left-20 w-3 h-3 bg-[hsl(176_52%_40%/0.35)] rounded-full animate-float-slow"></div>
+        <div className="absolute top-40 right-40 w-2 h-2 bg-[hsl(28_78%_55%/0.40)] rounded-full animate-float-slow" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-40 left-1/3 w-4 h-4 bg-[hsl(160_46%_45%/0.28)] rounded-full animate-float-slow" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-[hsl(45_72%_50%/0.40)] rounded-full animate-float-slow" style={{ animationDelay: '0.5s' }}></div>
       </div>
 
       <div className="container mx-auto px-2 sm:px-3 md:px-4 py-3 md:py-8 max-w-7xl relative z-10">
@@ -390,9 +393,9 @@ export default function RPDYonlendirme() {
             </div>
             
             {/* Live Clock */}
-            <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-linear-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-full shadow-md border border-blue-100">
-              <Clock className="w-3 h-3 text-blue-600 animate-pulse" />
-              <span className="text-[10px] sm:text-xs font-mono font-bold text-blue-700">
+            <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-linear-to-r from-[hsl(176_52%_40%/0.12)] to-[hsl(28_78%_55%/0.12)] backdrop-blur-sm rounded-full shadow-md border border-[hsl(176_40%_80%)]">
+              <Clock className="w-3 h-3 text-[hsl(176_52%_32%)] animate-pulse" />
+              <span className="text-[10px] sm:text-xs font-mono font-bold text-[hsl(176_52%_28%)]">
                 {currentTime.toLocaleTimeString('tr-TR')}
               </span>
             </div>
@@ -426,13 +429,13 @@ export default function RPDYonlendirme() {
           {/* Main Title with Animation - Mobile Optimized */}
           <div className="flex items-center justify-center mb-2 md:mb-4 group">
             <div className="relative">
-              <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 md:h-14 md:w-14 text-blue-600 mr-2 md:mr-3 group-hover:text-purple-600 hover:scale-110 transition-all duration-300 drop-shadow-lg" />
+              <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 md:h-14 md:w-14 text-[hsl(176_52%_30%)] mr-2 md:mr-3 group-hover:text-[hsl(28_76%_48%)] hover:scale-110 transition-all duration-300 drop-shadow-lg" />
               <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-linear-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
                 <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />
               </div>
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-linear-to-r from-gray-800 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl md:text-4xl font-bold bg-linear-to-r from-[hsl(185_25%_18%)] via-[hsl(176_52%_28%)] to-[hsl(28_72%_46%)] bg-clip-text text-transparent">
                 RPD Yönlendirme
               </h1>
             </div>
@@ -443,11 +446,11 @@ export default function RPDYonlendirme() {
           <div className="max-w-xs sm:max-w-md mx-auto mt-3 sm:mt-4 px-2">
             <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-500 mb-1">
               <span>Form İlerlemesi</span>
-              <span className="font-bold text-blue-600">{formProgress}%</span>
+              <span className="font-bold text-[hsl(176_52%_30%)]">{formProgress}%</span>
             </div>
             <div className="h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+              <div
+                className="h-full bg-linear-to-r from-[hsl(176_52%_36%)] via-[hsl(160_46%_42%)] to-[hsl(28_78%_52%)] rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${formProgress}%` }}
               ></div>
             </div>
@@ -459,7 +462,7 @@ export default function RPDYonlendirme() {
           {/* Mevcut Öğrenciler */}
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 shadow-lg border border-gray-100 hover:shadow-xl active:scale-[0.98] transition-all duration-300 group">
             <div className="flex items-center justify-between">
-              <div className="p-1.5 sm:p-2 bg-linear-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div className="p-1.5 sm:p-2 bg-linear-to-br from-[hsl(176_52%_34%)] to-[hsl(176_52%_26%)] rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div className="text-right">
@@ -468,7 +471,7 @@ export default function RPDYonlendirme() {
               </div>
             </div>
             <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-linear-to-r from-purple-400 to-purple-600 rounded-full" style={{ width: '70%' }}></div>
+              <div className="h-full bg-linear-to-r from-[hsl(176_46%_44%)] to-[hsl(176_52%_30%)] rounded-full" style={{ width: '70%' }}></div>
             </div>
           </div>
 
@@ -495,12 +498,12 @@ export default function RPDYonlendirme() {
             variant="outline"
             size="sm"
             onClick={() => setShowActivityLog(!showActivityLog)}
-            className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm hover:bg-blue-50 border-blue-200 text-blue-700 px-2 sm:px-3 h-9 sm:h-10 active:scale-95 transition-all text-xs sm:text-sm"
+            className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm hover:bg-[hsl(176_40%_94%)] border-[hsl(176_38%_80%)] text-[hsl(176_56%_26%)] px-2 sm:px-3 h-9 sm:h-10 active:scale-95 transition-all text-xs sm:text-sm"
           >
             <History className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden xs:inline">Aktivite</span>
             {recentActivity.length > 0 && (
-              <Badge className="bg-blue-500 text-white text-[10px] px-1 sm:px-1.5">{recentActivity.length}</Badge>
+              <Badge className="bg-[hsl(176_52%_32%)] text-white text-[10px] px-1 sm:px-1.5">{recentActivity.length}</Badge>
             )}
           </Button>
           
@@ -540,7 +543,7 @@ export default function RPDYonlendirme() {
         {/* Activity Log Panel */}
         {showActivityLog && recentActivity.length > 0 && (
           <div ref={activityRef} className="mb-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-scale-in">
-            <div className="p-4 bg-linear-to-r from-blue-500 to-indigo-500 text-white flex items-center justify-between">
+            <div className="p-4 bg-linear-to-r from-[hsl(176_52%_32%)] to-[hsl(176_52%_24%)] text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <History className="w-5 h-5" />
                 <span className="font-semibold">Son Aktiviteler</span>
@@ -553,13 +556,13 @@ export default function RPDYonlendirme() {
               {recentActivity.map((activity, index) => (
                 <div 
                   key={activity.id} 
-                  className={`flex items-center gap-3 p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${index === 0 ? 'bg-blue-50/50' : ''}`}
+                  className={`flex items-center gap-3 p-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${index === 0 ? 'bg-[hsl(176_40%_94%/0.5)]' : ''}`}
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <div className={`p-1.5 rounded-full ${
                     activity.type === 'add' ? 'bg-green-100 text-green-600' :
                     activity.type === 'remove' ? 'bg-red-100 text-red-600' :
-                    'bg-blue-100 text-blue-600'
+                    'bg-[hsl(176_40%_90%)] text-[hsl(176_56%_28%)]'
                   }`}>
                     {activity.type === 'add' ? <Plus className="w-3 h-3" /> :
                      activity.type === 'remove' ? <X className="w-3 h-3" /> :
@@ -575,8 +578,8 @@ export default function RPDYonlendirme() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-8 px-1">
           {/* Form Kartı - Mobile Enhanced */}
-          <Card className="shadow-xl shadow-blue-500/10 backdrop-blur-sm bg-white/80 border-0 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group animate-slide-in-left">
-            <CardHeader className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-t-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
+          <Card className="shadow-xl shadow-[hsl(176_52%_30%/0.12)] backdrop-blur-sm bg-white/80 border-0 hover:shadow-2xl hover:shadow-[hsl(176_52%_30%/0.20)] transition-all duration-500 group animate-slide-in-left">
+            <CardHeader className="bg-linear-to-r from-[hsl(176_54%_26%)] via-[hsl(176_52%_30%)] to-[hsl(160_46%_34%)] text-white rounded-t-lg p-3 sm:p-4 md:p-6 relative overflow-hidden">
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               {/* Animated dots */}
               <div className="absolute top-2 right-2 flex gap-1">
@@ -591,7 +594,7 @@ export default function RPDYonlendirme() {
                 <span className="truncate">Öğrenci Yönlendirme</span>
                 <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 ml-2 text-amber-300 animate-pulse" />
               </CardTitle>
-              <CardDescription className="text-blue-100 text-xs sm:text-sm md:text-base flex items-center gap-2">
+              <CardDescription className="text-[hsl(176_45%_88%)] text-xs sm:text-sm md:text-base flex items-center gap-2">
                 <Rocket className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                 <span className="truncate">Yönlendirme bilgilerini girin</span>
               </CardDescription>
@@ -607,7 +610,7 @@ export default function RPDYonlendirme() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-gray-700 font-medium text-sm sm:text-base">
-                          <UserCheck className="w-4 h-4 text-blue-500" />
+                          <UserCheck className="w-4 h-4 text-[hsl(176_52%_36%)]" />
                           Öğretmen *
                         </FormLabel>
                         <FormControl>
@@ -631,7 +634,7 @@ export default function RPDYonlendirme() {
                             }}
                             value={field.value}
                           >
-                            <SelectTrigger className="border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
+                            <SelectTrigger className="border-2 border-gray-200 hover:border-[hsl(176_40%_55%)] focus:border-[hsl(176_52%_38%)] focus:ring-4 focus:ring-[hsl(176_52%_38%/0.18)] transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
                               <SelectValue placeholder="🧑‍🏫 Öğretmen seçin" />
                             </SelectTrigger>
                             <SelectContent className="max-h-[40vh]">
@@ -659,14 +662,14 @@ export default function RPDYonlendirme() {
                       return (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2 text-gray-700 font-medium text-sm sm:text-base">
-                            <BookOpen className="w-4 h-4 text-indigo-500" />
+                            <BookOpen className="w-4 h-4 text-[hsl(176_52%_36%)]" />
                             Sınıf *
-                            {t && <Badge variant="secondary" className="text-[10px] sm:text-xs bg-indigo-100 text-indigo-700">Otomatik</Badge>}
+                            {t && <Badge variant="secondary" className="text-[10px] sm:text-xs bg-[hsl(176_40%_90%)] text-[hsl(176_56%_26%)]">Otomatik</Badge>}
                           </FormLabel>
                           {t ? (
                             // Öğretmen seçiliyse sınıfı doğrudan göster (disabled select yerine)
                             <FormControl>
-                              <div className="border-2 border-indigo-200 bg-indigo-50/50 backdrop-blur-sm min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl flex items-center text-gray-700">
+                              <div className="border-2 border-[hsl(176_38%_78%)] bg-[hsl(176_40%_94%/0.6)] backdrop-blur-sm min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl flex items-center text-gray-700">
                                 🏫 {t.sinifSubeDisplay}
                               </div>
                             </FormControl>
@@ -684,7 +687,7 @@ export default function RPDYonlendirme() {
                               value={field.value}
                             >
                               <FormControl>
-                                <SelectTrigger className="border-2 border-gray-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
+                                <SelectTrigger className="border-2 border-gray-200 hover:border-[hsl(176_40%_55%)] focus:border-[hsl(176_52%_38%)] focus:ring-4 focus:ring-[hsl(176_52%_38%/0.18)] transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99]">
                                   <SelectValue placeholder="🏫 Sınıf seçin">{selectedClass?.text}</SelectValue>
                                 </SelectTrigger>
                               </FormControl>
@@ -712,15 +715,15 @@ export default function RPDYonlendirme() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-gray-700 font-medium text-sm sm:text-base">
-                          <Users className="w-4 h-4 text-purple-500" />
+                          <Users className="w-4 h-4 text-[hsl(28_72%_48%)]" />
                           Öğrenci *
                           {ogrenciList.length > 0 && (
-                            <Badge variant="secondary" className="text-[10px] sm:text-xs bg-purple-100 text-purple-700">{ogrenciList.length}</Badge>
+                            <Badge variant="secondary" className="text-[10px] sm:text-xs bg-[hsl(28_70%_92%)] text-[hsl(28_72%_38%)]">{ogrenciList.length}</Badge>
                           )}
                         </FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger className={`border-2 border-gray-200 hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99] ${ogrenciLoading ? 'animate-pulse' : ''}`}>
+                            <SelectTrigger className={`border-2 border-gray-200 hover:border-[hsl(28_70%_60%)] focus:border-[hsl(28_74%_50%)] focus:ring-4 focus:ring-[hsl(28_74%_50%/0.18)] transition-all duration-300 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:shadow-md min-h-12 sm:min-h-13 px-3 sm:px-4 text-sm sm:text-base w-full rounded-xl active:scale-[0.99] ${ogrenciLoading ? 'animate-pulse' : ''}`}>
                               <SelectValue placeholder={ogrenciLoading ? "🔄 Yükleniyor..." : "👤 Öğrenci seçin"} />
                             </SelectTrigger>
                           </FormControl>
@@ -856,7 +859,7 @@ export default function RPDYonlendirme() {
 
                   {/* Submit Button - Mobile Enhanced */}
                   <div className="animate-fade-in" style={{ animationDelay: '0.35s' }}>
-                  <Button type="submit" className="w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 min-h-13 sm:min-h-14 text-sm sm:text-base font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform active:scale-[0.98] hover:scale-[1.01] transition-all duration-300 relative overflow-hidden group rounded-xl">
+                  <Button type="submit" className="w-full bg-linear-to-r from-[hsl(176_54%_28%)] via-[hsl(176_52%_32%)] to-[hsl(28_74%_50%)] hover:from-[hsl(176_54%_24%)] hover:via-[hsl(176_52%_28%)] hover:to-[hsl(28_74%_46%)] min-h-13 sm:min-h-14 text-sm sm:text-base font-semibold shadow-lg shadow-[hsl(176_52%_30%/0.30)] hover:shadow-xl hover:shadow-[hsl(176_52%_30%/0.40)] transform active:scale-[0.98] hover:scale-[1.01] transition-all duration-300 relative overflow-hidden group rounded-xl">
                     <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                     <div className="flex items-center justify-center gap-2 relative z-10">
                       <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
@@ -904,7 +907,7 @@ export default function RPDYonlendirme() {
                     <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-linear-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
                       <Users className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 animate-pulse" />
                     </div>
-                    <div className="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-linear-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                    <div className="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-linear-to-r from-[hsl(176_52%_45%/0.20)] to-[hsl(28_78%_55%/0.20)] rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                   </div>
                   <p className="text-sm sm:text-base font-medium text-gray-600 animate-fade-in">Henüz öğrenci yok</p>
                   <p className="text-xs sm:text-sm text-gray-400 mt-1 sm:mt-2">Forma ekleyince burada görünecek</p>
@@ -936,14 +939,14 @@ export default function RPDYonlendirme() {
                         </div>
                         <div className="ml-9 sm:ml-10 space-y-0.5 sm:space-y-1">
                           <div className="text-[10px] sm:text-xs md:text-sm text-gray-600 flex items-center gap-1">
-                            <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-indigo-500 shrink-0" />
+                            <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[hsl(176_52%_36%)] shrink-0" />
                             <span className="truncate">{ogrenci.sinifSube}</span>
                           </div>
                           <div className="text-[10px] sm:text-xs md:text-sm text-gray-600 flex items-center gap-1">
-                            <UserCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-500 shrink-0" />
+                            <UserCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[hsl(176_52%_36%)] shrink-0" />
                             <span className="truncate">{ogrenci.ogretmenAdi}</span>
                           </div>
-                          <Badge variant="outline" className="mt-1 sm:mt-2 text-[10px] sm:text-xs bg-linear-to-r from-blue-50 to-purple-50 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-purple-100 transition-all duration-300 shadow-sm">
+                          <Badge variant="outline" className="mt-1 sm:mt-2 text-[10px] sm:text-xs bg-linear-to-r from-[hsl(176_40%_94%)] to-[hsl(28_70%_94%)] border-[hsl(176_38%_80%)] text-[hsl(176_56%_26%)] hover:from-[hsl(176_40%_90%)] hover:to-[hsl(28_70%_90%)] transition-all duration-300 shadow-sm">
                             <Target className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                             <span className="truncate">{ogrenci.yonlendirmeNedeni}</span>
                           </Badge>
@@ -1033,7 +1036,7 @@ export default function RPDYonlendirme() {
                         <span><strong>{yonlendirilenOgrenciler.length}</strong> öğrenci</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock className="w-4 h-4 text-blue-500" />
+                        <Clock className="w-4 h-4 text-[hsl(176_52%_36%)]" />
                         <span>{currentTime.toLocaleTimeString('tr-TR')}</span>
                       </div>
                     </div>

@@ -31,7 +31,6 @@ import {
   BellOff
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // Takip hatırlatıcı tipi
 interface FollowUp {
@@ -118,13 +117,11 @@ export default function TakipHatirlaticilarPage() {
   const loadFollowUps = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('follow_ups')
-        .select('*')
-        .order('due_date', { ascending: true });
-      
-      if (error) throw error;
-      
+      const res = await fetch('/api/follow-ups');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Yüklenemedi');
+      const data = json.data as FollowUp[];
+
       // Gecikmiş olanları otomatik olarak işaretle
       const today = new Date().toISOString().split('T')[0];
       const updatedData = (data || []).map(item => {
@@ -156,22 +153,26 @@ export default function TakipHatirlaticilarPage() {
     
     try {
       if (editingFollowUp) {
-        const { error } = await supabase
-          .from('follow_ups')
-          .update({
+        const res = await fetch('/api/follow-ups', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingFollowUp.id,
             ...formData,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingFollowUp.id);
-        
-        if (error) throw error;
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Güncellenemedi');
         toast.success('Hatırlatıcı güncellendi');
       } else {
-        const { error } = await supabase
-          .from('follow_ups')
-          .insert(formData);
-        
-        if (error) throw error;
+        const res = await fetch('/api/follow-ups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Oluşturulamadı');
         toast.success('Hatırlatıcı oluşturuldu');
       }
       
@@ -186,16 +187,18 @@ export default function TakipHatirlaticilarPage() {
   // Tamamla
   const handleComplete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('follow_ups')
-        .update({
+      const res = await fetch('/api/follow-ups', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
           status: 'completed',
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .eq('id', id);
-      
-      if (error) throw error;
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'İşlem başarısız');
       toast.success('Tamamlandı olarak işaretlendi');
       loadFollowUps();
     } catch (error) {
@@ -209,9 +212,10 @@ export default function TakipHatirlaticilarPage() {
     if (!confirm('Bu hatırlatıcıyı silmek istediğinize emin misiniz?')) return;
     
     try {
-      const { error } = await supabase.from('follow_ups').delete().eq('id', id);
-      if (error) throw error;
-      
+      const res = await fetch('/api/follow-ups?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Silme sırasında hata oluştu');
+
       toast.success('Hatırlatıcı silindi');
       loadFollowUps();
     } catch (error) {

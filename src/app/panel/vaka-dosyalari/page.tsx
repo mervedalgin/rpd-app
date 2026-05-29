@@ -43,7 +43,6 @@ import {
   Loader2
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { ReferralRecord, DisiplinRecord, Appointment } from "@/types";
 
 // Vaka notu tipi
@@ -115,15 +114,27 @@ export default function VakaDosyalariPage() {
     const loadStudents = async () => {
       try {
         // Tüm kaynaklardan benzersiz öğrenci listesi oluştur
-        const [refResult, appResult, discResult] = await Promise.all([
-          supabase.from('referrals').select('student_name, class_display, class_key'),
-          supabase.from('appointments').select('participant_name, participant_class'),
-          supabase.from('discipline_records').select('student_name, class_display, class_key')
+        const [refRes, appRes, discRes] = await Promise.all([
+          fetch('/api/referrals'),
+          fetch('/api/appointments'),
+          fetch('/api/discipline')
         ]);
-        
+        const [refJson, appJson, discJson] = await Promise.all([
+          refRes.json(),
+          appRes.json(),
+          discRes.json()
+        ]);
+        if (!refRes.ok) throw new Error(refJson.error || 'Yüklenemedi');
+        if (!appRes.ok) throw new Error(appJson.error || 'Yüklenemedi');
+        if (!discRes.ok) throw new Error(discJson.error || 'Yüklenemedi');
+
+        const refData = (refJson.data || []) as ReferralRecord[];
+        const appData = (appJson.appointments || []) as Appointment[];
+        const discData = (discJson.records || []) as DisiplinRecord[];
+
         const studentMap = new Map<string, { name: string; class_display: string; class_key: string }>();
-        
-        refResult.data?.forEach(r => {
+
+        refData.forEach(r => {
           if (r.student_name && !studentMap.has(r.student_name)) {
             studentMap.set(r.student_name, {
               name: r.student_name,
@@ -133,7 +144,7 @@ export default function VakaDosyalariPage() {
           }
         });
         
-        appResult.data?.forEach(a => {
+        appData.forEach(a => {
           if (a.participant_name && !studentMap.has(a.participant_name)) {
             studentMap.set(a.participant_name, {
               name: a.participant_name,
@@ -142,8 +153,8 @@ export default function VakaDosyalariPage() {
             });
           }
         });
-        
-        discResult.data?.forEach(d => {
+
+        discData.forEach(d => {
           if (d.student_name && !studentMap.has(d.student_name)) {
             studentMap.set(d.student_name, {
               name: d.student_name,
@@ -180,22 +191,43 @@ export default function VakaDosyalariPage() {
   const loadStudentData = async (studentName: string) => {
     setIsLoading(true);
     try {
-      const [refResult, appResult, discResult, noteResult, contactResult, ramResult] = await Promise.all([
-        supabase.from('referrals').select('*').eq('student_name', studentName).order('created_at', { ascending: false }),
-        supabase.from('appointments').select('*').eq('participant_name', studentName).order('appointment_date', { ascending: false }),
-        supabase.from('discipline_records').select('*').eq('student_name', studentName).order('created_at', { ascending: false }),
-        supabase.from('case_notes').select('*').eq('student_name', studentName).order('note_date', { ascending: false }),
-        supabase.from('parent_contacts').select('*').eq('student_name', studentName).order('contact_date', { ascending: false }),
-        supabase.from('ram_referrals').select('*').eq('student_name', studentName).order('created_at', { ascending: false })
+      const [refRes, appRes, discRes, noteRes, contactRes, ramRes] = await Promise.all([
+        fetch('/api/referrals'),
+        fetch('/api/appointments'),
+        fetch('/api/discipline'),
+        fetch('/api/case-notes'),
+        fetch('/api/parent-contacts'),
+        fetch('/api/ram-referrals')
       ]);
-      
-      setReferrals(refResult.data || []);
-      setAppointments(appResult.data || []);
-      setDisciplines(discResult.data || []);
-      setCaseNotes(noteResult.data || []);
-      setParentContacts(contactResult.data || []);
-      setRamReferrals(ramResult.data || []);
-      
+      const [refJson, appJson, discJson, noteJson, contactJson, ramJson] = await Promise.all([
+        refRes.json(),
+        appRes.json(),
+        discRes.json(),
+        noteRes.json(),
+        contactRes.json(),
+        ramRes.json()
+      ]);
+      if (!refRes.ok) throw new Error(refJson.error || 'Yüklenemedi');
+      if (!appRes.ok) throw new Error(appJson.error || 'Yüklenemedi');
+      if (!discRes.ok) throw new Error(discJson.error || 'Yüklenemedi');
+      if (!noteRes.ok) throw new Error(noteJson.error || 'Yüklenemedi');
+      if (!contactRes.ok) throw new Error(contactJson.error || 'Yüklenemedi');
+      if (!ramRes.ok) throw new Error(ramJson.error || 'Yüklenemedi');
+
+      const allReferrals = (refJson.data || []) as ReferralRecord[];
+      const allAppointments = (appJson.appointments || []) as Appointment[];
+      const allDisciplines = (discJson.records || []) as DisiplinRecord[];
+      const allNotes = (noteJson.data || []) as CaseNote[];
+      const allContacts = (contactJson.data || []) as Record<string, unknown>[];
+      const allRam = (ramJson.data || []) as Record<string, unknown>[];
+
+      setReferrals(allReferrals.filter(r => r.student_name === studentName));
+      setAppointments(allAppointments.filter(a => a.participant_name === studentName));
+      setDisciplines(allDisciplines.filter(d => d.student_name === studentName));
+      setCaseNotes(allNotes.filter(n => n.student_name === studentName));
+      setParentContacts(allContacts.filter(p => (p as { student_name?: string }).student_name === studentName));
+      setRamReferrals(allRam.filter(r => (r as { student_name?: string }).student_name === studentName));
+
       // Sınıf bilgisini al
       const student = students.find(s => s.name === studentName);
       if (student) {
@@ -344,19 +376,23 @@ export default function VakaDosyalariPage() {
     
     try {
       const student = students.find(s => s.name === selectedStudent);
-      const { error } = await supabase.from('case_notes').insert({
-        student_name: selectedStudent,
-        class_key: student?.class_key || '',
-        class_display: student?.class_display || '',
-        note_date: new Date().toISOString().split('T')[0],
-        note_type: newNote.note_type,
-        content: newNote.content,
-        is_confidential: newNote.is_confidential,
-        tags: newNote.tags
+      const res = await fetch('/api/case-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_name: selectedStudent,
+          class_key: student?.class_key || '',
+          class_display: student?.class_display || '',
+          note_date: new Date().toISOString().split('T')[0],
+          note_type: newNote.note_type,
+          content: newNote.content,
+          is_confidential: newNote.is_confidential,
+          tags: newNote.tags
+        })
       });
-      
-      if (error) throw error;
-      
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Oluşturulamadı');
+
       toast.success('Not başarıyla eklendi');
       setShowNoteForm(false);
       setNewNote({ note_type: 'gozlem', content: '', is_confidential: false, tags: [] });

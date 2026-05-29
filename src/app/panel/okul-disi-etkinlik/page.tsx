@@ -38,7 +38,6 @@ import {
   Navigation
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   type OkulDisiEtkinlik,
@@ -141,12 +140,13 @@ export default function OkulDisiEtkinlikPage() {
   const loadActivities = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("okul_disi_etkinlikler")
-        .select("*")
-        .order("etkinlik_tarihi", { ascending: false });
-      if (error) throw error;
-      setActivities((data as OkulDisiEtkinlik[]) || []);
+      const res = await fetch("/api/okul-disi-etkinlikler");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Yüklenemedi");
+      const data = ((json.data as OkulDisiEtkinlik[]) || []).slice().sort(
+        (a, b) => (b.etkinlik_tarihi || "").localeCompare(a.etkinlik_tarihi || "")
+      );
+      setActivities(data);
     } catch (error) {
       console.error("Etkinlikler yüklenemedi:", error);
       toast.error("Etkinlikler yüklenirken hata oluştu");
@@ -177,8 +177,10 @@ export default function OkulDisiEtkinlikPage() {
 
   const loadSettings = async () => {
     try {
-      const { data, error } = await supabase.from("settings").select("*");
-      if (error) throw error;
+      const res = await fetch("/api/settings");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Yüklenemedi");
+      const data = json.data as { setting_key: string; setting_value: unknown }[] | undefined;
       if (data && data.length > 0) {
         const loaded = { ...DEFAULT_SETTINGS };
         data.forEach((s: { setting_key: string; setting_value: unknown }) => {
@@ -206,12 +208,22 @@ export default function OkulDisiEtkinlikPage() {
 
     try {
       if (editingId) {
-        const { error } = await supabase.from("okul_disi_etkinlikler").update({ ...saveData, updated_at: new Date().toISOString() }).eq("id", editingId);
-        if (error) throw error;
+        const res = await fetch("/api/okul-disi-etkinlikler", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingId, ...saveData, updated_at: new Date().toISOString() }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Kaydedilemedi");
         toast.success("Etkinlik güncellendi");
       } else {
-        const { error } = await supabase.from("okul_disi_etkinlikler").insert(saveData);
-        if (error) throw error;
+        const res = await fetch("/api/okul-disi-etkinlikler", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(saveData),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Oluşturulamadı");
         toast.success("Etkinlik oluşturuldu");
       }
       resetForm();
@@ -225,8 +237,9 @@ export default function OkulDisiEtkinlikPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Bu etkinliği silmek istediğinize emin misiniz?")) return;
     try {
-      const { error } = await supabase.from("okul_disi_etkinlikler").delete().eq("id", id);
-      if (error) throw error;
+      const res = await fetch("/api/okul-disi-etkinlikler?id=" + encodeURIComponent(id), { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Silinemedi");
       toast.success("Etkinlik silindi");
       loadActivities();
     } catch (error) {

@@ -26,7 +26,6 @@ import {
   XCircle
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 interface PeriodStats {
   referrals: number;
@@ -132,53 +131,42 @@ export default function TrendAnaliziPage() {
   
   // Dönem verilerini çek
   const fetchPeriodStats = async (startDate: string, endDate: string): Promise<PeriodStats> => {
+    const range = `from=${encodeURIComponent(startDate)}&to=${encodeURIComponent(endDate)}`;
+
+    // created_at bazlı filtreler -> ?from=&to= query param ile API'ye gönderilir
+    const fetchJson = async (url: string) => {
+      const res = await fetch(url);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Yüklenemedi');
+      return json;
+    };
+
     const [
-      referralsRes,
-      disciplineRes,
-      activitiesRes,
-      ramRes,
-      parentContactsRes,
-      riskRes
+      referralsJson,
+      disciplineJson,
+      activitiesJson,
+      ramJson,
+      parentContactsJson,
+      riskJson
     ] = await Promise.all([
-      supabase
-        .from('referrals')
-        .select('id, student_name, status')
-        .gte('created_at', startDate)
-        .lte('created_at', endDate),
-      
-      supabase
-        .from('discipline')
-        .select('id, student_name')
-        .gte('created_at', startDate)
-        .lte('created_at', endDate),
-      
-      supabase
-        .from('class_activities')
-        .select('id')
-        .gte('activity_date', startDate)
-        .lte('activity_date', endDate),
-      
-      supabase
-        .from('ram_referrals')
-        .select('id')
-        .gte('created_at', startDate)
-        .lte('created_at', endDate),
-      
-      supabase
-        .from('parent_contacts')
-        .select('id')
-        .gte('contact_date', startDate)
-        .lte('contact_date', endDate),
-      
-      supabase
-        .from('risk_students')
-        .select('id')
-        .gte('created_at', startDate)
-        .lte('created_at', endDate)
+      fetchJson(`/api/referrals?${range}`),
+      fetchJson(`/api/discipline?${range}`),
+      // class_activities -> activity_date kolonuna göre filtreleniyor; tüm liste çekilip JS'te filtrelenir
+      fetchJson(`/api/class-activities`),
+      fetchJson(`/api/ram-referrals?${range}`),
+      // parent_contacts -> contact_date kolonuna göre filtreleniyor; tüm liste çekilip JS'te filtrelenir
+      fetchJson(`/api/parent-contacts`),
+      fetchJson(`/api/risk-students?${range}`)
     ]);
-    
-    const referrals = referralsRes.data || [];
-    const discipline = disciplineRes.data || [];
+
+    const referrals = (referralsJson.data || []) as Array<{ id: string; student_name: string; status: string }>;
+    const discipline = (disciplineJson.records || []) as Array<{ id: string; student_name: string }>;
+
+    // activity_date / contact_date filtreleri client tarafında uygulanır (mevcut davranış korunur)
+    const classActivities = (activitiesJson.data || []) as Array<{ id: string; activity_date?: string }>;
+    const filteredActivities = classActivities.filter((a) => a.activity_date && a.activity_date >= startDate && a.activity_date <= endDate);
+    const parentContacts = (parentContactsJson.data || []) as Array<{ id: string; contact_date?: string }>;
+    const filteredParentContacts = parentContacts.filter((p) => p.contact_date && p.contact_date >= startDate && p.contact_date <= endDate);
     
     // Benzersiz öğrenciler
     const uniqueStudents = new Set([
@@ -190,10 +178,10 @@ export default function TrendAnaliziPage() {
       referrals: referrals.length,
       discipline: discipline.length,
       appointments: referrals.filter((r: any) => r.status === 'completed').length,
-      classActivities: (activitiesRes.data || []).length,
-      ramReferrals: (ramRes.data || []).length,
-      parentContacts: (parentContactsRes.data || []).length,
-      riskStudents: (riskRes.data || []).length,
+      classActivities: filteredActivities.length,
+      ramReferrals: ((ramJson.data || []) as unknown[]).length,
+      parentContacts: filteredParentContacts.length,
+      riskStudents: ((riskJson.data || []) as unknown[]).length,
       uniqueStudents: uniqueStudents.size
     };
   };

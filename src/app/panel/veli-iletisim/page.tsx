@@ -31,7 +31,6 @@ import {
   FileText
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // Veli iletişim tipi
 interface ParentContact {
@@ -123,13 +122,12 @@ export default function VeliIletisimPage() {
   const loadContacts = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('parent_contacts')
-        .select('*')
-        .order('contact_date', { ascending: false });
-      
-      if (error) throw error;
-      setContacts(data || []);
+      const res = await fetch('/api/parent-contacts');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Yüklenemedi');
+      const data = (json.data || []) as ParentContact[];
+      data.sort((a, b) => (b.contact_date || '').localeCompare(a.contact_date || ''));
+      setContacts(data);
     } catch (error) {
       console.error('Veli iletişimleri yüklenemedi:', error);
       toast.error('Veriler yüklenirken hata oluştu');
@@ -151,22 +149,26 @@ export default function VeliIletisimPage() {
     
     try {
       if (editingContact) {
-        const { error } = await supabase
-          .from('parent_contacts')
-          .update({
+        const res = await fetch('/api/parent-contacts', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingContact.id,
             ...formData,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingContact.id);
-        
-        if (error) throw error;
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Güncellenemedi');
         toast.success('İletişim kaydı güncellendi');
       } else {
-        const { error } = await supabase
-          .from('parent_contacts')
-          .insert(formData);
-        
-        if (error) throw error;
+        const res = await fetch('/api/parent-contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Oluşturulamadı');
         toast.success('İletişim kaydedildi');
       }
       
@@ -183,9 +185,10 @@ export default function VeliIletisimPage() {
     if (!confirm('Bu iletişim kaydını silmek istediğinize emin misiniz?')) return;
     
     try {
-      const { error } = await supabase.from('parent_contacts').delete().eq('id', id);
-      if (error) throw error;
-      
+      const res = await fetch('/api/parent-contacts?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Silinemedi');
+
       toast.success('İletişim kaydı silindi');
       loadContacts();
     } catch (error) {

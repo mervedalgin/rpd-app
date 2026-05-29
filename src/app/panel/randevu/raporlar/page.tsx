@@ -35,7 +35,6 @@ import {
   File,
   History
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, TableCell, TableRow, Table, WidthType } from "docx";
 import { saveAs } from "file-saver";
 import { Appointment, PARTICIPANT_TYPES } from "@/types";
@@ -1043,23 +1042,24 @@ export default function RandevuRaporlariPage() {
 
       if (currentReportId) {
         // Güncelle
-        const { error } = await supabase!
-          .from("appointment_reports")
-          .update(reportData)
-          .eq("id", currentReportId);
-        
-        if (error) throw error;
+        const res = await fetch("/api/appointment-reports", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: currentReportId, ...reportData }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Güncellenemedi");
         toast.success("Rapor güncellendi");
       } else {
         // Yeni kaydet
-        const { data, error } = await supabase!
-          .from("appointment_reports")
-          .insert(reportData)
-          .select()
-          .single();
-        
-        if (error) throw error;
-        setCurrentReportId(data.id);
+        const res = await fetch("/api/appointment-reports", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reportData),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Oluşturulamadı");
+        setCurrentReportId(json.data.id);
         toast.success("Rapor kaydedildi");
       }
       
@@ -1083,13 +1083,12 @@ export default function RandevuRaporlariPage() {
     if (!confirm("Bu raporu silmek istediğinizden emin misiniz?")) return;
 
     try {
-      const { error } = await supabase!
-        .from("appointment_reports")
-        .delete()
-        .eq("id", currentReportId);
-      
-      if (error) throw error;
-      
+      const res = await fetch("/api/appointment-reports?id=" + encodeURIComponent(currentReportId), {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Silinemedi");
+
       setCurrentReportId(null);
       toast.success("Rapor silindi");
       loadSavedReports();
@@ -1101,16 +1100,11 @@ export default function RandevuRaporlariPage() {
 
   // Kaydedilmiş raporları yükle
   const loadSavedReports = async () => {
-    if (!supabase) return;
-    
     try {
-      const { data, error } = await supabase
-        .from("appointment_reports")
-        .select("*")
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      setSavedReports(data || []);
+      const res = await fetch("/api/appointment-reports");
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Yüklenemedi");
+      setSavedReports(json.data || []);
     } catch (error) {
       console.error("Kaydedilmiş raporlar yüklenirken hata:", error);
     }
