@@ -12,4 +12,17 @@ const _supabaseClient: SupabaseClient | null = supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-export const supabase = _supabaseClient as SupabaseClient;
+// Env eksikse `null as SupabaseClient` yerine, erisimde NET hata firlatan bir
+// Proxy don. Boylece kullanim noktalarinda "Cannot read properties of null"
+// gibi anlamsiz bir crash yerine yapilandirma eksikligi acikca gorunur.
+// (Tip `SupabaseClient` kaliyor; cagri noktalarinda guard zorunlulugu olusmaz.)
+const missingConfigProxy = new Proxy({} as SupabaseClient, {
+  get() {
+    throw new Error(
+      "Supabase istemcisi yapilandirilmamis. NEXT_PUBLIC_SUPABASE_URL ve " +
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY ortam degiskenlerini ayarlayin."
+    );
+  },
+});
+
+export const supabase = (_supabaseClient ?? missingConfigProxy) as SupabaseClient;

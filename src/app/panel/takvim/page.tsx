@@ -27,7 +27,6 @@ import {
   AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { Appointment, APPOINTMENT_STATUS, PARTICIPANT_TYPES, APPOINTMENT_LOCATIONS } from "@/types";
 import Link from "next/link";
 
@@ -108,33 +107,52 @@ export default function TakvimPage() {
       const endStr = endDate.toISOString().split('T')[0];
       
       const [appResult, actResult, taskResult, followResult] = await Promise.all([
-        supabase.from('appointments')
-          .select('*')
-          .gte('appointment_date', startStr)
-          .lte('appointment_date', endStr)
-          .order('appointment_date', { ascending: true }),
-        supabase.from('class_activities')
-          .select('*')
-          .gte('activity_date', startStr)
-          .lte('activity_date', endStr)
-          .order('activity_date', { ascending: true }),
-        supabase.from('tasks')
-          .select('*')
-          .gte('due_date', startStr)
-          .lte('due_date', endStr)
-          .order('due_date', { ascending: true }),
-        supabase.from('follow_ups')
-          .select('*')
-          .gte('follow_up_date', startStr)
-          .lte('follow_up_date', endStr)
-          .eq('status', 'pending')
-          .order('follow_up_date', { ascending: true })
+        // Randevular: appointment_date aralığı endpoint'te destekleniyor (?from=&to=)
+        fetch(`/api/appointments?from=${startStr}&to=${endStr}`),
+        // Diğerleri: generic endpoint from/to'yu created_at üzerinde filtreler,
+        // bu yüzden tüm listeyi çekip tarih aralığını JS'te uyguluyoruz (mevcut davranış korunur)
+        fetch('/api/class-activities'),
+        fetch('/api/tasks'),
+        fetch('/api/follow-ups'),
       ]);
-      
-      setAppointments(appResult.data || []);
-      setActivities(actResult.data || []);
-      setTasks(taskResult.data || []);
-      setFollowUps(followResult.data || []);
+
+      const appJson = await appResult.json();
+      const actJson = await actResult.json();
+      const taskJson = await taskResult.json();
+      const followJson = await followResult.json();
+
+      if (!appResult.ok) throw new Error(appJson.error || 'Randevular yüklenemedi');
+      if (!actResult.ok) throw new Error(actJson.error || 'Etkinlikler yüklenemedi');
+      if (!taskResult.ok) throw new Error(taskJson.error || 'Görevler yüklenemedi');
+      if (!followResult.ok) throw new Error(followJson.error || 'Takipler yüklenemedi');
+
+      const allActivities = (actJson.data || []) as ClassActivity[];
+      const allTasks = (taskJson.data || []) as Record<string, unknown>[];
+      const allFollowUps = (followJson.data || []) as Record<string, unknown>[];
+
+      setAppointments((appJson.appointments || []) as Appointment[]);
+      setActivities(
+        allActivities.filter(
+          (a) => a.activity_date >= startStr && a.activity_date <= endStr
+        )
+      );
+      setTasks(
+        allTasks.filter((t) => {
+          const due = (t as { due_date?: string }).due_date;
+          return !!due && due >= startStr && due <= endStr;
+        })
+      );
+      setFollowUps(
+        allFollowUps.filter((f) => {
+          const fd = (f as { follow_up_date?: string }).follow_up_date;
+          return (
+            (f as { status?: string }).status === 'pending' &&
+            !!fd &&
+            fd >= startStr &&
+            fd <= endStr
+          );
+        })
+      );
     } catch (error) {
       console.error('Takvim verileri yüklenemedi:', error);
     } finally {

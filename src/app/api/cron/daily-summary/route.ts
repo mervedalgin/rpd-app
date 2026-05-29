@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseServer } from '@/lib/supabase-server';
+import { isAuthorizedCron } from '@/lib/cron-auth';
 
 const supabase = getSupabaseServer();
 
@@ -9,7 +10,11 @@ export const runtime = 'nodejs';
 // Örnek: cron-job.org, Vercel Cron, GitHub Actions, vb.
 // Hafta içi her gün saat 17:00'de çağrılmalı
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!isAuthorizedCron(request)) {
+    return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
+  }
+
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -125,7 +130,7 @@ export async function GET() {
 }
 
 // Manuel tetikleme için POST
-export async function POST() {
+export async function POST(request: Request) {
   // POST ile manuel olarak da tetiklenebilir (test amaçlı)
-  return GET();
+  return GET(request);
 }

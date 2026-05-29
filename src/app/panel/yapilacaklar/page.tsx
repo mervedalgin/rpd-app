@@ -32,7 +32,6 @@ import {
   CalendarCheck
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // Görev tipi
 interface Task {
@@ -100,13 +99,10 @@ export default function YapilacaklarPage() {
   const loadTasks = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setTasks(data || []);
+      const res = await fetch('/api/tasks');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Yüklenemedi');
+      setTasks((json.data as Task[]) || []);
     } catch (error) {
       console.error('Görevler yüklenemedi:', error);
       toast.error('Görevler yüklenirken hata oluştu');
@@ -130,10 +126,14 @@ export default function YapilacaklarPage() {
         due_time: newTask.due_time || null
       };
       
-      const { error } = await supabase.from('tasks').insert(taskData);
-      
-      if (error) throw error;
-      
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(taskData)
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Oluşturulamadı');
+
       toast.success('Görev eklendi');
       setShowForm(false);
       setNewTask({
@@ -167,13 +167,14 @@ export default function YapilacaklarPage() {
         updates.completed_at = undefined;
       }
       
-      const { error } = await supabase
-        .from('tasks')
-        .update(updates)
-        .eq('id', task.id);
-      
-      if (error) throw error;
-      
+      const res = await fetch('/api/tasks', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: task.id, ...updates })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Güncellenemedi');
+
       toast.success(newStatus === 'completed' ? 'Görev tamamlandı!' : 'Görev yeniden açıldı');
       loadTasks();
     } catch (error) {
@@ -187,9 +188,10 @@ export default function YapilacaklarPage() {
     if (!confirm('Bu görevi silmek istediğinize emin misiniz?')) return;
     
     try {
-      const { error } = await supabase.from('tasks').delete().eq('id', taskId);
-      if (error) throw error;
-      
+      const res = await fetch('/api/tasks?id=' + encodeURIComponent(taskId), { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Silinemedi');
+
       toast.success('Görev silindi');
       loadTasks();
     } catch (error) {

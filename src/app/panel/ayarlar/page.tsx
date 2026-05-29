@@ -33,7 +33,6 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // Ayar tipi
 interface Setting {
@@ -94,12 +93,11 @@ export default function AyarlarPage() {
   const loadSettings = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('*');
-      
-      if (error) throw error;
-      
+      const res = await fetch('/api/settings');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Ayarlar yüklenemedi');
+      const data = json.data as Setting[];
+
       if (data && data.length > 0) {
         const loadedSettings: Record<string, unknown> = { ...DEFAULT_SETTINGS };
         data.forEach((s: Setting) => {
@@ -132,22 +130,22 @@ export default function AyarlarPage() {
   const saveSettings = async () => {
     setIsSaving(true);
     try {
-      // Her ayarı ayrı ayrı upsert et
+      // Tüm ayarları tek POST çağrısında gönder
       const settingsArray = Object.entries(settings).map(([key, value]) => ({
         setting_key: key,
         setting_value: JSON.stringify(value),
         category: getCategoryForKey(key),
         updated_at: new Date().toISOString()
       }));
-      
-      for (const setting of settingsArray) {
-        const { error } = await supabase
-          .from('settings')
-          .upsert(setting, { onConflict: 'setting_key' });
-        
-        if (error) throw error;
-      }
-      
+
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: settingsArray })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Ayarlar kaydedilemedi');
+
       toast.success('Ayarlar başarıyla kaydedildi');
       setHasChanges(false);
     } catch (error) {

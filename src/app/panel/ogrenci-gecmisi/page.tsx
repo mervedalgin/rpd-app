@@ -172,10 +172,15 @@ export default function OgrenciGecmisiPage() {
 
     setLoadingHistory(true);
     try {
-      // Yönlendirmeleri getir
-      const referralRes = await fetch(
-        `/api/student-history?studentName=${encodeURIComponent(studentName)}${classDisplay ? `&classDisplay=${encodeURIComponent(classDisplay)}` : ''}`
-      );
+      // Yönlendirme ve disiplin istekleri birbirinden bağımsız; paralel çek.
+      const [referralRes, disciplineRes] = await Promise.all([
+        fetch(
+          `/api/student-history?studentName=${encodeURIComponent(studentName)}${classDisplay ? `&classDisplay=${encodeURIComponent(classDisplay)}` : ''}`
+        ),
+        fetch(`/api/discipline?studentName=${encodeURIComponent(studentName)}`),
+      ]);
+
+      // Yönlendirmeleri işle
       if (referralRes.ok) {
         const data = await referralRes.json();
         setReferrals(data.referrals || []);
@@ -194,10 +199,7 @@ export default function OgrenciGecmisiPage() {
         }
       }
 
-      // Disiplin kayıtlarını getir
-      const disciplineRes = await fetch(
-        `/api/discipline?studentName=${encodeURIComponent(studentName)}`
-      );
+      // Disiplin kayıtlarını işle (gerçek öğrenci adı için daha güvenilir kaynak)
       if (disciplineRes.ok) {
         const data = await disciplineRes.json();
         setDisciplineRecords(data.records || []);

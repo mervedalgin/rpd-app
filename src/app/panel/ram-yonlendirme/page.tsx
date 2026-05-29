@@ -32,7 +32,6 @@ import {
   ArrowRight
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 
 // RAM yönlendirme tipi
 interface RamReferral {
@@ -124,13 +123,10 @@ export default function RamYonlendirmePage() {
   const loadReferrals = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('ram_referrals')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setReferrals(data || []);
+      const res = await fetch('/api/ram-referrals');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Veriler yüklenemedi');
+      setReferrals((json.data as RamReferral[]) || []);
     } catch (error) {
       console.error('RAM yönlendirmeleri yüklenemedi:', error);
       toast.error('Veriler yüklenirken hata oluştu');
@@ -152,22 +148,26 @@ export default function RamYonlendirmePage() {
     
     try {
       if (editingReferral) {
-        const { error } = await supabase
-          .from('ram_referrals')
-          .update({
+        const res = await fetch('/api/ram-referrals', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingReferral.id,
             ...formData,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingReferral.id);
-        
-        if (error) throw error;
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Güncellenemedi');
         toast.success('Kayıt güncellendi');
       } else {
-        const { error } = await supabase
-          .from('ram_referrals')
-          .insert(formData);
-        
-        if (error) throw error;
+        const res = await fetch('/api/ram-referrals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Oluşturulamadı');
         toast.success('RAM yönlendirmesi oluşturuldu');
       }
       
@@ -184,9 +184,10 @@ export default function RamYonlendirmePage() {
     if (!confirm('Bu RAM yönlendirmesini silmek istediğinize emin misiniz?')) return;
     
     try {
-      const { error } = await supabase.from('ram_referrals').delete().eq('id', id);
-      if (error) throw error;
-      
+      const res = await fetch('/api/ram-referrals?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Silinemedi');
+
       toast.success('Yönlendirme silindi');
       loadReferrals();
     } catch (error) {

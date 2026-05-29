@@ -4,6 +4,9 @@ import { getSupabaseServer } from '@/lib/supabase-server';
 const supabase = getSupabaseServer();
 
 export const runtime = 'nodejs';
+// Dashboard istatistikleri saniye saniye degismez; kisa cache ile her
+// gezinmede tum referrals tablosunun yeniden cekilmesini onler.
+export const revalidate = 60;
 
 export async function GET(request: NextRequest) {
   if (!supabase) {
@@ -20,8 +23,10 @@ export async function GET(request: NextRequest) {
     const teacher = searchParams.get('teacher');
     const classKey = searchParams.get('class');
 
-    // Basit: eğer tarih aralığı verilmemişse tüm kayıtları al
-    let query = supabase.from('referrals').select('*', { count: 'exact', head: false });
+    // Sadece istatistik hesabinda kullanilan kolonlari cek (payload'i kucult).
+    let query = supabase
+      .from('referrals')
+      .select('student_name, class_display, reason, teacher_name, created_at', { count: 'exact', head: false });
 
     if (from) {
       query = query.gte('created_at', `${from}T00:00:00`);

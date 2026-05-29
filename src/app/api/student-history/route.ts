@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Öğrencinin tüm yönlendirmelerini getir
     let query = supabase
       .from('referrals')
-      .select('*')
+      .select('id, student_name, reason, teacher_name, class_display, created_at, notes')
       .ilike('student_name', `%${studentName.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`)
       .order('created_at', { ascending: false });
 

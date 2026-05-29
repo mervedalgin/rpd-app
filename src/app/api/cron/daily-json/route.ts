@@ -4,6 +4,7 @@ import { getSupabaseServer } from '@/lib/supabase-server';
 const supabase = getSupabaseServer();
 import { loadStudentData } from '@/lib/data';
 import { resolveAsama } from '@/lib/mebbis-mapping';
+import { isAuthorizedCron } from '@/lib/cron-auth';
 
 export const runtime = 'nodejs';
 
@@ -61,7 +62,11 @@ function formatDate(dateStr: string) {
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!isAuthorizedCron(request)) {
+    return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
+  }
+
   if (!supabase) {
     return NextResponse.json({ error: 'Supabase yapılandırması eksik' }, { status: 500 });
   }
@@ -169,6 +174,6 @@ export async function GET() {
 }
 
 // Manuel tetikleme için POST
-export async function POST() {
-  return GET();
+export async function POST(request: Request) {
+  return GET(request);
 }
